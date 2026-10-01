@@ -1,0 +1,143 @@
+{
+  "gate": "G0",
+  "status": "PASS",
+  "git": {
+    "sha": "602191d",
+    "dirty": false
+  },
+  "criteria": {
+    "G0.1": {
+      "status": "PASS",
+      "detail": "all tools report a version"
+    },
+    "G0.2": {
+      "status": "PASS",
+      "detail": "docker mem=11.49 GB ncpu=14"
+    },
+    "G0.3": {
+      "status": "PASS",
+      "detail": {
+        "os": "Windows-11-10.0.22631-SP0",
+        "cpu_logical": 16,
+        "disk_total_gb": 456.7,
+        "disk_free_gb": 59.1
+      }
+    },
+    "G0.4": {
+      "status": "PASS",
+      "detail": {
+        "time_to_healthy_s": 85.5,
+        "cold_start": true,
+        "services": {
+          "clickhouse": [
+            "running",
+            "healthy"
+          ],
+          "grafana": [
+            "running",
+            "healthy"
+          ],
+          "kafka": [
+            "running",
+            "healthy"
+          ],
+          "keycloak": [
+            "running",
+            "healthy"
+          ],
+          "objectstore": [
+            "running",
+            "healthy"
+          ],
+          "otel-collector": [
+            "running",
+            ""
+          ],
+          "postgres": [
+            "running",
+            "healthy"
+          ],
+          "prometheus": [
+            "running",
+            "healthy"
+          ],
+          "redis": [
+            "running",
+            "healthy"
+          ],
+          "vault": [
+            "running",
+            "healthy"
+          ]
+        },
+        "unhealthy": []
+      }
+    },
+    "G0.5": {
+      "status": "PASS",
+      "detail": {
+        "kafka": {
+          "ok": true,
+          "detail": "produce/consume round-trip ok on 3-partition topic"
+        },
+        "postgres": {
+          "ok": true,
+          "detail": "pgvector 0.8.6 / keycloak_db=1"
+        },
+        "clickhouse": {
+          "ok": true,
+          "detail": "25.8.33.6 499999500000"
+        },
+        "redis": {
+          "ok": true,
+          "detail": "auth enforced (unauthenticated PING rejected); OK"
+        },
+        "s3": {
+          "ok": true,
+          "detail": "signed bucket create/put/get ok; anonymous read rejected"
+        },
+        "keycloak": {
+          "ok": true,
+          "detail": "issuer=http://localhost:8080/realms/master"
+        },
+        "vault": {
+          "ok": true,
+          "detail": "vault 1.20.4 initialized, unsealed (dev mode)"
+        },
+        "grafana": {
+          "ok": true,
+          "detail": "Prometheus datasource healthy through Grafana"
+        }
+      }
+    },
+    "G0.7": {
+      "status": "PASS",
+      "detail": "OTLP metric g0_probe_1790845340 visible in Prometheus with value 42; targets up: ['keycloak', 'otel-app-metrics', 'otel-collector-self', 'prometheus']"
+    },
+    "G0.6": {
+      "status": "PASS",
+      "detail": {
+        "idle_mem_mb": {
+          "grafana": 91.6,
+          "keycloak": 628.8,
+          "clickhouse": 263.9,
+          "vault": 243.6,
+          "objectstore": 34.0,
+          "prometheus": 35.4,
+          "redis": 4.0,
+          "postgres": 65.0,
+          "kafka": 402.0,
+          "otel-collector": 32.5
+        },
+        "total_mb": 1800.8
+      }
+    },
+    "G0.10": {
+      "status": "PASS",
+      "detail": ".env is git-ignored"
+    }
+  },
+  "not_covered_here": [
+    "G0.8 (static checks) and G0.9 (CI) are verified by CI, see evidence/G0/ci.md"
+  ]
+}
