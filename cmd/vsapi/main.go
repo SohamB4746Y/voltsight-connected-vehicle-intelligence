@@ -18,6 +18,7 @@ import (
 	"github.com/twmb/franz-go/pkg/kgo"
 
 	"voltsight/internal/api"
+	"voltsight/internal/copilot"
 	"voltsight/internal/dbtool"
 	"voltsight/internal/dotenv"
 	"voltsight/internal/jwtverify"
@@ -31,6 +32,7 @@ func main() {
 		issuer  = flag.String("issuer", "http://localhost:8080/realms/voltsight", "OIDC issuer (exact `iss` claim)")
 		jwks    = flag.String("jwks", "http://127.0.0.1:8080/realms/voltsight/protocol/openid-connect/certs", "JWKS URL")
 		rps     = flag.Float64("rate", 50, "requests per second per user")
+		llm     = flag.String("copilot", "auto", "copilot provider: auto | stub | anthropic (auto = anthropic when ANTHROPIC_API_KEY is set)")
 	)
 	flag.Parse()
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
@@ -75,8 +77,22 @@ func main() {
 		Pool:     pool, Redis: rdb, CH: ch, Kafka: kc, RateRPS: *rps, StaticDir: *static,
 		Origins: []string{"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8081", "http://127.0.0.1:8081"},
 	})
+	if *llm == "anthropic" || (*llm == "auto" && os.Getenv("ANTHROPIC_API_KEY") != "") {
+		model := os.Getenv("COPILOT_MODEL")
+		if model == "" {
+			model = "claude-sonnet-5-5"
+		}
+		srv.SetCopilot(copilot.New(srv, &copilot.Anthropic{APIKey: os.Getenv("ANTHROPIC_API_KEY"), Model: model}))
+	} else {
+		srv.SetCopilot(copilot.New(srv, copilot.Stub{}))
+	}
 	hs := &http.Server{Addr: *listen, Handler: srv, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 30 * time.Second, IdleTimeout: 2 * time.Minute}
-	go func() { <-ctx.Done(); sctx, c := context.WithTimeout(context.Background(), 5*time.Second); defer c(); _ = hs.Shutdown(sctx) }()
+	go func() {
+		<-ctx.Done()
+		sctx, c := context.WithTimeout(context.Background(), 5*time.Second)
+		defer c()
+		_ = hs.Shutdown(sctx)
+	}()
 	fmt.Fprintf(os.Stderr, "vsapi: listening on http://%s (issuer %s)\n", *listen, *issuer)
 	if err := hs.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		must(err)

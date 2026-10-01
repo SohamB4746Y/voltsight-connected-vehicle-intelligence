@@ -56,6 +56,8 @@ func main() {
 	flag.IntVar(&cfg.ChargerOutageAt, "charger-outage-at", 0, "charger outage start (sim s)")
 	flag.IntVar(&cfg.ChargerOutageDuration, "charger-outage-duration", 0, "charger outage length (sim s)")
 	flag.Float64Var(&cfg.ChargerOutageFraction, "charger-outage-fraction", 0, "share of chargers taken out of service")
+	flag.Float64Var(&cfg.LowSoCStartMin, "low-soc-min", 0, "lowest start SoC fraction of a low-battery vehicle (default 0.14)")
+	flag.Float64Var(&cfg.LowSoCStartMax, "low-soc-max", 0, "highest start SoC fraction of a low-battery vehicle (default 0.34)")
 	flag.Float64Var(&cfg.LowSoCStartFraction, "low-soc-fraction", 0, "share of vehicles that start with a low battery (default 0.08)")
 	flag.StringVar(&cfg.TruthDir, "truth-dir", "", "write ground-truth files here")
 	flag.Parse()

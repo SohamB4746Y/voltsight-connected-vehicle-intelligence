@@ -75,7 +75,6 @@ type Config struct {
 	RateBurst int         // default 100
 	StaticDir string      // web console build, served at /
 	Origins   []string    // CORS allow-list
-	Copilot   CopilotHandler
 	Now       func() time.Time
 }
 
@@ -92,7 +91,12 @@ type Server struct {
 	lim  sync.Map // user -> *rate.Limiter
 	feat sync.Map // tenant -> featureCache
 	snap sync.Map // tenant -> *snapshot
+
+	copilot CopilotHandler
 }
+
+// SetCopilot installs the copilot (it needs the server for its tools, so it is attached after New).
+func (s *Server) SetCopilot(c CopilotHandler) { s.copilot = c }
 
 // Principal is the authenticated caller. Tenant and roles come only from the verified token.
 type Principal struct {
@@ -409,3 +413,45 @@ func sign(v float64) float64 {
 func fmtSscan(s string, f *float64) (int, error) { return fmt.Sscanf(s, "%g", f) }
 
 func fmtSscanInt(s string, n *int64) (int, error) { return fmt.Sscanf(s, "%d", n) }
+
+// ---------------------------------------------------------------------------------------------
+// exported helpers for the copilot (same data access paths, same tenant binding)
+
+// Tx runs fn in a tenant-bound transaction (row-level security applies).
+func (s *Server) Tx(ctx context.Context, tenant uuid.UUID, fn func(pgx.Tx) error) error {
+	return s.tx(ctx, tenant, fn)
+}
+
+// States fetches the latest vehicle states, masked for the caller's role.
+func (s *Server) States(ctx context.Context, p *Principal, vins []string) (map[string]VehicleState, error) {
+	m, err := s.states(ctx, p.TenantID, vins)
+	for k, v := range m {
+		s.maskState(p, &v)
+		m[k] = v
+	}
+	return m, err
+}
+
+// CH returns the history store connection (may be nil).
+func (s *Server) CH() driver.Conn { return s.cfg.CH }
+
+// Redis returns the shared Redis client.
+func (s *Server) Redis() redis.UniversalClient { return s.cfg.Redis }
+
+// MaskEvidence applies the role-based masking to alert evidence.
+func (s *Server) MaskEvidence(p *Principal, raw json.RawMessage) json.RawMessage {
+	return s.maskEvidence(p, raw)
+}
+
+// ApprovePlan approves a proposed plan on behalf of the caller. It reports whether the plan was in the proposed state.
+func (s *Server) ApprovePlan(ctx context.Context, p *Principal, id uuid.UUID) (bool, error) {
+	var n int64
+	err := s.tx(ctx, p.TenantID, func(tx pgx.Tx) error {
+		tag, e := tx.Exec(ctx, `UPDATE charge_plan SET status = 'approved', approved_by = $3, approved_at = now() WHERE tenant_id = $1 AND id = $2 AND status = 'proposed'`, p.TenantID, id, p.UserID)
+		if e == nil {
+			n = tag.RowsAffected()
+		}
+		return e
+	})
+	return n > 0, err
+}

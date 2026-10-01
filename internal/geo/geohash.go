@@ -123,3 +123,35 @@ func HaversineKm(lat1, lon1, lat2, lon2 float64) float64 {
 		math.Cos(lat1*rad)*math.Cos(lat2*rad)*math.Sin(dLon/2)*math.Sin(dLon/2)
 	return 2 * earthRadiusKm * math.Asin(math.Min(1, math.Sqrt(a)))
 }
+
+// Neighbors returns the (up to) 8 cells adjacent to hash at the same precision. It encodes the points one cell
+// width/height away from the cell centre, so it needs no lookup tables and is correct across cell boundaries.
+func Neighbors(hash string) []string {
+	latLo, latHi, lonLo, lonHi, err := Bounds(hash)
+	if err != nil {
+		return nil
+	}
+	lat, lon := (latLo+latHi)/2, (lonLo+lonHi)/2
+	dLat, dLon := latHi-latLo, lonHi-lonLo
+	var out []string
+	for _, di := range []float64{-1, 0, 1} {
+		for _, dj := range []float64{-1, 0, 1} {
+			if di == 0 && dj == 0 {
+				continue
+			}
+			la, lo := lat+di*dLat, lon+dj*dLon
+			if la < -90 || la > 90 {
+				continue
+			}
+			if lo > 180 {
+				lo -= 360
+			} else if lo < -180 {
+				lo += 360
+			}
+			if h := Encode(la, lo, len(hash)); h != hash {
+				out = append(out, h)
+			}
+		}
+	}
+	return out
+}

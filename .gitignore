@@ -15,3 +15,5 @@ bin/
 tmp/
 # the problem statement PDF is provided input, not part of the deliverable
 Motorq_Hackathon_Problem_Statement.pdf
+web/node_modules/
+web/dist/

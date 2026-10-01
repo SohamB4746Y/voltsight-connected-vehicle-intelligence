@@ -39,10 +39,20 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /v1/audit", s.guard(PermAuditRead, "audit.read", "audit", s.listAudit))
 	m.HandleFunc("GET /v1/ops/pipeline", s.guard(PermOpsRead, "ops.read", "ops", s.opsPipeline))
 
-	if s.cfg.Copilot != nil {
-		m.HandleFunc("POST /v1/copilot/messages", s.guard(PermCopilotUse, "", "copilot", s.cfg.Copilot.Handle))
-		m.HandleFunc("POST /v1/copilot/actions/{id}/approve", s.guard(PermCopilotUse, "", "copilot", s.cfg.Copilot.Approve))
-	}
+	m.HandleFunc("POST /v1/copilot/messages", s.guard(PermCopilotUse, "", "copilot", func(w http.ResponseWriter, r *http.Request, p *Principal) {
+		if s.copilot == nil {
+			writeProblem(w, 503, "copilot not configured")
+			return
+		}
+		s.copilot.Handle(w, r, p)
+	}))
+	m.HandleFunc("POST /v1/copilot/actions/{id}/approve", s.guard(PermCopilotUse, "", "copilot", func(w http.ResponseWriter, r *http.Request, p *Principal) {
+		if s.copilot == nil {
+			writeProblem(w, 503, "copilot not configured")
+			return
+		}
+		s.copilot.Approve(w, r, p)
+	}))
 	m.HandleFunc("GET /v1/config", s.publicConfig)
 
 	if s.cfg.StaticDir != "" {

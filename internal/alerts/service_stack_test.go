@@ -61,7 +61,9 @@ func TestAlertServiceIsIdempotentAndTenantIsolated(t *testing.T) {
 		t.Fatal(err)
 	}
 	win := time.Date(2026, 10, 1, 6, 0, 0, 0, time.UTC).Add(time.Duration(time.Now().UnixNano()%1_000_000) * time.Hour) // unique per run
-	t.Cleanup(func() { _, _ = op.Exec(context.Background(), `DELETE FROM alert WHERE vin = $1 AND window_start = $2`, vin, win) })
+	t.Cleanup(func() {
+		_, _ = op.Exec(context.Background(), `DELETE FROM alert WHERE vin = $1 AND window_start = $2`, vin, win)
+	})
 
 	ev, _ := structpb.NewStruct(map[string]any{"estimator": "t", "distance_to_charger_km": 12.5})
 	a := &alertv1.AlertEvent{TenantId: tenant, Vin: vin, Rule: alertv1.Rule_RULE_RANGE_CRITICAL, Severity: alertv1.Severity_SEVERITY_CRITICAL,

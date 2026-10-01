@@ -142,7 +142,7 @@ func newWorld(cfg Config, stats *Stats) (*world, error) {
 		v.forgot = v.r.Float64() < cfg.LowSoCStartFraction
 		frac := 0.55 + 0.45*v.r.Float64()
 		if v.forgot {
-			frac = 0.14 + 0.2*v.r.Float64() // left unplugged overnight
+			frac = cfg.LowSoCStartMin + (cfg.LowSoCStartMax-cfg.LowSoCStartMin)*v.r.Float64() // left unplugged overnight
 		}
 		v.energy = float32(frac) * v.capKWh
 

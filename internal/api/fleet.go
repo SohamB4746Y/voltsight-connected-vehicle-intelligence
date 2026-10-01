@@ -300,10 +300,6 @@ type telemetryPoint struct {
 
 // vehicleTelemetry serves history from ClickHouse, always bound to the caller's tenant.
 func (s *Server) vehicleTelemetry(w http.ResponseWriter, r *http.Request, p *Principal) {
-	if s.cfg.CH == nil {
-		writeProblem(w, 503, "history store not configured")
-		return
-	}
 	ctx := r.Context()
 	vin := strings.ToUpper(r.PathValue("vin"))
 	// the vehicle must belong to the tenant (404 otherwise: no cross-tenant probing)
@@ -316,6 +312,10 @@ func (s *Server) vehicleTelemetry(w http.ResponseWriter, r *http.Request, p *Pri
 	}
 	if !ok {
 		notFound(w)
+		return
+	}
+	if s.cfg.CH == nil {
+		writeProblem(w, 503, "history store not configured")
 		return
 	}
 	to := s.cfg.Now().UTC()
