@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+// Serve MapLibre's web worker as a same-origin file built by Vite (works under `worker-src \'self\'`), instead of the
+// inline blob worker that failed to start in the production bundle ("Worker failed to load").
+import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+
+maplibregl.setWorkerUrl(workerUrl);
 import { api } from "../api";
 import { usePoll, fmtTime, ago } from "../hooks";
 import { Sev } from "../components";
@@ -15,6 +20,13 @@ export const CITY_VIEW: Record<string, { center: [number, number]; zoom: number 
   Bengaluru: { center: [77.5946, 12.9716], zoom: 10.5 },
   Surat: { center: [72.8311, 21.1702], zoom: 10.5 },
 };
+const BLANK_STYLE = {
+  version: 8,
+  name: "basemap-unavailable",
+  sources: {},
+  glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+  layers: [{ id: "background", type: "background", paint: { "background-color": "#e5e7eb" } }],
+} as maplibregl.StyleSpecification;
 const RISK_COLOR = ["match", ["get", "risk"], "critical", "#dc2626", "low", "#f59e0b", "#16a34a"] as any;
 const empty = { type: "FeatureCollection", features: [] } as any;
 const na = (v: unknown, unit = "") => (v === undefined || v === null || v === "" ? "not available" : `${typeof v === "number" ? Math.round(v * 10) / 10 : v}${unit}`);
@@ -38,6 +50,7 @@ export function GeoMap({ city, refreshKey, selection, onSelect, live }: { city: 
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [ready, setReady] = useState(false);
   const [charger, setCharger] = useState<any | null>(null);
+  const [basemap, setBasemap] = useState(true);
   const cityQ = city === "All cities" ? "" : `?city=${encodeURIComponent(city)}`;
 
   // one aggregated endpoint, not one request per vehicle
@@ -59,7 +72,8 @@ export function GeoMap({ city, refreshKey, selection, onSelect, live }: { city: 
       "bottom-right",
     );
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-    map.on("load", () => {
+    const addLayers = () => {
+      if (map.getSource("vehicles")) return;
       map.addSource("chargers", { type: "geojson", data: empty });
       map.addSource("route", { type: "geojson", data: empty });
       map.addSource("vehicles", {
@@ -99,29 +113,46 @@ export function GeoMap({ city, refreshKey, selection, onSelect, live }: { city: 
       });
       map.addLayer({ id: "veh-selected", type: "circle", source: "vehicles", filter: ["==", ["get", "vin"], ""], paint: { "circle-radius": 15, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#2563eb", "circle-stroke-width": 3 } });
 
-      map.on("click", "veh-clusters", async (e: maplibregl.MapLayerMouseEvent) => {
-        const f = e.features?.[0];
-        if (!f) return;
-        const z = await (map.getSource("vehicles") as maplibregl.GeoJSONSource).getClusterExpansionZoom(f.properties!.cluster_id);
-        map.easeTo({ center: (f.geometry as any).coordinates, zoom: z + 0.5 });
-      });
-      map.on("click", "veh-points", (e: maplibregl.MapLayerMouseEvent) => {
-        const p = e.features?.[0]?.properties as any;
-        if (p) {
-          setCharger(null);
-          onSelect({ vin: p.vin, alertId: p.alert_id || undefined });
-        }
-      });
-      map.on("click", "chargers", (e: maplibregl.MapLayerMouseEvent) => {
-        const p = e.features?.[0]?.properties as any;
-        if (p) setCharger(p);
-      });
-      for (const l of ["veh-clusters", "veh-points", "chargers"]) {
-        map.on("mouseenter", l, () => (map.getCanvas().style.cursor = "pointer"));
-        map.on("mouseleave", l, () => (map.getCanvas().style.cursor = ""));
-      }
       setReady(true);
+    };
+    // layer-delegated handlers work for layers added later, so they are registered once, outside addLayers
+    map.on("click", "veh-clusters", async (e: maplibregl.MapLayerMouseEvent) => {
+      const f = e.features?.[0];
+      if (!f) return;
+      const z = await (map.getSource("vehicles") as maplibregl.GeoJSONSource).getClusterExpansionZoom(f.properties!.cluster_id);
+      map.easeTo({ center: (f.geometry as any).coordinates, zoom: z + 0.5 });
     });
+    map.on("click", "veh-points", (e: maplibregl.MapLayerMouseEvent) => {
+      const p = e.features?.[0]?.properties as any;
+      if (p) {
+        setCharger(null);
+        onSelect({ vin: p.vin, alertId: p.alert_id || undefined });
+      }
+    });
+    map.on("click", "chargers", (e: maplibregl.MapLayerMouseEvent) => {
+      const p = e.features?.[0]?.properties as any;
+      if (p) setCharger(p);
+    });
+    for (const l of ["veh-clusters", "veh-points", "chargers"]) {
+      map.on("mouseenter", l, () => (map.getCanvas().style.cursor = "pointer"));
+      map.on("mouseleave", l, () => (map.getCanvas().style.cursor = ""));
+    }
+
+    // The basemap is a third-party service: if its style cannot be fetched (blocked network, outage) the markers must
+    // still render, so fall back to a plain background style. Backend data never depends on the tile host.
+    let styleOk = false, fellBack = false;
+    const fallback = () => {
+      if (styleOk || fellBack) return;
+      fellBack = true;
+      setBasemap(false);
+      map.setStyle(BLANK_STYLE);
+    };
+    map.on("style.load", () => {
+      styleOk = true;
+      addLayers();
+    });
+    map.on("error", fallback);
+    window.setTimeout(fallback, 8000);
     mapRef.current = map;
     (window as unknown as { __voltsightMap?: maplibregl.Map }).__voltsightMap = map; // read-only handle for the browser E2E tests
     return () => map.remove();
@@ -163,6 +194,7 @@ export function GeoMap({ city, refreshKey, selection, onSelect, live }: { city: 
     <div>
       <div className="geo-head">
         <span className={`conn ${live}`}>{live === "live" ? "LIVE ●" : live === "connecting" ? "CONNECTING…" : "RECONNECTING…"}</span>
+        {!basemap && <span className="muted small">basemap unavailable (tile host unreachable): markers only</span>}
         <span className="muted small">
           {vehicles.data ? `${vehicles.data.count} vehicles` : "…"} · {chargers.data ? `${chargers.data.count} chargers` : "…"} · updated every 4 s from the backend
         </span>
