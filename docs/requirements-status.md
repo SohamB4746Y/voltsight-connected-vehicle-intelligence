@@ -14,7 +14,7 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | N4 | critical alert < 5 s | NOT MEASURED | `vsalerts -latency-log` is ready; the live run was aborted (priority change) and the one overloaded demo run showed ~90 s lag when the 4 cores were shared with training/test jobs |
 | N5 | API p95 < 200 ms, p99 < 500 ms | PASS (ingest idle) | p95 26.8 ms, p99 41.0 ms, 829 req/s, 16 clients (`evidence/G9b/api_latency.json`); not measured under 100K ev/s ingest |
 | N6/N7 | horizontal scale, add brokers without code change | NOT MEASURED | stateless services + 64 partitions by design; no scale-out experiment |
-| N8/N9/N10 | no SPOF, 99.9%, recovery | N10 PARTIAL (see `evidence/G13/status.md`: component kills/restarts recover with zero loss); N8 LIMITATION (single broker/ClickHouse/Redis locally); N9 NOT MEASURED | |
+| N8/N9/N10 | no SPOF, 99.9%, recovery | N10 PARTIAL (`evidence/G13/status.md`: worker/sink kill, Redis/ClickHouse/Kafka restart recover with zero loss; gateway kill, PostgreSQL failover and Kubernetes pod kills not run); N8 LIMITATION (single broker/ClickHouse/Redis locally); N9 NOT MEASURED | |
 | N11–N14 | OIDC/JWT, RBAC, tenant isolation, device mTLS | PASS | API/G3/G1 test suites (`docs/threat-model.md`) |
 | N15 | TLS 1.3 | PASS (local, openssl) | API `-tls` and gateway accept only 1.3 (`evidence/G12/tls_api.txt`, G3); no scanner run |
 | N16 | AES-256 at rest | LIMITATION | local volumes unencrypted; KMS/CMEK in Terraform (validated, not applied) |
