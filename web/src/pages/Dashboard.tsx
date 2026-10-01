@@ -1,66 +1,27 @@
-import { useEffect, useRef, useState } from "react";
-import { api, streamAlerts, type Me } from "../api";
+import { useEffect, useState } from "react";
+import { api, streamAlerts, type Me, type StreamStatus } from "../api";
+import { GeoMap, CITY_VIEW, type Selection } from "./GeoMap";
 import { usePoll, ago } from "../hooks";
 import { Card, ErrorBox, Sev } from "../components";
 
-interface Cell {
-  lat: number;
-  lon: number;
-  count: number;
-  avg_soc_pct: number;
-  low_soc: number;
-}
-
-const CITIES: Record<string, [number, number]> = {
-  "All cities": [0, 0],
-  Chennai: [13.08, 80.27],
-  Bengaluru: [12.97, 77.59],
-  Surat: [21.17, 72.83],
-};
-
-function FleetMap({ cells, size }: { cells: Cell[]; size: number }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const c = ref.current;
-    if (!c) return;
-    const ctx = c.getContext("2d")!;
-    const W = (c.width = c.clientWidth * devicePixelRatio),
-      H = (c.height = c.clientHeight * devicePixelRatio);
-    ctx.fillStyle = "#0f172a";
-    ctx.fillRect(0, 0, W, H);
-    if (!cells.length) return;
-    const lats = cells.map((x) => x.lat),
-      lons = cells.map((x) => x.lon);
-    const [a, b, l, r] = [Math.min(...lats) - size, Math.max(...lats) + size, Math.min(...lons) - size, Math.max(...lons) + size];
-    const sx = (lon: number) => ((lon - l) / (r - l || 1)) * W,
-      sy = (lat: number) => H - ((lat - a) / (b - a || 1)) * H;
-    const maxCount = Math.max(...cells.map((x) => x.count));
-    for (const cell of cells) {
-      const risk = cell.low_soc / cell.count;
-      const hue = 130 - Math.min(1, risk * 2) * 130; // green -> red
-      const rad = (3 + 9 * Math.sqrt(cell.count / maxCount)) * devicePixelRatio;
-      ctx.beginPath();
-      ctx.fillStyle = `hsla(${hue}, 85%, 55%, 0.75)`;
-      ctx.arc(sx(cell.lon), sy(cell.lat), rad, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }, [cells, size]);
-  return <canvas ref={ref} className="map" />;
-}
-
-export function Dashboard({ me }: { me: Me }) {
-  const summary = usePoll(() => api("/v1/fleet/summary"), 5000);
-  const map = usePoll(() => api("/v1/map/cells?cell=0.01"), 5000);
-  const open = usePoll(() => api("/v1/alerts?status=open&limit=8"), 10000);
+export function Dashboard({}: { me: Me }) {
+  // dashboard statistics: one aggregated endpoint served from the 3 s per-tenant hot-state snapshot
+  const summary = usePoll(() => api("/v1/fleet/summary"), 3000);
+  const open = usePoll(() => api("/v1/alerts?status=open&limit=8"), 5000);
   const [city, setCity] = useState("All cities");
   const [live, setLive] = useState<any[]>([]);
+  const [conn, setConn] = useState<StreamStatus>("connecting");
+  const [bump, setBump] = useState(0); // a new alert refreshes the map straight away
+  const [sel, setSel] = useState<Selection>({});
 
   useEffect(() => {
     const ac = new AbortController();
     streamAlerts((a) => {
       setLive((x) => [a, ...x].slice(0, 20));
       open.reload();
-    }, ac.signal);
+      summary.reload();
+      setBump((n) => n + 1);
+    }, ac.signal, setConn);
     return () => ac.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -71,7 +32,7 @@ export function Dashboard({ me }: { me: Me }) {
   return (
     <div>
       <h2>Fleet overview</h2>
-      <ErrorBox error={summary.error || map.error} />
+      <ErrorBox error={summary.error} />
       <div className="cards">
         <Card title="Vehicles" value={s?.vehicles ?? "–"} sub={`${s?.live.reporting ?? 0} reporting live`} />
         <Card title="Moving / charging" value={s ? `${s.live.moving} / ${s.live.charging}` : "–"} />
@@ -81,24 +42,20 @@ export function Dashboard({ me }: { me: Me }) {
       </div>
       <div className="two">
         <section>
-          <h3>Live map {map.data && <span className="muted small">· {map.data.vehicles} vehicles in {map.data.cells.length} cells{me.permissions.includes("geo.precise") ? "" : " (coarse)"}</span>}</h3>
+          <h3>Live map</h3>
           <div className="row">
-            {Object.keys(CITIES).map((c) => (
+            {Object.keys(CITY_VIEW).map((c) => (
               <button key={c} className={c === city ? "primary" : ""} onClick={() => setCity(c)}>{c}</button>
             ))}
           </div>
-          <FleetMap
-            cells={(map.data?.cells ?? []).filter((c: Cell) => city === "All cities" || (Math.abs(c.lat - CITIES[city][0]) < 0.4 && Math.abs(c.lon - CITIES[city][1]) < 0.4))}
-            size={map.data?.cell_degrees ?? 0.01}
-          />
-          <div className="muted small">circle size = vehicles in the cell · colour = share below 20% SoC (green → red)</div>
+          <GeoMap city={city} refreshKey={bump} selection={sel} onSelect={setSel} live={conn} />
         </section>
         <section>
           <h3>Live alert feed</h3>
           {live.length === 0 && <p className="muted">Waiting for alerts… (streamed over SSE the moment the alert service persists them)</p>}
           {live.map((a, i) => (
-            <div key={i} className="feed">
-              <Sev s={a.severity} /> <b>{a.vin}</b> {a.rule.replace(/_/g, " ").toLowerCase()} · SoC {a.soc_pct}% · margin {a.margin_km?.toFixed?.(1)} km
+            <div key={i} className="feed live-item" data-alert-id={a.id} data-detected={a.detected_at}>
+              <Sev s={a.severity} /> <a href="#dashboard" onClick={() => setSel({ vin: a.vin, alertId: a.id })}><b>{a.vin}</b></a> {a.rule.replace(/_/g, " ").toLowerCase()} · SoC {a.soc_pct}% · margin {a.margin_km?.toFixed?.(1)} km
               <span className="muted small"> · {ago(a.detected_at)}</span>
             </div>
           ))}
@@ -106,7 +63,7 @@ export function Dashboard({ me }: { me: Me }) {
           {open.data?.items.length === 0 && <p className="muted">None.</p>}
           {open.data?.items.map((a: any) => (
             <div key={a.id} className="feed">
-              <Sev s={a.severity} /> <a href={`#alerts`}>{a.vin}</a> {a.rule.replace(/_/g, " ").toLowerCase()} <span className="muted small">· {ago(a.detected_at)}</span>
+              <Sev s={a.severity} /> <a href="#dashboard" onClick={() => setSel({ vin: a.vin, alertId: a.id })}>{a.vin}</a> {a.rule.replace(/_/g, " ").toLowerCase()} <span className="muted small">· {ago(a.detected_at)}</span>
             </div>
           ))}
         </section>

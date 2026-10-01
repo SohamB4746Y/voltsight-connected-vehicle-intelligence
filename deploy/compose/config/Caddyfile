@@ -41,6 +41,7 @@
 	}
 
 	handle {
+		encode zstd gzip # the map and list responses are JSON; the event stream above is never compressed
 		reverse_proxy api:8081
 	}
 }

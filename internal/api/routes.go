@@ -19,6 +19,8 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /v1/vehicles/{vin}", s.guard(PermFleetRead, "vehicle.read", "vehicle", s.getVehicle))
 	m.HandleFunc("GET /v1/vehicles/{vin}/telemetry", s.guard(PermFleetRead, "vehicle.telemetry", "vehicle", s.vehicleTelemetry))
 	m.HandleFunc("GET /v1/map/cells", s.guard(PermMapRead, "map.read", "map", s.mapCells))
+	m.HandleFunc("GET /v1/map/vehicles", s.guard(PermMapRead, "map.vehicles", "map", s.mapVehicles))
+	m.HandleFunc("GET /v1/map/chargers", s.guard(PermMapRead, "map.chargers", "map", s.mapChargers))
 
 	m.HandleFunc("GET /v1/alerts", s.guard(PermAlertsRead, "alert.list", "alert", s.listAlerts))
 	m.HandleFunc("GET /v1/alerts/stream", s.guard(PermAlertsRead, "alert.stream", "alert", s.alertStream))

@@ -90,6 +90,7 @@ type Server struct {
 	lim  sync.Map // user -> *rate.Limiter
 	feat sync.Map // tenant -> featureCache
 	snap sync.Map // tenant -> *snapshot
+	risk sync.Map // tenant -> *riskCache (open alerts per vehicle, for the map)
 
 	copilot CopilotHandler
 }

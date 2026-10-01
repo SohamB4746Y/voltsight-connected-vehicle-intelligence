@@ -153,17 +153,21 @@ services:
   simulator:
     <<: *app
     entrypoint: ["/app/vssim"]
-    # a stressed fleet so range-risk alerts appear within minutes; the charger network degrades at +5 min
+    # DEMO SCENARIO "range-risk" (the default, deterministic for a given world seed): a stressed fleet so range-risk
+    # alerts appear within minutes through the real pipeline. DEMO_LOW_SOC_FRACTION of the vehicles start with a SoC
+    # between 10.1% and 13%; at +DEMO_CHARGER_OUTAGE_AT s, 99% of the charger network fails for ~50 minutes, which
+    # makes the nearest reachable charger farther or unreachable and drives WARNING -> CRITICAL alerts. Nothing is
+    # written to the database by the simulator: alerts are created by the risk engine from the telemetry.
     command:
       - -vehicles=${DEMO_VEHICLES:-2000}
       - -duration=604800
       - -realtime
       - -seq-base=-1  # continue above the previous run's sequence numbers after any restart
       - -start-tod=27000
-      - -low-soc-fraction=0.3
+      - -low-soc-fraction=${DEMO_LOW_SOC_FRACTION:-0.3}
       - -low-soc-min=0.101
       - -low-soc-max=0.13
-      - -charger-outage-at=300
+      - -charger-outage-at=${DEMO_CHARGER_OUTAGE_AT:-300}
       - -charger-outage-duration=3000
       - -charger-outage-fraction=0.99
       - -dup-rate=0.02

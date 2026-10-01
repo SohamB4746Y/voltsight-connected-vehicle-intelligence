@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, currentUser, login, logout, setToken, type Me } from "./api";
+import { api, currentUser, login, logout, type Me } from "./api";
 import { Dashboard } from "./pages/Dashboard";
 import { Vehicles } from "./pages/Vehicles";
 import { Alerts } from "./pages/Alerts";
@@ -40,7 +40,6 @@ export function App() {
       try {
         const u = await currentUser();
         if (!u) return setState("anon");
-        setToken(u.access_token);
         setMe(await api<Me>("/v1/me"));
         setState("ready");
       } catch (e: any) {
