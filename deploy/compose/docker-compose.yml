@@ -42,7 +42,8 @@ services:
     <<: *restart
     mem_limit: 1g
     ports:
-      - "5432:5432"
+      # 55432 on the host: a native PostgreSQL commonly occupies 5432 on developer machines
+      - "55432:5432"
     environment:
       POSTGRES_USER: voltsight
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run make env}
@@ -139,8 +140,15 @@ services:
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
       KC_HEALTH_ENABLED: "true"
       KC_METRICS_ENABLED: "true"
+      # stable token issuer regardless of the Host header used by a client
+      KC_HOSTNAME: http://localhost:8080
       JAVA_OPTS_KC_HEAP: -Xms256m -Xmx768m
-    command: ["start-dev"]
+      # substituted into the realm import (placeholders in voltsight-realm.json); never stored in the repo
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:?run make env}
+      KC_TEST_CLIENT_SECRET: ${KC_TEST_CLIENT_SECRET:?run make env}
+    volumes:
+      - ./config/keycloak:/opt/keycloak/data/import:ro
+    command: ["start-dev", "--import-realm"]
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"status\": \"UP\"' <&3"]
       interval: 10s

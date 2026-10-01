@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package voltsight.dlq.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "voltsight/gen/voltsight/dlq/v1;dlqv1";
+
+enum ErrorClass {
+  ERROR_CLASS_UNSPECIFIED = 0;
+  ERROR_CLASS_MALFORMED = 1; // cannot be decoded
+  ERROR_CLASS_SCHEMA_INVALID = 2; // decoded but violates the contract
+  ERROR_CLASS_VIN_INVALID = 3;
+  ERROR_CLASS_UNAUTHORIZED_VIN = 4; // VIN does not belong to the connector's tenant
+  ERROR_CLASS_TOO_LATE = 5; // beyond allowed lateness and rejected by policy
+  ERROR_CLASS_SINK_FAILURE = 6; // retries exhausted writing downstream
+}
+
+// telemetry.dlq.v1, keyed by VIN when known. The original bytes are preserved so the record can be
+// replayed after a fix.
+message DlqRecord {
+  bytes original = 1;
+  ErrorClass error_class = 2;
+  string error_detail = 3;
+  string source_topic = 4;
+  int32 source_partition = 5;
+  int64 source_offset = 6;
+  string tenant_id = 7;
+  string vin = 8;
+  uint32 schema_ver = 9;
+  google.protobuf.Timestamp failed_at = 10;
+  uint32 attempts = 11;
+}

@@ -1,0 +1,12 @@
+version: v2
+modules:
+  - path: .
+lint:
+  use:
+    - STANDARD
+  except:
+    # telemetry.v1.Event values mirror the problem statement's JSON ("HARSH_BRAKE"), see telemetry.proto
+    - ENUM_VALUE_PREFIX
+breaking:
+  use:
+    - FILE

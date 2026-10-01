@@ -35,3 +35,35 @@ jobs:
           docker run --rm -v "$PWD:/repo" aquasec/trivy:0.74.0 fs \
             --scanners misconfig,secret --severity HIGH,CRITICAL --exit-code 1 \
             --skip-files /repo/.env /repo
+
+  g1:
+    name: gate G1 (contracts, database, identity, PKI, seed)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: bufbuild/buf-setup-action@v1
+      - name: Install generators and linters (pinned)
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.12
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+      - name: Generate throwaway .env
+        run: python tools/dev/gen_env.py
+      - name: Run gate G1 (same script used locally; Testcontainers + compose stack)
+        env:
+          BUF_BASELINE_REF: HEAD~1
+        run: python tools/gates/g1.py
+      - name: Upload G1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-G1
+          path: evidence/G1

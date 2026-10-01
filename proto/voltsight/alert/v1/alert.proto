@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package voltsight.alert.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "voltsight/gen/voltsight/alert/v1;alertv1";
+
+enum Rule {
+  RULE_UNSPECIFIED = 0;
+  RULE_RANGE_CRITICAL = 1; // no available charger reachable with the safety margin
+  RULE_RANGE_LOW = 2; // reachable, but below the reserve margin
+  RULE_CHARGER_UNAVAILABLE_ON_ROUTE = 3;
+  RULE_UNAPPROVED_DEPOT_CLUSTER = 4;
+  RULE_SOH_DROP = 5;
+  RULE_THERMAL_FAULT_DTC = 6;
+}
+
+enum Severity {
+  SEVERITY_UNSPECIFIED = 0;
+  SEVERITY_INFO = 1;
+  SEVERITY_WARNING = 2;
+  SEVERITY_CRITICAL = 3;
+}
+
+// alerts.v1, keyed by (tenant_id, vin). Identity for idempotent persistence is
+// (vin, rule, window_start): replays and duplicates collapse into one alert row.
+message AlertEvent {
+  string tenant_id = 1;
+  string vin = 2;
+  Rule rule = 3;
+  Severity severity = 4;
+  google.protobuf.Timestamp window_start = 5; // start of the rule's evaluation window (idempotency key part)
+  google.protobuf.Timestamp detected_at = 6; // worker clock when the decision was made
+  google.protobuf.Timestamp source_event_ts = 7; // device ts of the triggering telemetry sample
+  google.protobuf.Timestamp source_recv_ts = 8; // gateway receive time of that sample, for latency measurement
+
+  // Typed core of the evidence; the full snapshot is kept in `evidence`.
+  float soc_pct = 9;
+  float usable_range_km = 10;
+  float distance_to_charger_km = 11;
+  float margin_km = 12;
+  string nearest_charger_id = 13;
+  string model_version = 14; // model or baseline rule that produced the range estimate
+  google.protobuf.Struct evidence = 15;
+  string trace_id = 16;
+}

@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package voltsight.telemetry.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "voltsight/gen/voltsight/telemetry/v1;telemetryv1";
+
+// Event types reported by the vehicle. Value names deliberately carry no enum prefix so that the
+// JSON example from the problem statement ("evt":"HARSH_BRAKE") parses unchanged; the buf lint
+// rule ENUM_VALUE_PREFIX is excluded for this reason (see proto/buf.yaml).
+enum Event {
+  EVENT_UNSPECIFIED = 0;
+  HARSH_BRAKE = 1;
+  HARSH_ACCEL = 2;
+  OVERSPEED = 3;
+  IGNITION_ON = 4;
+  IGNITION_OFF = 5;
+  PLUG_IN = 6;
+  PLUG_OUT = 7;
+  CHARGE_COMPLETE = 8;
+  LOW_SOC = 9;
+  THERMAL_WARNING = 10;
+}
+
+enum ChargeState {
+  CHARGE_STATE_UNSPECIFIED = 0;
+  CHARGE_STATE_NONE = 1;
+  CHARGE_STATE_PLUGGED = 2;
+  CHARGE_STATE_CHARGING = 3;
+}
+
+// One normalised telemetry sample. Field names 1-10 mirror the illustrative event in the problem
+// statement: {"vin","ts","lat","lon","speed_kmh","soc_pct","odo_km","dtc","evt","seq"}.
+message TelemetryEvent {
+  string vin = 1; // 17 chars, no I/O/Q, ISO 3779 check digit
+  google.protobuf.Timestamp ts = 2; // device event time
+  double lat = 3;
+  double lon = 4;
+  float speed_kmh = 5;
+  float soc_pct = 6; // 0..100
+  double odo_km = 7;
+  repeated string dtc = 8; // OBD-II codes, e.g. "P0A7F"
+  Event evt = 9;
+  uint64 seq = 10; // per-VIN monotonic sequence; (vin, seq) is the event identity
+
+  string oem = 11; // source OEM dialect, set by the gateway
+  uint32 schema_ver = 12; // OEM payload schema version, set by the gateway
+  google.protobuf.Timestamp recv_ts = 13; // gateway receive time, set by the gateway
+  float heading_deg = 14;
+  float pack_temp_c = 15;
+  float ambient_temp_c = 16;
+  float pack_voltage_v = 17;
+  float pack_current_a = 18;
+  ChargeState charge_state = 19;
+  string charger_id = 20; // set while plugged/charging
+
+  // Set by the gateway from the client-certificate identity; any value supplied by a device is
+  // overwritten. Never trusted from the payload.
+  string tenant_id = 30;
+}
+
+message TelemetryBatch {
+  string batch_id = 1; // client-chosen id, used for logging and retry correlation
+  repeated TelemetryEvent events = 2;
+}

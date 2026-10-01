@@ -59,7 +59,8 @@ def log(msg: str) -> None:
 
 
 def run(cmd: list[str], timeout: int = 120, check: bool = False) -> subprocess.CompletedProcess:
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=ROOT)
+    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       timeout=timeout, cwd=ROOT)
     if check and p.returncode != 0:
         raise RuntimeError(f"{' '.join(cmd)} -> {p.returncode}: {p.stderr.strip()[:500]}")
     return p
@@ -74,7 +75,7 @@ def git_sha() -> tuple[str, bool]:
 
 def load_env() -> dict[str, str]:
     env = {}
-    for line in (ROOT / ".env").read_text().splitlines():
+    for line in (ROOT / ".env").read_text(encoding="utf-8").splitlines():
         if "=" in line:
             k, v = line.split("=", 1)
             env[k] = v
@@ -353,9 +354,9 @@ def main() -> int:
     if not args.no_evidence:
         out = ROOT / "evidence/G0" / f"{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{sha}"
         out.mkdir(parents=True, exist_ok=True)
-        (out / "env.json").write_text(json.dumps(env, indent=2))
-        (out / "results.json").write_text(json.dumps(results, indent=2, default=str))
-        (out / "run.log").write_text("\n".join(LOG))
+        (out / "env.json").write_text(json.dumps(env, indent=2), encoding="utf-8")
+        (out / "results.json").write_text(json.dumps(results, indent=2, default=str), encoding="utf-8")
+        (out / "run.log").write_text("\n".join(LOG), encoding="utf-8")
         log(f"evidence written to {out.relative_to(ROOT)}")
     return 0 if overall == "PASS" else 1
 

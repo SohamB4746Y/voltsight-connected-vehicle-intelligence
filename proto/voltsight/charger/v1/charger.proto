@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package voltsight.charger.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "voltsight/gen/voltsight/charger/v1;chargerv1";
+
+enum ChargerStatus {
+  CHARGER_STATUS_UNSPECIFIED = 0;
+  CHARGER_STATUS_AVAILABLE = 1;
+  CHARGER_STATUS_OCCUPIED = 2;
+  CHARGER_STATUS_OUT_OF_SERVICE = 3;
+}
+
+// Compacted topic charger.status.v1, keyed by charger_id. Every stream worker reads the whole
+// topic to maintain its road-graph overlay (distance to nearest *available* charger).
+message ChargerStatusEvent {
+  string charger_id = 1;
+  ChargerStatus status = 2;
+  google.protobuf.Timestamp ts = 3;
+  uint64 seq = 4;
+  float power_kw_available = 5;
+}
