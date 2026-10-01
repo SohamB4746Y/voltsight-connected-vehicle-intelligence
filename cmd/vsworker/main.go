@@ -25,7 +25,7 @@ func main() {
 		topic   = flag.String("topic", kafkautil.Telemetry, "telemetry topic")
 		group   = flag.String("group", "rt-processor", "consumer group")
 		admin   = flag.String("admin", "127.0.0.1:9102", "admin listener (/healthz /metrics)")
-		replay  = flag.Bool("replay", false, "a new group starts from the earliest offset instead of the end")
+		fromEnd = flag.Bool("from-end", false, "a group with no committed offset skips the backlog (default: starts at the earliest offset, loses nothing)")
 		poll    = flag.Int("max-poll", 20000, "records per batch")
 	)
 	flag.Parse()
@@ -39,7 +39,7 @@ func main() {
 	must(rdb.Ping(ctx).Err())
 
 	w, err := rtp.New(rtp.Config{Brokers: strings.Split(*brokers, ","), Topic: *topic, Group: *group, MaxPoll: *poll,
-		StartFromBeginning: *replay, Logger: func(f string, a ...any) { fmt.Fprintf(os.Stderr, f+"\n", a...) }}, &state.Store{R: rdb})
+		StartAtEnd: *fromEnd, Logger: func(f string, a ...any) { fmt.Fprintf(os.Stderr, f+"\n", a...) }}, &state.Store{R: rdb})
 	must(err)
 	defer w.Close()
 	go func() {
@@ -61,7 +61,7 @@ func main() {
 			}
 		}
 	}()
-	fmt.Fprintf(os.Stderr, "rtp: group %q on %s (replay=%v)\n", *group, *topic, *replay)
+	fmt.Fprintf(os.Stderr, "rtp: group %q on %s (from-end=%v)\n", *group, *topic, *fromEnd)
 	must(w.Run(ctx))
 }
 

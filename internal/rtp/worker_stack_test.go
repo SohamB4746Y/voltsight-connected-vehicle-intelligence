@@ -112,7 +112,7 @@ func TestWorkerDedupAndLatestState(t *testing.T) {
 	testkit.Produce(t, topic, sc.Events)
 
 	group := "g-" + uuid.NewString()[:8]
-	w, cancel, wg := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, StartFromBeginning: true, MaxPoll: 3000}, rdb)
+	w, cancel, wg := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, MaxPoll: 3000}, rdb)
 	testkit.WaitDrained(t, group, topic, 60*time.Second)
 	cancel()
 	wg.Wait()
@@ -145,7 +145,7 @@ func TestReplayRebuildsIdenticalState(t *testing.T) {
 	testkit.Produce(t, topic, sc.Events)
 
 	run := func(group string) string {
-		w, cancel, wg := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, StartFromBeginning: true}, rdb)
+		w, cancel, wg := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group}, rdb)
 		testkit.WaitDrained(t, group, topic, 60*time.Second)
 		cancel()
 		wg.Wait()
@@ -179,7 +179,7 @@ func TestCrashMidStreamLosesNothing(t *testing.T) {
 	testkit.Produce(t, topic, sc.Events)
 
 	group := "g-" + uuid.NewString()[:8]
-	a, cancelA, wgA := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, StartFromBeginning: true, MaxPoll: 1500}, rdb)
+	a, cancelA, wgA := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, MaxPoll: 1500}, rdb)
 	deadline := time.Now().Add(30 * time.Second)
 	for a.Stats.Records.Load() < int64(len(sc.Events))/4 && time.Now().Before(deadline) {
 		time.Sleep(5 * time.Millisecond)
@@ -192,7 +192,7 @@ func TestCrashMidStreamLosesNothing(t *testing.T) {
 		t.Skip("worker finished before it could be killed; scenario too small for this machine")
 	}
 
-	b, cancelB, wgB := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, StartFromBeginning: true, MaxPoll: 1500}, rdb)
+	b, cancelB, wgB := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, MaxPoll: 1500}, rdb)
 	testkit.WaitDrained(t, group, topic, 90*time.Second)
 	cancelB()
 	wgB.Wait()
@@ -206,7 +206,7 @@ func TestCrashMidStreamLosesNothing(t *testing.T) {
 		rdb.Del(context.Background(), state.Key(sc.Tenant, v))
 	}
 	g2 := "ref-" + uuid.NewString()[:8]
-	c, cancelC, wgC := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: g2, StartFromBeginning: true}, rdb)
+	c, cancelC, wgC := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: g2}, rdb)
 	testkit.WaitDrained(t, g2, topic, 90*time.Second)
 	cancelC()
 	wgC.Wait()
@@ -236,7 +236,7 @@ func TestWorkerTracksTopDTCs(t *testing.T) {
 	topic := testkit.Topic(t, "t4.dtc", 3)
 	testkit.Produce(t, topic, sc.Events)
 	group := "g-" + uuid.NewString()[:8]
-	w, cancel, wg := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group, StartFromBeginning: true}, rdb)
+	w, cancel, wg := runWorker(t, Config{Brokers: testkit.Brokers, Topic: topic, Group: group}, rdb)
 	testkit.WaitDrained(t, group, topic, 60*time.Second)
 	cancel()
 	wg.Wait()

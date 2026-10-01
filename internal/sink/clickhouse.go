@@ -3,7 +3,9 @@ package sink
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"math/rand"
 	"regexp"
 	"sync/atomic"
 	"time"
@@ -60,17 +62,19 @@ TTL toDateTime(ts) + INTERVAL 30 DAY DELETE`, table)
 type Stats struct {
 	Records, Inserted, DecodeErrors, Batches, InsertNanos atomic.Int64
 	Lag                                                   atomic.Int64
+	Retries                                               atomic.Int64 // failed insert/commit attempts that were retried
 }
 
 // Config configures the sink.
 type Config struct {
-	Brokers            []string
-	Topic              string
-	Group              string
-	Table              string
-	CH                 *clickhouse.Options
-	MaxPoll            int // records per insert, default 50,000
-	StartFromBeginning bool
+	Brokers      []string
+	Topic        string
+	Group        string
+	Table        string
+	CH           *clickhouse.Options
+	MaxPoll      int           // records per insert, default 50,000
+	StartAtEnd   bool          // group without committed offset skips the backlog (default: start at the earliest offset)
+	MaxRetryTime time.Duration // keep retrying a failing insert this long before giving up (default 10 min)
 }
 
 // Sink consumes the topic and inserts into ClickHouse.
@@ -89,6 +93,9 @@ func Open(ctx context.Context, cfg Config) (*Sink, error) {
 	if cfg.MaxPoll == 0 {
 		cfg.MaxPoll = 50_000
 	}
+	if cfg.MaxRetryTime == 0 {
+		cfg.MaxRetryTime = 10 * time.Minute
+	}
 	conn, err := clickhouse.Open(cfg.CH)
 	if err != nil {
 		return nil, err
@@ -96,9 +103,11 @@ func Open(ctx context.Context, cfg Config) (*Sink, error) {
 	if err := conn.Exec(ctx, DDL(cfg.Table)); err != nil {
 		return nil, fmt.Errorf("create table: %w", err)
 	}
-	reset := kgo.NewOffset().AtEnd()
-	if cfg.StartFromBeginning {
-		reset = kgo.NewOffset().AtStart()
+	// Earliest by default: "end" is resolved at partition assignment, so records produced before the group joined
+	// would be skipped while the group still reports zero lag.
+	reset := kgo.NewOffset().AtStart()
+	if cfg.StartAtEnd {
+		reset = kgo.NewOffset().AtEnd()
 	}
 	cl, err := kgo.NewClient(kgo.SeedBrokers(cfg.Brokers...), kgo.ClientID("vs-sink"), kgo.ConsumerGroup(cfg.Group),
 		kgo.ConsumeTopics(cfg.Topic), kgo.ConsumeResetOffset(reset), kgo.DisableAutoCommit(),
@@ -138,25 +147,77 @@ func (s *Sink) Run(ctx context.Context) error {
 	return nil
 }
 
+// appendError marks a failure to build the batch (a data/schema problem). Retrying cannot help, so it is fatal.
+type appendError struct{ error }
+
 func (s *Sink) insert(ctx context.Context, fetches kgo.Fetches) error {
+	var n, decodeErrs, lag int64
+	err := s.retry(ctx, "insert", func() error {
+		var err error
+		n, decodeErrs, lag, err = s.tryInsert(ctx, fetches)
+		return err
+	})
+	if err != nil {
+		return err
+	}
+	// The data is durable in ClickHouse. Only now may the offsets advance (at-least-once; replays collapse on
+	// the event identity).
+	if err := s.retry(ctx, "commit", func() error { return s.cl.CommitUncommittedOffsets(ctx) }); err != nil {
+		return err
+	}
+	s.Stats.DecodeErrors.Add(decodeErrs)
+	s.Stats.Records.Add(int64(fetches.NumRecords()))
+	s.Stats.Inserted.Add(n)
+	s.Stats.Batches.Add(1)
+	s.Stats.Lag.Store(lag)
+	return nil
+}
+
+// retry runs op, retrying with capped exponential back-off and jitter for up to MaxRetryTime. A ClickHouse
+// that is restarting, over its memory limit or refusing parts must slow the sink down (Kafka absorbs the
+// backlog), never kill it or lose records: offsets are not committed until op succeeds.
+func (s *Sink) retry(ctx context.Context, what string, op func() error) error {
+	deadline := time.Now().Add(s.cfg.MaxRetryTime)
+	delay := 250 * time.Millisecond
+	for {
+		err := op()
+		if err == nil {
+			return nil
+		}
+		var ae appendError
+		if errors.As(err, &ae) || ctx.Err() != nil || time.Now().After(deadline) {
+			return fmt.Errorf("%s: %w", what, err)
+		}
+		s.Stats.Retries.Add(1)
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("%s: %w", what, err)
+		case <-time.After(delay/2 + time.Duration(rand.Int63n(int64(delay/2)+1))):
+		}
+		if delay *= 2; delay > 15*time.Second {
+			delay = 15 * time.Second
+		}
+	}
+}
+
+func (s *Sink) tryInsert(ctx context.Context, fetches kgo.Fetches) (n, decodeErrs, lag int64, err error) {
 	batch, err := s.conn.PrepareBatch(ctx, "INSERT INTO "+s.cfg.Table)
 	if err != nil {
-		return fmt.Errorf("prepare batch: %w", err)
+		return 0, 0, 0, fmt.Errorf("prepare batch: %w", err)
 	}
-	var n, lag int64
 	fetches.EachPartition(func(p kgo.FetchTopicPartition) {
 		if k := len(p.Records); k > 0 {
 			lag += p.HighWatermark - (p.Records[k-1].Offset + 1)
 		}
 		for _, r := range p.Records {
 			var e telemetryv1.TelemetryEvent
-			if err := proto.Unmarshal(r.Value, &e); err != nil {
-				s.Stats.DecodeErrors.Add(1)
+			if perr := proto.Unmarshal(r.Value, &e); perr != nil {
+				decodeErrs++
 				continue
 			}
 			tenant, perr := uuid.Parse(e.TenantId)
 			if perr != nil || len(e.Vin) != 17 {
-				s.Stats.DecodeErrors.Add(1)
+				decodeErrs++
 				continue
 			}
 			recv := time.Time{}
@@ -166,7 +227,7 @@ func (s *Sink) insert(ctx context.Context, fetches kgo.Fetches) error {
 			if aerr := batch.Append(tenant, e.Vin, e.Ts.AsTime(), recv, e.Seq, e.Lat, e.Lon, e.SpeedKmh, e.SocPct, e.OdoKm,
 				e.HeadingDeg, e.PackTempC, e.AmbientTempC, e.PackVoltageV, e.PackCurrentA, e.ChargeState.String()[len("CHARGE_STATE_"):],
 				e.ChargerId, evName(e.Evt), e.Oem, uint8(e.SchemaVer), nonNil(e.Dtc)); aerr != nil {
-				err = aerr
+				err = appendError{aerr}
 				return
 			}
 			n++
@@ -174,21 +235,14 @@ func (s *Sink) insert(ctx context.Context, fetches kgo.Fetches) error {
 	})
 	if err != nil {
 		_ = batch.Abort()
-		return fmt.Errorf("append: %w", err)
+		return 0, 0, 0, fmt.Errorf("append: %w", err)
 	}
 	t0 := time.Now()
 	if err := batch.Send(); err != nil {
-		return fmt.Errorf("insert: %w", err)
+		return 0, 0, 0, fmt.Errorf("send: %w", err)
 	}
 	s.Stats.InsertNanos.Add(time.Since(t0).Nanoseconds())
-	if err := s.cl.CommitUncommittedOffsets(ctx); err != nil {
-		return fmt.Errorf("commit: %w", err)
-	}
-	s.Stats.Records.Add(int64(fetches.NumRecords()))
-	s.Stats.Inserted.Add(n)
-	s.Stats.Batches.Add(1)
-	s.Stats.Lag.Store(lag)
-	return nil
+	return n, decodeErrs, lag, nil
 }
 
 // evName maps the protobuf zero value (EVENT_UNSPECIFIED) onto the ClickHouse enum's UNSPECIFIED.

@@ -29,13 +29,13 @@ type Processor interface {
 
 // Config configures a worker.
 type Config struct {
-	Brokers            []string
-	Topic              string
-	Group              string
-	MaxPoll            int  // records per batch, default 20,000
-	StartFromBeginning bool // for a new group: replay the topic from the earliest offset
-	Processor          Processor
-	Logger             func(format string, args ...any)
+	Brokers    []string
+	Topic      string
+	Group      string
+	MaxPoll    int  // records per batch, default 20,000
+	StartAtEnd bool // for a group with no committed offset: skip the backlog (default: start at the earliest retained offset so nothing is lost)
+	Processor  Processor
+	Logger     func(format string, args ...any)
 }
 
 // Stats are the worker counters (also exported as Prometheus metrics).
@@ -82,10 +82,12 @@ func New(cfg Config, store *state.Store) (*Worker, error) {
 	w.mLag = prometheus.NewGauge(prometheus.GaugeOpts{Name: "rtp_consumer_lag_records", Help: "Records behind the log end across assigned partitions."})
 	w.reg.MustRegister(proc, w.mLatency, w.mLag)
 
-	// a group with no committed offset starts at the end (live) unless a full replay was requested
-	reset := kgo.NewOffset().AtEnd()
-	if cfg.StartFromBeginning {
-		reset = kgo.NewOffset().AtStart()
+	// A group with no committed offset starts at the earliest retained offset. "End" is resolved when partitions are
+	// assigned, which can be after producers started: events produced in between would be skipped, and the group
+	// would still report zero lag (live finding, evidence/G4/status.md).
+	reset := kgo.NewOffset().AtStart()
+	if cfg.StartAtEnd {
+		reset = kgo.NewOffset().AtEnd()
 	}
 	cl, err := kgo.NewClient(
 		kgo.SeedBrokers(cfg.Brokers...), kgo.ClientID("vs-rtp"), kgo.ConsumerGroup(cfg.Group), kgo.ConsumeTopics(cfg.Topic),

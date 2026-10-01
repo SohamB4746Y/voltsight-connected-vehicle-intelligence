@@ -5,6 +5,7 @@ package sink
 import (
 	"context"
 	"fmt"
+	"os/exec"
 	"strings"
 	"sync"
 	"testing"
@@ -40,7 +41,7 @@ func scalar(t testing.TB, conn driver.Conn, q string) uint64 {
 
 func runSink(t *testing.T, topic, group, table string) *Sink {
 	s, err := Open(context.Background(), Config{Brokers: testkit.Brokers, Topic: topic, Group: group, Table: table,
-		CH: chOptions(t), StartFromBeginning: true, MaxPoll: 20_000})
+		CH: chOptions(t), MaxPoll: 20_000})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -160,4 +161,54 @@ func TestOpenRejectsUnsafeTableNames(t *testing.T) {
 			t.Errorf("table name %q accepted", name)
 		}
 	}
+}
+
+// G4.9 defect fix: a ClickHouse that restarts mid-run must slow the sink down, not kill it or lose records.
+// Offsets are committed only after an acknowledged insert, so after the restart every distinct event is present.
+func TestSinkSurvivesClickHouseRestartWithoutLoss(t *testing.T) {
+	conn, err := clickhouse.Open(chOptions(t))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+	sc := testkit.NewScenario(31, 400, 500, 0.02, 0.03, 0.005)
+	table := "t4_" + strings.ReplaceAll(uuid.NewString()[:8], "-", "")
+	topic := testkit.Topic(t, "t4.restart", 6)
+	testkit.Produce(t, topic, sc.Events)
+	group := "gr-" + uuid.NewString()[:8]
+
+	s, err := Open(context.Background(), Config{Brokers: testkit.Brokers, Topic: topic, Group: group, Table: table, CH: chOptions(t),
+		MaxPoll: 5_000, MaxRetryTime: 3 * time.Minute})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	ctx, cancel := context.WithCancel(context.Background())
+	runErr := make(chan error, 1)
+	go func() { runErr <- s.Run(ctx) }()
+
+	deadline := time.Now().Add(60 * time.Second)
+	for s.Stats.Batches.Load() < 2 {
+		if time.Now().After(deadline) {
+			t.Fatal("sink did not start inserting")
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	if out, err := exec.Command("docker", "restart", "voltsight-clickhouse-1").CombinedOutput(); err != nil {
+		t.Fatalf("docker restart: %v: %s", err, out)
+	}
+	testkit.WaitDrained(t, group, topic, 150*time.Second)
+	cancel()
+	if err := <-runErr; err != nil {
+		t.Fatalf("sink died instead of retrying: %v", err)
+	}
+	t.Cleanup(func() { _ = conn.Exec(context.Background(), "DROP TABLE IF EXISTS "+table+" SYNC") })
+	if s.Stats.Retries.Load() == 0 {
+		t.Skip("restart completed between batches; no insert had to be retried (rerun)")
+	}
+	rows := scalar(t, conn, "SELECT count() FROM "+table+" FINAL")
+	if rows != uint64(sc.Distinct) {
+		t.Fatalf("after ClickHouse restart: %d distinct rows, want %d (lost %d)", rows, sc.Distinct, uint64(sc.Distinct)-rows)
+	}
+	t.Logf("MEASURED: survived a ClickHouse restart with %d retried attempts; %d/%d distinct events present", s.Stats.Retries.Load(), rows, sc.Distinct)
 }

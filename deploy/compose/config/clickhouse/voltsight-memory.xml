@@ -1,0 +1,14 @@
+<!-- Sized for the 3 GB container in docker-compose.yml. ClickHouse's defaults (mark cache 5 GB, uncompressed cache 8 GB,
+     16 background merge threads) assume a large host and let a single analytic query exhaust the whole server. -->
+<clickhouse>
+    <!-- server-wide ceiling: 80% of the container limit, leaving headroom for page cache, jemalloc and the kernel -->
+    <max_server_memory_usage_to_ram_ratio>0.8</max_server_memory_usage_to_ram_ratio>
+    <mark_cache_size>268435456</mark_cache_size>
+    <index_mark_cache_size>67108864</index_mark_cache_size>
+    <uncompressed_cache_size>0</uncompressed_cache_size>
+    <index_uncompressed_cache_size>0</index_uncompressed_cache_size>
+    <!-- 8 threads x ratio 4 = 32 slots, above the engine defaults for the free-entries thresholds (20 / 25) -->
+    <background_pool_size>8</background_pool_size>
+    <background_merges_mutations_concurrency_ratio>4</background_merges_mutations_concurrency_ratio>
+    <background_schedule_pool_size>8</background_schedule_pool_size>
+</clickhouse>

@@ -3,7 +3,7 @@ COMPOSE := docker compose -f deploy/compose/docker-compose.yml --env-file .env
 PY ?= python
 GO ?= go
 
-.PHONY: env up bootstrap gateway simulate seed verify-seed down nuke ps logs health proto er realm lint secrets-scan \
+.PHONY: up-lowulimit build e2e env up bootstrap gateway simulate seed verify-seed down nuke ps logs health proto er realm lint secrets-scan \
         gate-G0 gate-G0-clean gate-G1 test test-integration
 
 env:  ## generate .env with random credentials (idempotent, appends only missing keys)
@@ -79,3 +79,15 @@ gate-G0-clean: env  ## G0 from clean volumes (cold start timing)
 
 gate-G1: env  ## full G1 evidence run (contracts, DB, RLS, seed, Keycloak, Vault, static, coverage, mutation)
 	$(PY) tools/gates/g1.py
+
+LOW_ULIMIT := -f deploy/compose/docker-compose.lowulimit.yml
+
+up-lowulimit:  ## like `up` for hosts whose hard RLIMIT_NOFILE is below 262144 (restricted sandboxes)
+	docker compose -f deploy/compose/docker-compose.yml $(LOW_ULIMIT) --env-file .env up -d --wait --wait-timeout 300
+	$(MAKE) bootstrap
+
+build:  ## build all binaries into ./bin
+	@for c in vssim vsgateway vsworker vssink vsrecon vstopics vsdb vspki; do $(GO) build -o bin/$$c ./cmd/$$c || exit 1; done
+
+e2e:  ## live 60 s run at 100K vehicles through every stage + reconciliation (evidence in $(OUT))
+	tools/live/e2e.sh $(or $(OUT),tmp/e2e) 100000 60 -dup-rate 0.02 -ooo-rate 0.03 -fault-rate 0.002

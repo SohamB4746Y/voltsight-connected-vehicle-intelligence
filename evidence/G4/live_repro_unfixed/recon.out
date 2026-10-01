@@ -1,0 +1,11 @@
+{
+  "balanced": true,
+  "clickhouse_duplicates_collapsed": 0,
+  "clickhouse_rows": 6000000,
+  "clickhouse_rows_after_dedup": 6000000,
+  "kafka_dlq_records": 0,
+  "kafka_telemetry_records": 6000000,
+  "problems": null,
+  "rt_group_lag": 0,
+  "sink_group_lag": 0
+}

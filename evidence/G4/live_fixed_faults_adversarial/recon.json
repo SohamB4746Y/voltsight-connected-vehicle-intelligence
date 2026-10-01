@@ -1,0 +1,19 @@
+{
+  "balanced": true,
+  "clickhouse_duplicates_awaiting_merge": 24037,
+  "clickhouse_rows": 5921793,
+  "clickhouse_rows_after_dedup": 5897756,
+  "kafka_dlq_records": 11855,
+  "kafka_telemetry_records": 6000557,
+  "problems": null,
+  "rt_group_lag": 0,
+  "sink_group_lag": 0,
+  "worker_distinct_events": 5897756,
+  "worker_processed": 6000557,
+  "worker_verdicts": {
+    "duplicate": 102801,
+    "late": 87369,
+    "new": 5810387,
+    "stale": 0
+  }
+}
