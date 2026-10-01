@@ -114,7 +114,7 @@ func (s *Service) Run(ctx context.Context) error {
 			evs = append(evs, &a)
 		})
 		s.Stats.Consumed.Add(int64(fetches.NumRecords()))
-		if err := s.persist(ctx, evs); err != nil {
+		if err := retry(ctx, func() error { return s.persist(ctx, evs) }); err != nil {
 			s.Stats.Failed.Add(1)
 			if ctx.Err() != nil {
 				return nil
@@ -231,4 +231,26 @@ func trimPrefix(s, p string) string {
 		return s[len(p):]
 	}
 	return s
+}
+
+// retry runs op with capped exponential back-off for up to 10 minutes: PostgreSQL or Redis restarting must slow the
+// service down (alerts stay in Kafka, offsets are committed only after persistence), not kill it. Persisting is
+// idempotent (unique key), so repeating a partially applied batch is safe.
+func retry(ctx context.Context, op func() error) error {
+	deadline := time.Now().Add(10 * time.Minute)
+	delay := 200 * time.Millisecond
+	for {
+		err := op()
+		if err == nil || ctx.Err() != nil || time.Now().After(deadline) {
+			return err
+		}
+		select {
+		case <-ctx.Done():
+			return err
+		case <-time.After(delay):
+		}
+		if delay *= 2; delay > 10*time.Second {
+			delay = 10 * time.Second
+		}
+	}
 }

@@ -184,8 +184,8 @@ func (w *Worker) processBatch(ctx context.Context, fetches kgo.Fetches) error {
 		}
 	})
 	if len(need) > 0 {
-		loaded, err := w.store.Load(ctx, need)
-		if err != nil {
+		var loaded map[string]*state.Entry
+		if err := retry(ctx, "load state", func() (e error) { loaded, e = w.store.Load(ctx, need); return }); err != nil {
 			return err
 		}
 		part := map[string]int32{}
@@ -252,7 +252,7 @@ func (w *Worker) processBatch(ctx context.Context, fetches kgo.Fetches) error {
 			return fmt.Errorf("processor flush: %w", err)
 		}
 	}
-	if err := w.store.Save(ctx, dirty); err != nil {
+	if err := retry(ctx, "save state", func() error { return w.store.Save(ctx, dirty) }); err != nil {
 		return err
 	}
 	if err := w.cl.CommitUncommittedOffsets(ctx); err != nil {
@@ -263,6 +263,33 @@ func (w *Worker) processBatch(ctx context.Context, fetches kgo.Fetches) error {
 	w.mLag.Set(float64(lag))
 	return nil
 }
+
+// retry runs op, retrying with capped exponential back-off for up to retryBudget. A Redis that is restarting or
+// loading its dataset must slow the worker down (Kafka absorbs the backlog; offsets are not committed until the state
+// is saved), not kill it.
+func retry(ctx context.Context, what string, op func() error) error {
+	deadline := time.Now().Add(retryBudget)
+	delay := 200 * time.Millisecond
+	for {
+		err := op()
+		if err == nil {
+			return nil
+		}
+		if ctx.Err() != nil || time.Now().After(deadline) {
+			return fmt.Errorf("%s: %w", what, err)
+		}
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("%s: %w", what, err)
+		case <-time.After(delay):
+		}
+		if delay *= 2; delay > 10*time.Second {
+			delay = 10 * time.Second
+		}
+	}
+}
+
+const retryBudget = 10 * time.Minute
 
 // Kill closes the client without committing, simulating a crash.
 func (w *Worker) Kill() {
