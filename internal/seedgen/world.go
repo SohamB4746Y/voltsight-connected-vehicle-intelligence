@@ -163,6 +163,23 @@ var cities = []city{
 	{"Surat", 21.1702, 72.8311, "SRT", 3},
 }
 
+// City is a metro area of the synthetic world.
+type City struct {
+	Name     string
+	Code     string
+	Lat, Lon float64
+	Zone     int16 // tariff zone id
+}
+
+// Cities returns the cities of the synthetic world (stable order = tariff-zone order).
+func Cities() []City {
+	out := make([]City, len(cities))
+	for i, c := range cities {
+		out[i] = City{Name: c.name, Code: c.code, Lat: c.lat, Lon: c.lon, Zone: c.zone}
+	}
+	return out
+}
+
 var tenantSpecs = []Tenant{
 	{Name: "Meridian Logistics", Slug: "meridian", Region: "south", Plan: "enterprise", share: 0.40, cities: []int{0, 1}},
 	{Name: "Coastal Rentals", Slug: "coastal", Region: "west", Plan: "pro", share: 0.25, cities: []int{2}},
