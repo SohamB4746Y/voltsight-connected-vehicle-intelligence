@@ -6,6 +6,8 @@ package sim
 import (
 	"sync/atomic"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Format selects the wire encoding of telemetry messages.
@@ -29,8 +31,10 @@ const (
 // Message is one encoded event. Payload is only valid until the sink's Emit returns.
 type Message struct {
 	Kind    Kind
-	Key     string // VIN (telemetry) or charger id; used as the Kafka key
-	Dialect byte   // 'A', 'B' for OEM JSON, 0 for protobuf
+	Key     string    // VIN (telemetry) or charger id; used as the Kafka key
+	Dialect byte      // 'A', 'B' for OEM JSON, 0 for protobuf
+	Tenant  uuid.UUID // the connector (tenant x OEM) this telemetry travels through
+	OEM     string
 	Payload []byte
 }
 
@@ -48,6 +52,9 @@ type Config struct {
 	Duration  int    // simulated seconds to run
 	SimStart  time.Time
 	StartTOD  int // local time of day at simulation start, seconds after midnight; default 05:30
+	// TimeBase, when set, is the timestamp of simulated second 0 (use time.Now() for live runs so event
+	// times are current); otherwise timestamps are SimStart + StartTOD.
+	TimeBase time.Time
 
 	Format   Format
 	Shards   int     // default GOMAXPROCS

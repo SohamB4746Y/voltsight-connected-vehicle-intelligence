@@ -3,7 +3,7 @@ COMPOSE := docker compose -f deploy/compose/docker-compose.yml --env-file .env
 PY ?= python
 GO ?= go
 
-.PHONY: env up bootstrap seed verify-seed down nuke ps logs health proto er realm lint secrets-scan \
+.PHONY: env up bootstrap gateway simulate seed verify-seed down nuke ps logs health proto er realm lint secrets-scan \
         gate-G0 gate-G0-clean gate-G1 test test-integration
 
 env:  ## generate .env with random credentials (idempotent, appends only missing keys)
@@ -13,10 +13,17 @@ up: env  ## start the stack, wait until healthy, migrate the database, set role 
 	$(COMPOSE) up -d --wait --wait-timeout 300
 	$(MAKE) bootstrap
 
-bootstrap:  ## database schema + service-role passwords + Vault PKI (idempotent)
+bootstrap:  ## database schema + service-role passwords + Vault PKI + Kafka topics (idempotent)
 	$(GO) run ./cmd/vsdb migrate-up
 	$(GO) run ./cmd/vsdb bootstrap-roles
 	$(GO) run ./cmd/vspki bootstrap
+	$(GO) run ./cmd/vstopics
+
+gateway:  ## run the ingest gateway (mTLS :8443, admin :9100)
+	$(GO) run ./cmd/vsgateway
+
+simulate:  ## 60 s of the 100K fleet through the gateway (start `make gateway` first)
+	$(GO) run ./cmd/vssim -vehicles 100000 -duration 60 -start-tod 27000 -gateway https://127.0.0.1:8443
 
 seed:  ## load the deterministic 100,000-vehicle dataset and verify it against db/seed/manifest.json
 	$(GO) run ./cmd/vsdb seed -reset

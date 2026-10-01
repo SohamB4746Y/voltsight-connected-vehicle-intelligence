@@ -259,6 +259,15 @@ def main() -> int:
               "up", "-d", "--wait", "--wait-timeout", "300"], timeout=420)
     if up.returncode != 0:
         crit("stack", False, up.stderr[-400:])
+    # the stack tests of later milestones (ingest gateway) need the migrated + seeded database, the
+    # service-role passwords, the Vault CA and the Kafka topics: exactly what `make up && make seed` does
+    for step in (["go", "run", "./cmd/vsdb", "migrate-up"], ["go", "run", "./cmd/vsdb", "bootstrap-roles"],
+                 ["go", "run", "./cmd/vspki", "bootstrap"], ["go", "run", "./cmd/vstopics"],
+                 ["go", "run", "./cmd/vsdb", "seed", "-reset"]):
+        r = run(step, timeout=900)
+        if r.returncode != 0:
+            crit("stack_prepare", False, {"step": " ".join(step), "stderr": r.stderr[-400:]})
+            break
     versions = {n: (run(c).stdout or run(c).stderr).strip().splitlines()[0] for n, c in
                 {"go": ["go", "version"], "buf": ["buf", "--version"], "docker": ["docker", "--version"],
                  "staticcheck": ["staticcheck", "-version"]}.items()}

@@ -120,7 +120,41 @@ func (v *Vault) Bootstrap(ctx context.Context) error {
 		"ttl": "720h", "max_ttl": fmt.Sprintf("%dh", int(MaxTTL.Hours())), "require_cn": true,
 		"no_store": false, "generate_lease": false,
 	})
+	if err != nil {
+		return err
+	}
+	// server-only role for the ingest gateway's own certificate
+	_, err = v.call(ctx, http.MethodPost, "/v1/pki/roles/"+ServerRole, map[string]any{
+		"allowed_domains": []string{"localhost", "voltsight.internal"}, "allow_subdomains": true, "allow_localhost": true,
+		"allow_ip_sans": true, "enforce_hostnames": true, "key_type": "ec", "key_bits": 256,
+		"server_flag": true, "client_flag": false, "ext_key_usage": []string{"ServerAuth"},
+		"ttl": "720h", "max_ttl": "2160h", "require_cn": true,
+	})
 	return err
+}
+
+// ServerRole is the Vault PKI role for server certificates.
+const ServerRole = "gateway-server"
+
+// IssueServer issues a server-auth certificate for the given common name and extra SANs (DNS names and IPs).
+func (v *Vault) IssueServer(ctx context.Context, cn string, altNames, ipSANs []string, ttl time.Duration) (*Issued, error) {
+	data, err := v.call(ctx, http.MethodPost, "/v1/pki/issue/"+ServerRole, map[string]any{
+		"common_name": cn, "alt_names": strings.Join(altNames, ","), "ip_sans": strings.Join(ipSANs, ","),
+		"ttl": fmt.Sprintf("%ds", int(ttl.Seconds())),
+	})
+	if err != nil {
+		return nil, err
+	}
+	s := func(k string) string { x, _ := data[k].(string); return x }
+	blk, _ := pem.Decode([]byte(s("certificate")))
+	if blk == nil {
+		return nil, errors.New("vault returned no certificate")
+	}
+	cert, err := x509.ParseCertificate(blk.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return &Issued{CertPEM: s("certificate"), KeyPEM: s("private_key"), CAPEM: s("issuing_ca"), Serial: s("serial_number"), Cert: cert}, nil
 }
 
 // Issued is a freshly issued connector certificate.

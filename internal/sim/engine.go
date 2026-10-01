@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
+
+	"voltsight/internal/seedgen"
 )
 
 type delayed struct {
@@ -49,6 +53,9 @@ func Run(ctx context.Context, cfg Config, sink Sink, stats *Stats) error {
 	}
 	e := &engine{w: w, cfg: cfg, sink: sink, stats: stats,
 		baseMs: cfg.SimStart.UnixMilli() + int64(cfg.StartTOD)*1000}
+	if !cfg.TimeBase.IsZero() {
+		e.baseMs = cfg.TimeBase.UnixMilli()
+	}
 	ringSize := maxInt(cfg.OOOMaxDelay, 30) + 2
 	for i := 0; i < cfg.Shards; i++ {
 		e.shards = append(e.shards, &shard{id: i, arena: make([]byte, 0, 4<<20), ring: make([][]delayed, ringSize)})
@@ -147,6 +154,31 @@ func Run(ctx context.Context, cfg Config, sink Sink, stats *Stats) error {
 	return w.truth.close()
 }
 
+// ConnectorKey identifies one OEM-cloud connector: the tenant's vehicles of one OEM.
+type ConnectorKey struct {
+	Tenant uuid.UUID
+	OEM    string
+}
+
+// Connectors lists the connectors a run with this configuration needs (one per tenant x OEM present).
+func Connectors(cfg Config) ([]ConnectorKey, error) {
+	cfg.defaults()
+	sw, err := seedgen.Generate(seedgen.Config{Seed: cfg.WorldSeed, Vehicles: cfg.Vehicles})
+	if err != nil {
+		return nil, err
+	}
+	seen := map[ConnectorKey]bool{}
+	var out []ConnectorKey
+	for _, v := range sw.Vehicles {
+		k := ConnectorKey{Tenant: v.TenantID, OEM: sw.Models[v.ModelID-1].OEM}
+		if !seen[k] {
+			seen[k] = true
+			out = append(out, k)
+		}
+	}
+	return out, nil
+}
+
 func (e *engine) schemaVer(v *vehicle, now int) uint32 {
 	if v.dialect == 'A' && e.cfg.SchemaV2At > 0 && now >= e.cfg.SchemaV2At {
 		return 2
@@ -206,7 +238,7 @@ func (e *engine) tick(sh *shard, now int) error {
 			}
 			outage := e.inOutage(v, now)
 			route := func(p []byte, delay int) {
-				m := Message{Kind: KindTelemetry, Key: v.vin, Dialect: dialect, Payload: p}
+				m := Message{Kind: KindTelemetry, Key: v.vin, Dialect: dialect, Tenant: v.tenant, OEM: sh.s.oem, Payload: p}
 				switch {
 				case outage:
 					m.Payload = append([]byte(nil), p...)

@@ -9,22 +9,33 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/twmb/franz-go/pkg/kgo"
+
+	"voltsight/internal/dbtool"
+	"voltsight/internal/dotenv"
+	"voltsight/internal/ingest"
+	"voltsight/internal/pki"
 	"voltsight/internal/sim"
 )
 
 func main() {
 	var (
-		cfg      sim.Config
-		format   = flag.String("format", "proto", "proto | oem-json")
-		out      = flag.String("out", "", "write length-prefixed messages to this file instead of discarding them")
-		report   = flag.String("report", "", "write the run report JSON here")
-		realtime = flag.Bool("realtime", false, "pace simulated time to the wall clock")
+		cfg          sim.Config
+		format       = flag.String("format", "proto", "proto | oem-json")
+		out          = flag.String("out", "", "write length-prefixed messages to this file instead of discarding them")
+		report       = flag.String("report", "", "write the run report JSON here")
+		realtime     = flag.Bool("realtime", false, "pace simulated time to the wall clock")
+		gateway      = flag.String("gateway", "", "deliver to this ingest gateway over mTLS, e.g. https://127.0.0.1:8443 (issues and registers connector certificates via Vault)")
+		kafkaBrokers = flag.String("brokers", "127.0.0.1:29092", "Kafka brokers for charger-status events (with -gateway)")
 	)
 	flag.Uint64Var(&cfg.Seed, "seed", 1, "behaviour seed")
 	flag.IntVar(&cfg.Vehicles, "vehicles", 100_000, "number of vehicles")
@@ -57,6 +68,11 @@ func main() {
 	var sink sim.Sink
 	null := &sim.NullSink{}
 	sink = null
+	var sender *ingest.Sender
+	if *gateway != "" {
+		sender = connectToGateway(ctx, &cfg, *gateway, *kafkaBrokers)
+		sink = sender
+	}
 	var fsink *fileSink
 	if *out != "" {
 		var err error
@@ -97,6 +113,16 @@ func main() {
 		"heap_alloc_mb": float64(ms.HeapAlloc) / 1e6, "sys_mb": float64(ms.Sys) / 1e6,
 		"delivery_digest": fmt.Sprintf("%016x", null.Digest()),
 	}
+	if sender != nil {
+		rep["gateway"] = map[string]any{
+			"url": *gateway, "requests": sender.Stats.Requests.Load(), "events_sent": sender.Stats.Sent.Load(),
+			"accepted": sender.Stats.Accepted.Load(), "rejected": sender.Stats.Rejected.Load(),
+			"retried_429": sender.Stats.Retried429.Load(), "retried_503": sender.Stats.Retried503.Load(),
+			"failed": sender.Stats.Failed.Load(), "bytes_sent": sender.Stats.BytesSent.Load(),
+			"charger_events_published":     sender.Stats.ChargerEvents.Load(),
+			"end_to_end_events_per_second": float64(sender.Stats.Sent.Load()) / wall.Seconds(),
+		}
+	}
 	b, _ := json.MarshalIndent(rep, "", "  ")
 	fmt.Println(string(b))
 	if *report != "" {
@@ -104,6 +130,52 @@ func main() {
 			fatal(err)
 		}
 	}
+}
+
+// connectToGateway provisions one Vault-issued, registered certificate per connector and returns a sender.
+// Development tooling: it uses the database owner connection to register the credentials.
+func connectToGateway(ctx context.Context, cfg *sim.Config, url, brokers string) *ingest.Sender {
+	env, err := dotenv.Load(".env")
+	if err != nil {
+		fatal(err)
+	}
+	addr := dotenv.Get(env, "VAULT_ADDR")
+	if addr == "" {
+		addr = "http://127.0.0.1:8200"
+	}
+	vault := pki.NewVault(addr, dotenv.Get(env, "VAULT_DEV_TOKEN"))
+	dsn, err := dbtool.OwnerDSN(env)
+	if err != nil {
+		fatal(err)
+	}
+	pool, err := pgxpool.New(ctx, dsn)
+	if err != nil {
+		fatal(err)
+	}
+	defer pool.Close()
+	keys, err := sim.Connectors(*cfg)
+	if err != nil {
+		fatal(err)
+	}
+	certs, err := ingest.Provision(ctx, vault, pool, keys, 24*time.Hour)
+	if err != nil {
+		fatal(err)
+	}
+	roots, err := vault.RootPool(ctx)
+	if err != nil {
+		fatal(err)
+	}
+	s := &ingest.Sender{URL: url, Clients: map[sim.ConnectorKey]*http.Client{}}
+	for k, c := range certs {
+		s.Clients[k] = ingest.NewClient(c, roots, "localhost")
+	}
+	if s.Kafka, err = kgo.NewClient(kgo.SeedBrokers(strings.Split(brokers, ",")...)); err != nil {
+		fatal(err)
+	}
+	cfg.TimeBase = time.Now() // current event times so the gateway's freshness checks pass
+	fmt.Fprintf(os.Stderr, "vssim: %d connector certificates issued and registered; waiting 12 s for the gateway to refresh its directory\n", len(keys))
+	time.Sleep(12 * time.Second)
+	return s
 }
 
 func max64(a, b int64) int64 {
