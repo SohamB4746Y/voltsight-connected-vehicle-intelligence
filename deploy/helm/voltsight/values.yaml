@@ -2,8 +2,9 @@
 # S3/Vault HTTP). Pointing `config` at managed services (MSK/Confluent, RDS/Cloud SQL, ElastiCache/Memorystore ...)
 # or at the in-cluster dev stack (`infra.enabled=true`) needs no code change.
 image:
-  repository: voltsight/platform
-  tag: "1.0.0"
+  # published by the `image` CI job on every push to main (pin by digest for a release)
+  repository: ghcr.io/sohamb4746y/voltsight-connected-vehicle-intelligence
+  tag: "main"
   pullPolicy: IfNotPresent
 
 config:

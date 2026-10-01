@@ -453,3 +453,26 @@ func TestHundredThousandVehicles(t *testing.T) {
 		t.Fatalf("heap %.0f MB for 100K vehicles exceeds the 1 GB budget", heapMB)
 	}
 }
+
+// A sequence base shifts every vehicle's numbers (so a restarted run continues above the previous one) and
+// changes nothing else; a zero base leaves the output untouched.
+func TestSeqBaseShiftsSequencesOnly(t *testing.T) {
+	base := Config{Seed: 5, Vehicles: 300, Duration: 20, Shards: 2}
+	a, b, c := &NullSink{}, &NullSink{}, &NullSink{}
+	sa := run(t, base, a)
+	zero := base
+	zero.SeqBase = 0
+	run(t, zero, b)
+	shifted := base
+	shifted.SeqBase = 1_790_000_000
+	sc := run(t, shifted, c)
+	if a.Digest() != b.Digest() {
+		t.Fatal("a zero sequence base changed the output")
+	}
+	if a.Digest() == c.Digest() {
+		t.Fatal("a non-zero sequence base did not change the sequence numbers")
+	}
+	if sa.Generated.Load() != sc.Generated.Load() {
+		t.Fatalf("the sequence base changed the event count: %d vs %d", sa.Generated.Load(), sc.Generated.Load())
+	}
+}

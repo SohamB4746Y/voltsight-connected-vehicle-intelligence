@@ -26,8 +26,18 @@ func mapper(name, typ string, cfg obj) obj {
 	return obj{"name": name, "protocol": "openid-connect", "protocolMapper": typ, "consentRequired": false, "config": cfg}
 }
 
-// Build returns the realm representation.
-func Build() obj {
+// PublicURLPlaceholder is substituted by Keycloak at import time from the PUBLIC_URL container variable.
+const PublicURLPlaceholder = "${PUBLIC_URL}"
+
+// Build returns the development realm representation (localhost redirects, DEV-only test client).
+func Build() obj { return build(false) }
+
+// BuildPublic returns the realm for an internet-facing deployment: the only redirect URI and web origin is the
+// deployment's own public URL (substituted from PUBLIC_URL at import) and the DEV-only direct-grant test client
+// is omitted, so there is no password grant and no client secret in the realm at all.
+func BuildPublic() obj { return build(true) }
+
+func build(public bool) obj {
 	w, err := seedgen.Generate(seedgen.Config{Seed: 1, Vehicles: 1}) // identities are seed-independent
 	if err != nil {
 		panic(err)
@@ -70,6 +80,38 @@ func Build() obj {
 	}
 	builtinScopes := []string{"basic", "profile", "email", "roles", "web-origins"}
 
+	redirects, origins := []string{"http://localhost:5173/*", "http://localhost:8081/*"}, []string{"http://localhost:5173", "http://localhost:8081"}
+	if public {
+		redirects, origins = []string{PublicURLPlaceholder + "/*"}, []string{PublicURLPlaceholder}
+	}
+	clients := []obj{
+		{
+			"clientId": WebClient, "name": "VoltSight web", "enabled": true, "publicClient": true,
+			"standardFlowEnabled": true, "directAccessGrantsEnabled": false, "implicitFlowEnabled": false,
+			"serviceAccountsEnabled": false, "protocol": "openid-connect",
+			"redirectUris": redirects, "webOrigins": origins,
+			"attributes":          obj{"pkce.code.challenge.method": "S256", "post.logout.redirect.uris": "+"},
+			"defaultClientScopes": builtinScopes, "protocolMappers": platformMappers(),
+		},
+		{
+			"clientId": APIClient, "name": "VoltSight API (resource server)", "enabled": true, "bearerOnly": true,
+			"standardFlowEnabled": false, "directAccessGrantsEnabled": false, "protocol": "openid-connect",
+		},
+	}
+	if !public {
+		clients = append(clients, obj{
+			// DEV/TEST ONLY: lets automated tests obtain tokens with the demo users' passwords.
+			// Production realms must omit this client (see docs/threat-model.md).
+			"clientId": TestClient, "name": "VoltSight test client (DEV ONLY)", "enabled": true,
+			"publicClient": false, "secret": "${KC_TEST_CLIENT_SECRET}", "standardFlowEnabled": false,
+			"directAccessGrantsEnabled": true, "implicitFlowEnabled": false, "serviceAccountsEnabled": false,
+			"protocol": "openid-connect", "defaultClientScopes": builtinScopes,
+			// extra audience so tests can call the Account REST API as the user (attack simulation)
+			"protocolMappers": append(platformMappers(), mapper("account-audience", "oidc-audience-mapper",
+				obj{"included.client.audience": "account", "id.token.claim": "false"})),
+		})
+	}
+
 	return obj{
 		"realm": Name, "enabled": true, "displayName": "VoltSight",
 		"sslRequired": "external", "registrationAllowed": false, "resetPasswordAllowed": false,
@@ -80,39 +122,19 @@ func Build() obj {
 		// forge their own tenant claim through the account console or the account API.
 		"attributes": obj{"unmanagedAttributePolicy": "ADMIN_EDIT"},
 		"roles":      obj{"realm": roles},
-		"clients": []obj{
-			{
-				"clientId": WebClient, "name": "VoltSight web", "enabled": true, "publicClient": true,
-				"standardFlowEnabled": true, "directAccessGrantsEnabled": false, "implicitFlowEnabled": false,
-				"serviceAccountsEnabled": false, "protocol": "openid-connect",
-				"redirectUris":        []string{"http://localhost:5173/*", "http://localhost:8081/*"},
-				"webOrigins":          []string{"http://localhost:5173", "http://localhost:8081"},
-				"attributes":          obj{"pkce.code.challenge.method": "S256", "post.logout.redirect.uris": "+"},
-				"defaultClientScopes": builtinScopes, "protocolMappers": platformMappers(),
-			},
-			{
-				"clientId": APIClient, "name": "VoltSight API (resource server)", "enabled": true, "bearerOnly": true,
-				"standardFlowEnabled": false, "directAccessGrantsEnabled": false, "protocol": "openid-connect",
-			},
-			{
-				// DEV/TEST ONLY: lets automated tests obtain tokens with the demo users' passwords.
-				// Production realms must omit this client (see docs/threat-model.md).
-				"clientId": TestClient, "name": "VoltSight test client (DEV ONLY)", "enabled": true,
-				"publicClient": false, "secret": "${KC_TEST_CLIENT_SECRET}", "standardFlowEnabled": false,
-				"directAccessGrantsEnabled": true, "implicitFlowEnabled": false, "serviceAccountsEnabled": false,
-				"protocol": "openid-connect", "defaultClientScopes": builtinScopes,
-				// extra audience so tests can call the Account REST API as the user (attack simulation)
-				"protocolMappers": append(platformMappers(), mapper("account-audience", "oidc-audience-mapper",
-					obj{"included.client.audience": "account", "id.token.claim": "false"})),
-			},
-		},
-		"users": users,
+		"clients":    clients,
+		"users":      users,
 	}
 }
 
-// JSON returns the indented realm document with a trailing newline.
-func JSON() ([]byte, error) {
-	b, err := json.MarshalIndent(Build(), "", "  ")
+// JSON returns the indented development realm document with a trailing newline.
+func JSON() ([]byte, error) { return marshal(Build()) }
+
+// PublicJSON returns the indented public-deployment realm document with a trailing newline.
+func PublicJSON() ([]byte, error) { return marshal(BuildPublic()) }
+
+func marshal(r obj) ([]byte, error) {
+	b, err := json.MarshalIndent(r, "", "  ")
 	if err != nil {
 		return nil, err
 	}

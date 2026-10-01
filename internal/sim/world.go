@@ -159,7 +159,7 @@ func newWorld(cfg Config, stats *Stats) (*world, error) {
 		}
 		v.skewMs = int16(v.r.NormFloat64() * 150)
 		v.phaseMs = int16(v.r.IntN(1000))
-		v.seq = uint64(1000 + v.r.IntN(9000))
+		v.seq = cfg.SeqBase + uint64(1000+v.r.IntN(9000))
 		v.odo = 5000 + v.r.Float64()*60000
 		v.outageMember = hash01(sv.VIN) < cfg.OutageFraction
 		v.dialect = m.dialect

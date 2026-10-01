@@ -1,0 +1,10 @@
+alert receive->detect latency, from the alert rows of the live deployment (detected_at - source_recv_ts), measured 2026-10-01T19:17:14Z
+NOT end-to-end: it excludes device->gateway time and alert->dashboard time. Sample is whatever alerts the demo produced.
+columns: n | avg_s | p50_s | p95_s | max_s
+33|0.046|0.028|0.133|0.224
+alerts by rule/severity/status:
+RANGE_CRITICAL|CRITICAL|acknowledged|1
+RANGE_CRITICAL|CRITICAL|open|3
+RANGE_LOW|WARNING|acknowledged|1
+RANGE_LOW|WARNING|open|28
+event rate (worker log, last sample): rtp: 593943 events (816/s) new=557035 late=16266 dup=11611 stale=9031 lag=0

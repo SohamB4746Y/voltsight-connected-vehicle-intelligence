@@ -41,6 +41,7 @@ func main() {
 	flag.IntVar(&cfg.Vehicles, "vehicles", 100_000, "number of vehicles")
 	flag.IntVar(&cfg.Duration, "duration", 60, "simulated seconds")
 	flag.IntVar(&cfg.Shards, "shards", 0, "worker shards (default GOMAXPROCS)")
+	seqBase := flag.Int64("seq-base", 0, "added to every vehicle's initial sequence number; -1 = the current unix time in seconds (a restarted live run continues above the previous run's numbers)")
 	flag.IntVar(&cfg.StartTOD, "start-tod", 0, "local time of day at start, seconds after midnight (default 19800 = 05:30)")
 	flag.Float64Var(&cfg.Speedup, "speedup", 1, "simulated seconds per wall second (with -realtime)")
 	flag.Float64Var(&cfg.DupRate, "dup-rate", 0, "probability an event is delivered twice")
@@ -61,6 +62,11 @@ func main() {
 	flag.Float64Var(&cfg.LowSoCStartFraction, "low-soc-fraction", 0, "share of vehicles that start with a low battery (default 0.08)")
 	flag.StringVar(&cfg.TruthDir, "truth-dir", "", "write ground-truth files here")
 	flag.Parse()
+	if *seqBase < 0 {
+		cfg.SeqBase = uint64(time.Now().Unix())
+	} else {
+		cfg.SeqBase = uint64(*seqBase)
+	}
 	cfg.Format = sim.Format(*format)
 	cfg.RealTime = *realtime
 

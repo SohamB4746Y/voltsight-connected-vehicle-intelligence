@@ -55,6 +55,10 @@ type Config struct {
 	// TimeBase, when set, is the timestamp of simulated second 0 (use time.Now() for live runs so event
 	// times are current); otherwise timestamps are SimStart + StartTOD.
 	TimeBase time.Time
+	// SeqBase is added to every vehicle's initial sequence number. A restarted live run sets it to the wall
+	// clock (seconds) so its numbers continue above the previous run's: a real device keeps its counter across
+	// reconnects, and the pipeline rightly drops lower numbers as stale. Zero keeps the output byte-identical.
+	SeqBase uint64
 
 	Format   Format
 	Shards   int     // default GOMAXPROCS

@@ -60,3 +60,27 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | DL15 demo video | PARTIAL | three silent screen-recording clips of the real journey (dispatcher, energy manager, viewer; 49 s + 17 s + 13 s) in `docs/demo/*.webm`, recorded by `tests/e2e/record_demo.mjs` against the live system; **no narration**, shorter than the 5-minute slot; the spoken script is `docs/demo.md` |
 | RL1, RL2, RL5 | PASS | `docs/ai-oss-declaration.md` (SBOM not generated) |
 | RL3 | see git tags | |
+
+## Live deployment (added 2026-10-01; scope: the live profile on the build sandbox unless stated)
+Columns: Implementation = what exists; Live verification = what was actually run and where; Status uses PASS / PARTIAL / FAIL / BLOCKED / NOT RUN / NOT MEASURED.
+| ID | Requirement | Implementation | Live verification | Status | Limitation |
+|---|---|---|---|---|---|
+| LD1 | Public HTTPS URL a judge can open | `deploy/live/up.sh`, Caddy edge, `.devcontainer`, `tls` profile | none: nothing is hosted on the internet | **BLOCKED** (needs the owner's Codespace or VM account) | free hosts that can run the stack were investigated 2026-10-01 (`docs/deployment-live.md` section 2) |
+| LD2 | Real frontend + real backend on one origin | console + API + OIDC behind Caddy | browser journey and 31 checks on `http://localhost:8080` | PASS (local profile) | not on the internet |
+| LD3 | Real authentication (OIDC) | Keycloak `start` mode, public realm, PKCE | 4 users signed in via the real flow | PASS (local profile) | |
+| LD4 | RBAC + tenant isolation | unchanged from G9/G1; public realm without DEV client | `live_checks.json` RBAC-*, ISO-*, EXP-* | PASS (local profile) | |
+| LD5 | Real telemetry pipeline | simulator, mTLS gateway, Kafka, worker, sink | ~816 events/s, lag 0, 33 alerts | PASS (local profile) | demo scale |
+| LD6 | Range-risk alerts persisted and visible | worker risk engine, alert service, SSE | alert rows in PostgreSQL, alert detail screenshot | PASS (local profile) | |
+| LD7 | Copilot | typed tools, guardrails, audit | answered a tool-backed question | **PARTIAL** | deterministic stub provider; no LLM key |
+| LD8 | Docker production image builds and runs | `deploy/docker/Dockerfile`; CI `image` job | built, 74.5 MB, non-root, started in compose | PASS (local, and CI run 36913328981 on a plain runner) | sandbox needed a CA workaround, not part of the repo; GHCR publish happens only on `main` and has not run |
+| LD9 | Image scan | Trivy in CI (report) | Trivy 0.57.1: 0 HIGH/CRITICAL | PASS | |
+| LD10 | Helm validates | chart + kubeconform | lint ok, 21/21 valid | PASS | |
+| LD11 | Chart accepted by a real Kubernetes API server | `.github/workflows/kubernetes.yml` (kind in CI) | CI run 36913329082: ephemeral kind v1.32.2, dry run + real install + uninstall all passed (could not run in the sandbox) | **PASS (API-server acceptance only)** | pod readiness not asserted (needs external backing services); no public cluster |
+| LD12 | Terraform validates | AWS, GCP | fmt + validate pass | PASS | not applied |
+| LD13 | Survives restart | `up.sh`, named volumes, `vssim -seq-base` | single-service restarts and a full stop/start | PASS after one defect found and fixed | PostgreSQL failover, gateway kill, node loss not tested |
+| LD14 | Live event rate | | ~816 events/s at 2,000 configured vehicles | MEASURED | 100K/s NOT MEASURED live |
+| LD15 | Alert latency | | receive-to-detect p50 28 ms, p95 133 ms (n=33) | MEASURED (partial path) | end-to-end and the 5 s target NOT MEASURED live |
+| LD16 | API p95/p99 | | p95 <= 10.3 ms, p99 <= 12.9 ms (loopback, 300 req/endpoint) | MEASURED | not under concurrent load or over a network |
+| LD17 | No secrets committed | gitleaks, `.env` ignored | clean over 37 commits | PASS | |
+| LD18 | Observability | Prometheus, Grafana, OTel | 6 scrape targets up | PARTIAL | no Loki/Tempo; internal only |
+| LD19 | Deployment triggered by a GitHub commit | `image` job publishes to GHCR | not run | NOT RUN | no provider credential exists |
