@@ -26,7 +26,7 @@ nohup ./bin/vsapi > tmp/demo/api.log 2>&1 &
 sleep 8
 echo "console: http://localhost:8081   (sign in as dispatcher@meridian.example / \$DEMO_USER_PASSWORD from .env)"
 # a stressed fleet so alerts appear quickly: low batteries, drivers ignoring warnings, 90% of chargers failing at +120 s
-nohup ./bin/vssim -vehicles "$V" -duration "$D" -start-tod 27000 -realtime -low-soc-fraction 0.3 -low-soc-min 0.02 -low-soc-max 0.05 \
+nohup ./bin/vssim -vehicles "$V" -duration "$D" -start-tod 27000 -realtime -low-soc-fraction 0.3 -low-soc-min 0.101 -low-soc-max 0.13 \
   -charger-outage-at 90 -charger-outage-duration 1200 -charger-outage-fraction 0.99 \
   -gateway https://127.0.0.1:8443 > tmp/demo/sim.log 2>&1 &
 echo "simulator running for $D s; logs in tmp/demo/"

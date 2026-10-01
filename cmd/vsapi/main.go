@@ -49,11 +49,11 @@ func main() {
 	must(err)
 	defer pool.Close()
 
-	rdb := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", Password: dotenv.Get(env, "REDIS_PASSWORD"), PoolSize: 32})
+	rdb := redis.NewClient(&redis.Options{Addr: dotenv.GetOr(env, "REDIS_ADDR", "127.0.0.1:6379"), Password: dotenv.Get(env, "REDIS_PASSWORD"), PoolSize: 32})
 	defer rdb.Close()
 
 	var ch clickhouse.Conn
-	if c, err := clickhouse.Open(&clickhouse.Options{Addr: []string{"127.0.0.1:9000"},
+	if c, err := clickhouse.Open(&clickhouse.Options{Addr: []string{dotenv.GetOr(env, "CLICKHOUSE_ADDR", "127.0.0.1:9000")},
 		Auth:        clickhouse.Auth{Database: "default", Username: "voltsight", Password: dotenv.Get(env, "CLICKHOUSE_PASSWORD")},
 		Compression: &clickhouse.Compression{Method: clickhouse.CompressionLZ4}, MaxOpenConns: 8}); err == nil {
 		ch = c

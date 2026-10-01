@@ -37,7 +37,7 @@ func main() {
 	pool, err := pgxpool.New(ctx, u.String())
 	must(err)
 	defer pool.Close()
-	ch, err := clickhouse.Open(&clickhouse.Options{Addr: []string{"127.0.0.1:9000"},
+	ch, err := clickhouse.Open(&clickhouse.Options{Addr: []string{dotenv.GetOr(env, "CLICKHOUSE_ADDR", "127.0.0.1:9000")},
 		Auth:        clickhouse.Auth{Database: "default", Username: "voltsight", Password: dotenv.Get(env, "CLICKHOUSE_PASSWORD")},
 		Compression: &clickhouse.Compression{Method: clickhouse.CompressionLZ4}})
 	must(err)

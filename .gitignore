@@ -17,3 +17,6 @@ tmp/
 Motorq_Hackathon_Problem_Statement.pdf
 web/node_modules/
 web/dist/
+ml/data/
+.terraform/
+*.tfstate*

@@ -41,7 +41,7 @@ func main() {
 
 	env, err := dotenv.Load(".env")
 	must(err)
-	rdb := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", Password: dotenv.Get(env, "REDIS_PASSWORD"), PoolSize: 16})
+	rdb := redis.NewClient(&redis.Options{Addr: dotenv.GetOr(env, "REDIS_ADDR", "127.0.0.1:6379"), Password: dotenv.Get(env, "REDIS_PASSWORD"), PoolSize: 16})
 	defer rdb.Close()
 	must(rdb.Ping(ctx).Err())
 

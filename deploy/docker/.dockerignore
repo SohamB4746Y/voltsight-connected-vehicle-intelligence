@@ -1,0 +1,10 @@
+.git
+.env
+.venv
+bin
+tmp
+evidence
+web/node_modules
+web/dist
+ml/data
+tests/e2e/node_modules

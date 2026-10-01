@@ -33,7 +33,7 @@ func main() {
 	must(err)
 	s, err := sink.Open(ctx, sink.Config{Brokers: strings.Split(*brokers, ","), Topic: *topic, Group: *group, Table: *table,
 		StartAtEnd: *fromEnd, MaxPoll: *poll, CH: &clickhouse.Options{
-			Addr: []string{"127.0.0.1:9000"}, Auth: clickhouse.Auth{Database: "default", Username: "voltsight", Password: dotenv.Get(env, "CLICKHOUSE_PASSWORD")},
+			Addr: []string{dotenv.GetOr(env, "CLICKHOUSE_ADDR", "127.0.0.1:9000")}, Auth: clickhouse.Auth{Database: "default", Username: "voltsight", Password: dotenv.Get(env, "CLICKHOUSE_PASSWORD")},
 			Compression: &clickhouse.Compression{Method: clickhouse.CompressionLZ4}, MaxOpenConns: 4}})
 	must(err)
 	defer s.Close()

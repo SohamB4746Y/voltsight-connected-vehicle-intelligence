@@ -20,6 +20,7 @@ import (
 	"voltsight/internal/dbtool"
 	"voltsight/internal/dotenv"
 	"voltsight/internal/jwtverify"
+	"voltsight/internal/privacy"
 )
 
 type harness struct {
@@ -258,4 +259,61 @@ func TestKeysetPagination(t *testing.T) {
 		after = r.Next
 	}
 	_ = time.Second
+}
+
+// N23: erasure through the API + worker, with verification evidence; another tenant's driver is not reachable
+func TestErasureFlowEndToEnd(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	dsn, _ := dbtool.OwnerDSN(h.env)
+	owner, err := pgxpool.New(ctx, dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer owner.Close()
+	var subject, other string
+	if err := owner.QueryRow(ctx, `SELECT d.id::text FROM driver d JOIN tenant t ON t.id = d.tenant_id WHERE t.name = 'Meridian Logistics' AND d.erased_at IS NULL LIMIT 1`).Scan(&subject); err != nil {
+		t.Skip("seed missing")
+	}
+	_ = owner.QueryRow(ctx, `SELECT d.id::text FROM driver d JOIN tenant t ON t.id = d.tenant_id WHERE t.name = 'Coastal Rentals' LIMIT 1`).Scan(&other)
+	var piiBefore int
+	_ = owner.QueryRow(ctx, `SELECT count(*) FROM driver WHERE id = $1 AND pii_enc IS NOT NULL`, subject).Scan(&piiBefore)
+	if piiBefore != 1 {
+		t.Fatal("subject has no PII to erase")
+	}
+	admin, viewer := h.token("tenant_admin@meridian.example"), h.token("viewer@meridian.example")
+	if code, _ := h.do("POST", "/v1/privacy/erasure", viewer, `{"subject_id":"`+subject+`"}`); code != 403 {
+		t.Fatalf("a viewer requested an erasure: %d", code)
+	}
+	if code, _ := h.do("POST", "/v1/privacy/erasure", admin, `{"subject_id":"`+other+`"}`); code != 404 {
+		t.Fatalf("erasure of another tenant's driver -> %d, want 404", code)
+	}
+	code, body := h.do("POST", "/v1/privacy/erasure", admin, `{"subject_id":"`+subject+`"}`)
+	if code != 202 {
+		t.Fatalf("request -> %d %s", code, body)
+	}
+	var created struct{ ID string }
+	_ = json.Unmarshal(body, &created)
+
+	u, _ := url.Parse(dsn)
+	u.User = url.UserPassword("voltsight_privacy", dotenv.Get(h.env, "DB_PRIVACY_PASSWORD"))
+	pp, err := pgxpool.New(ctx, u.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pp.Close()
+	n, err := privacy.ProcessPending(ctx, pp)
+	if err != nil || n < 1 {
+		t.Fatalf("worker completed %d: %v", n, err)
+	}
+	code, body = h.do("GET", "/v1/privacy/erasure/"+created.ID, admin, "")
+	if code != 200 || !strings.Contains(string(body), `"status":"completed"`) || !strings.Contains(string(body), `"driver_pii_ciphertext_remaining":0`) {
+		t.Fatalf("status %d %s", code, body)
+	}
+	var pii int
+	var pseudonym string
+	_ = owner.QueryRow(ctx, `SELECT count(*) FILTER (WHERE pii_enc IS NOT NULL), max(pseudonym) FROM driver WHERE id = $1`, subject).Scan(&pii, &pseudonym)
+	if pii != 0 || !strings.HasPrefix(pseudonym, "erased-") {
+		t.Fatalf("subject data remains: pii=%d pseudonym=%q", pii, pseudonym)
+	}
 }

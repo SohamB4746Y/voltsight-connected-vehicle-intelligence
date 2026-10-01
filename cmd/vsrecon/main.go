@@ -74,7 +74,7 @@ func main() {
 	}
 	accepted, rejected := endSum(*topic), endSum(*dlq)
 
-	conn, err := clickhouse.Open(&clickhouse.Options{Addr: []string{"127.0.0.1:9000"},
+	conn, err := clickhouse.Open(&clickhouse.Options{Addr: []string{dotenv.GetOr(env, "CLICKHOUSE_ADDR", "127.0.0.1:9000")},
 		Auth: clickhouse.Auth{Database: "default", Username: "voltsight", Password: dotenv.Get(env, "CLICKHOUSE_PASSWORD")}})
 	must(err)
 	defer conn.Close()

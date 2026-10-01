@@ -38,3 +38,11 @@ func Get(env map[string]string, key string) string {
 	}
 	return env[key]
 }
+
+// GetOr is Get with a default for an unset key.
+func GetOr(env map[string]string, key, def string) string {
+	if v := Get(env, key); v != "" {
+		return v
+	}
+	return def
+}

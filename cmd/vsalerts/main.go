@@ -43,7 +43,7 @@ func main() {
 	pool, err := pgxpool.New(ctx, u.String())
 	must(err)
 	defer pool.Close()
-	rdb := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", Password: dotenv.Get(env, "REDIS_PASSWORD")})
+	rdb := redis.NewClient(&redis.Options{Addr: dotenv.GetOr(env, "REDIS_ADDR", "127.0.0.1:6379"), Password: dotenv.Get(env, "REDIS_PASSWORD")})
 	defer rdb.Close()
 
 	s, err := alerts.New(alerts.Config{Brokers: strings.Split(*brokers, ","), Group: *group, StartAtEnd: *fromEnd, LatencyLog: *latency}, pool, rdb)

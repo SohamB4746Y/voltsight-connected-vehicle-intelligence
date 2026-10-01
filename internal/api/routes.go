@@ -37,6 +37,8 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /v1/reports/soh", s.guard(PermReportsRead, "report.soh", "report", s.reportSoH))
 
 	m.HandleFunc("GET /v1/audit", s.guard(PermAuditRead, "audit.read", "audit", s.listAudit))
+	m.HandleFunc("POST /v1/privacy/erasure", s.guard(PermPrivacyWrite, "privacy.erasure.request", "erasure_request", s.requestErasure))
+	m.HandleFunc("GET /v1/privacy/erasure/{id}", s.guard(PermPrivacyWrite, "privacy.erasure.read", "erasure_request", s.getErasure))
 	m.HandleFunc("GET /v1/ops/pipeline", s.guard(PermOpsRead, "ops.read", "ops", s.opsPipeline))
 
 	m.HandleFunc("POST /v1/copilot/messages", s.guard(PermCopilotUse, "", "copilot", func(w http.ResponseWriter, r *http.Request, p *Principal) {
