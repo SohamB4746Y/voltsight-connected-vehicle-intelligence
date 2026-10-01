@@ -9,7 +9,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -119,8 +118,6 @@ func (p *Principal) Has(perm string) bool {
 }
 
 type ctxKey int
-
-const principalKey ctxKey = 1
 
 // New builds the server.
 func New(cfg Config) *Server {
@@ -383,8 +380,6 @@ func intParam(r *http.Request, name string, def, min, max int) int {
 	}
 	return n
 }
-
-var errNotFound = errors.New("not found")
 
 func notFound(w http.ResponseWriter) { writeProblem(w, http.StatusNotFound, "not found") }
 

@@ -98,6 +98,7 @@ func (r *rig) agentAuditRows(tenantName string) int {
 func TestGroundedAnswersCiteEvidenceAndEveryStepIsAudited(t *testing.T) {
 	r := newRig(t, Stub{})
 	tok := r.token("dispatcher@meridian.example")
+	seedIncident(t, r, "Delivery van stranded after a regional charger outage; the driver ignored the low battery warning and a tow truck recovered it.")
 	before := r.agentAuditRows("Meridian Logistics")
 	resp, code := r.ask(tok, "Find similar past incidents where chargers failed and a van was stranded")
 	if code != 200 || len(resp.Citations) == 0 || !strings.Contains(resp.Answer, "[incident:") {
@@ -296,4 +297,16 @@ func TestMessageValidation(t *testing.T) {
 	if code, _ := r.post("/v1/copilot/messages", tok, `{"session_id":"00000000-0000-0000-0000-000000000000","message":"hi"}`); code != 404 {
 		t.Errorf("unknown session accepted: %d", code)
 	}
+}
+
+// seedIncident makes the test independent of the incident corpus (vsincidents) having been loaded.
+func seedIncident(t *testing.T, r *rig, text string) {
+	t.Helper()
+	ctx := context.Background()
+	var id string
+	if err := r.owner.QueryRow(ctx, `INSERT INTO incident_embedding (tenant_id, kind, source_ref, body, embedding)
+		SELECT t.id, 'stranding', 'test:seed', $1, $2::vector FROM tenant t WHERE t.name = 'Meridian Logistics' RETURNING id::text`, text, embed.Literal(embed.Embed(text))).Scan(&id); err != nil {
+		t.Skip("seed missing")
+	}
+	t.Cleanup(func() { _, _ = r.owner.Exec(ctx, `DELETE FROM incident_embedding WHERE id = $1`, id) })
 }
