@@ -21,7 +21,7 @@ Evidence bundle (clean tree, commit `031637e`): `evidence/G1/20261001T111419Z-03
 | G1.10 ER + 3NF | PASS | `docs/er/` regenerated from the live schema and equal to the committed files; `docs/3nf.md` has a section for each of the 31 tables and none for non-existent ones |
 | G1.11 unit coverage, static, SAST | PASS | **89 tests, 0 failed, 0 skipped**; coverage: vin 100.0, geo 100.0, seedgen 98.8, dotenv 94.4, jwtverify 93.2, realm 92.3, erdiagram 89.2, pki 82.0, dbtool 81.8 (threshold 80); gofmt/vet/staticcheck/gitleaks clean; Semgrep (golang, secrets, dockerfile) 0 findings with the waiver below |
 | G1.12a regression | PASS | G0 health and functional probes re-run: exit 0 |
-| G1.12b GitHub CI green | see the CI section below | |
+| G1.12b GitHub CI green | **PARTIAL (not yet confirmed green)** | CI run `36854511933` (commit `a95f618`): on the Linux runner **all G1 criteria passed** (89 tests, 0 failed/skipped; coverage, RLS mutation check, static, Semgrep) and only the G0 regression step failed, because G0.1-G0.3 describe the developer machine. Fixed in `dd56cea` (`--stack-only`: those criteria are recorded SKIPPED, never PASS). The CI run for `dd56cea` (`36855616757`) was still in progress when this was written; its result is **not recorded here and must be read from GitHub** before G1.12b is called PASS |
 
 ## Defects found by this gate and fixed (iteration history)
 1. Charger primary-key collision at full size (depot names repeated across fleets) — found by the first 100K load; fixed, regression test `TestIdentitiesUniqueAtFullSize`.
