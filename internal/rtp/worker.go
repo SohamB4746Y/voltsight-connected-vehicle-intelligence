@@ -255,8 +255,8 @@ func (w *Worker) processBatch(ctx context.Context, fetches kgo.Fetches) error {
 	if err := retry(ctx, "save state", func() error { return w.store.Save(ctx, dirty) }); err != nil {
 		return err
 	}
-	if err := w.cl.CommitUncommittedOffsets(ctx); err != nil {
-		return fmt.Errorf("commit: %w", err)
+	if err := retry(ctx, "commit offsets", func() error { return w.cl.CommitUncommittedOffsets(ctx) }); err != nil {
+		return err
 	}
 	w.Stats.Batches.Add(1)
 	w.Stats.Lag.Store(lag)

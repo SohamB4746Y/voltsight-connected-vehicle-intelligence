@@ -121,7 +121,7 @@ func (s *Service) Run(ctx context.Context) error {
 			}
 			return fmt.Errorf("persist: %w", err)
 		}
-		if err := s.cl.CommitUncommittedOffsets(ctx); err != nil && ctx.Err() == nil {
+		if err := retry(ctx, func() error { return s.cl.CommitUncommittedOffsets(ctx) }); err != nil && ctx.Err() == nil {
 			return fmt.Errorf("commit: %w", err)
 		}
 	}
