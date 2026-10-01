@@ -76,7 +76,8 @@ def check_proto(out: pathlib.Path) -> None:
     has_baseline = run(["git", "cat-file", "-e", f"{ref}:proto/buf.yaml"]).returncode == 0
     res["baseline_ref"] = ref
     if has_baseline:
-        res["breaking_vs_baseline"] = run(["buf", "breaking", "--against", f".git#ref={ref},subdir=proto"], cwd=ROOT).returncode == 0
+        # run inside the module directory (proto/ holds buf.yaml); the baseline is that same subdir at `ref`
+        res["breaking_vs_baseline"] = run(["buf", "breaking", "--against", f"../.git#ref={ref},subdir=proto"], cwd=proto).returncode == 0
     else:
         res["breaking_vs_baseline"] = f"no baseline at {ref} yet (first contract commit); detection capability proven below"
 
