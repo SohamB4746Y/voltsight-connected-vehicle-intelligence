@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs every chaos scenario in sequence and collects the results (about 5 minutes each on a 4-vCPU box).
 cd "$(dirname "$0")/.."
-for s in worker-kill sink-kill redis-restart clickhouse-restart kafka-restart gateway-kill; do
+for s in ${SCENARIOS:-worker-kill sink-kill redis-restart clickhouse-restart kafka-restart gateway-kill}; do
   chaos/run.sh $s evidence/G13/$s 75 > tmp/chaos-$s.log 2>&1
 done
 python3 - <<'PY'
