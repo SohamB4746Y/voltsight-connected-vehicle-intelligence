@@ -1,0 +1,137 @@
+{
+  "gate": "G1",
+  "status_local": "PASS",
+  "git": {
+    "sha": "031637e",
+    "dirty": false
+  },
+  "criteria": {
+    "G1.1": {
+      "status": "PASS",
+      "detail": {
+        "lint": true,
+        "format_clean": true,
+        "generate_ok": true,
+        "generated_code_up_to_date": true,
+        "baseline_ref": "HEAD",
+        "breaking_vs_baseline": true,
+        "negative_test": {
+          "breaking_change_detected": true,
+          "findings": [
+            "C:\\Users\\Dell\\AppData\\Local\\Temp\\tmp76_rc5o7\\mutated\\voltsight\\telemetry\\v1\\telemetry.proto:35:1:Previously present field \"6\" with name \"soc_pct\" on message \"TelemetryEvent\" was deleted.",
+            "C:\\Users\\Dell\\AppData\\Local\\Temp\\tmp76_rc5o7\\mutated\\voltsight\\telemetry\\v1\\telemetry.proto:45:3:Field \"10\" with name \"seq\" on message \"TelemetryEvent\" changed type from \"uint64\" to \"string\"."
+          ],
+          "additive_change_allowed": true
+        }
+      }
+    },
+    "G1.2": {
+      "status": "PASS",
+      "detail": {
+        "tests": {
+          "voltsight/internal/contract::TestProblemStatementExampleParsesUnchanged": "pass",
+          "voltsight/internal/contract::TestTelemetryContainsRequiredFields": "pass",
+          "voltsight/internal/contract::TestBinaryAndJSONRoundTrip": "pass",
+          "voltsight/internal/contract::TestBatchRoundTripAndGarbageIsRejected": "pass",
+          "voltsight/internal/contract::TestWireSizeIsMeasuredAndWithinBudget": "pass",
+          "voltsight/internal/contract::TestOtherContractsRoundTrip": "pass",
+          "voltsight/internal/contract::TestEnumZeroValuesAreUnspecified": "pass"
+        }
+      }
+    },
+    "G1.3": {
+      "status": "PASS",
+      "detail": "up -> down -> up on a fresh PostgreSQL; fingerprint equality asserted in the test"
+    },
+    "G1.4": {
+      "status": "PASS",
+      "detail": "schema lint tests"
+    },
+    "G1.5": {
+      "status": "PASS",
+      "detail": "RLS attack suite (+ documented limitation assertion)"
+    },
+    "G1.6": {
+      "status": "PASS",
+      "detail": "ACID suite"
+    },
+    "G1.7": {
+      "status": "PASS",
+      "detail": {
+        "rows": 323321,
+        "duration_ns": 18518779000,
+        "rows_per_s": 17459.088420462278
+      }
+    },
+    "G1.8": {
+      "status": "PASS",
+      "detail": "Keycloak realm + JWT verification against the running Keycloak"
+    },
+    "G1.9": {
+      "status": "PASS",
+      "detail": "Vault PKI against the running Vault"
+    },
+    "G1.10": {
+      "status": "PASS",
+      "detail": "ER regenerated from live DDL; 3NF doc covers every table"
+    },
+    "G1.11a_tests": {
+      "status": "PASS",
+      "detail": {
+        "tests_passed": 89,
+        "tests_failed": [],
+        "tests_skipped": [],
+        "exit_code": 0
+      }
+    },
+    "G1.11b_coverage": {
+      "status": "PASS",
+      "detail": {
+        "coverage_pct": {
+          "vin": 100.0,
+          "seedgen": 98.8,
+          "pki": 82.0,
+          "jwtverify": 93.2,
+          "realm": 92.3,
+          "geo": 100.0,
+          "dotenv": 94.4,
+          "dbtool": 81.8,
+          "erdiagram": 89.2
+        },
+        "below_threshold": {}
+      }
+    },
+    "G1.5_mutation": {
+      "status": "PASS",
+      "detail": {
+        "suite_failed": true,
+        "leak_reports": 21,
+        "restored": true
+      }
+    },
+    "G1.11c_static": {
+      "status": "PASS",
+      "detail": {
+        "gofmt_unformatted": [],
+        "go_vet_ok": true,
+        "staticcheck_ok": true,
+        "gitleaks_ok": true,
+        "semgrep_findings": 0,
+        "semgrep_waivers": [
+          {
+            "rule": "go.lang.security.audit.crypto.math_random.math-random-used",
+            "file": "internal/seedgen/world.go",
+            "rationale": "seeded PRNG for deterministic synthetic data; not security-sensitive"
+          }
+        ]
+      }
+    },
+    "G1.12a_g0_regression": {
+      "status": "PASS",
+      "detail": "tools/gates/g0.py (health + functional probes) re-run: exit 0"
+    }
+  },
+  "pending": [
+    "G1.12b: GitHub CI green on the milestone commit (verified after push)"
+  ]
+}
