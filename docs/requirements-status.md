@@ -72,7 +72,7 @@ Columns: Implementation = what exists; Live verification = what was actually run
 | LD5 | Real telemetry pipeline | simulator, mTLS gateway, Kafka, worker, sink | ~816 events/s, lag 0, 33 alerts | PASS (local profile) | demo scale |
 | LD6 | Range-risk alerts persisted and visible | worker risk engine, alert service, SSE | alert rows in PostgreSQL, alert detail screenshot | PASS (local profile) | |
 | LD7 | Copilot | typed tools, guardrails, audit | answered a tool-backed question | **PARTIAL** | deterministic stub provider; no LLM key |
-| LD8 | Docker production image builds and runs | `deploy/docker/Dockerfile`; CI `image` job | built, 74.5 MB, non-root, started in compose | PASS (local, and CI run 36913328981 on a plain runner) | sandbox needed a CA workaround, not part of the repo; GHCR publish happens only on `main` and has not run |
+| LD8 | Docker production image builds and runs | `deploy/docker/Dockerfile`; CI `image` job | built, 74.5 MB, non-root, started in compose | PASS (local, and CI run 36913328981 on a plain runner) | sandbox needed a CA workaround, not part of the repo; published to GHCR by CI on `main` (run 36923352796), anonymous pull verified |
 | LD9 | Image scan | Trivy in CI (report) | Trivy 0.57.1: 0 HIGH/CRITICAL | PASS | |
 | LD10 | Helm validates | chart + kubeconform | lint ok, 21/21 valid | PASS | |
 | LD11 | Chart accepted by a real Kubernetes API server | `.github/workflows/kubernetes.yml` (kind in CI) | CI run 36913329082: ephemeral kind v1.32.2, dry run + real install + uninstall all passed (could not run in the sandbox) | **PASS (API-server acceptance only)** | pod readiness not asserted (needs external backing services); no public cluster |
