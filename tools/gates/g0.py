@@ -285,6 +285,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--clean", action="store_true", help="down -v first and time a cold start")
     ap.add_argument("--no-evidence", action="store_true")
+    ap.add_argument("--stack-only", action="store_true",
+                    help="regression mode for CI runners: skip the developer-machine criteria G0.1-G0.3 "
+                         "(recorded as SKIPPED, never as PASS) and run all stack criteria")
     args = ap.parse_args()
 
     run([sys.executable, str(ROOT / "tools/dev/gen_env.py")])
@@ -296,11 +299,16 @@ def main() -> int:
         log(f"{cid}: {'PASS' if ok else 'FAIL'} - {detail}")
 
     env = collect_env()
-    missing = [k for k, v in env["tool_versions"].items() if not v]
-    crit("G0.1", not missing, "missing: " + ", ".join(missing) if missing else "all tools report a version")
-    de = env["docker_engine"]
-    crit("G0.2", de["mem_gb"] >= 11 and de["ncpu"] >= 12, f"docker mem={de['mem_gb']} GB ncpu={de['ncpu']}")
-    crit("G0.3", True, env["host"])
+    if args.stack_only:
+        for cid in ("G0.1", "G0.2", "G0.3"):
+            criteria[cid] = {"status": "SKIPPED", "detail": "developer-machine criterion; --stack-only regression mode"}
+            log(f"{cid}: SKIPPED (--stack-only)")
+    else:
+        missing = [k for k, v in env["tool_versions"].items() if not v]
+        crit("G0.1", not missing, "missing: " + ", ".join(missing) if missing else "all tools report a version")
+        de = env["docker_engine"]
+        crit("G0.2", de["mem_gb"] >= 11 and de["ncpu"] >= 12, f"docker mem={de['mem_gb']} GB ncpu={de['ncpu']}")
+        crit("G0.3", True, env["host"])
 
     t_healthy = None
     if args.clean:
@@ -347,7 +355,12 @@ def main() -> int:
 
     sha, dirty = git_sha()
     crit("G0.10", ".env" in run(["git", "check-ignore", ".env"]).stdout, ".env is git-ignored")
-    overall = "PASS" if all(c["status"] == "PASS" for c in criteria.values()) else "FAIL"
+    if any(c["status"] == "FAIL" for c in criteria.values()):
+        overall = "FAIL"
+    elif any(c["status"] == "SKIPPED" for c in criteria.values()):
+        overall = "PASS (stack-only: G0.1-G0.3 skipped)"
+    else:
+        overall = "PASS"
     results = {"gate": "G0", "status": overall, "git": {"sha": sha, "dirty": dirty}, "criteria": criteria,
                "not_covered_here": ["G0.8 (static checks) and G0.9 (CI) are verified by CI, see evidence/G0/ci.md"]}
     log(f"G0 (local portion): {overall}")
@@ -358,7 +371,7 @@ def main() -> int:
         (out / "results.json").write_text(json.dumps(results, indent=2, default=str), encoding="utf-8")
         (out / "run.log").write_text("\n".join(LOG), encoding="utf-8")
         log(f"evidence written to {out.relative_to(ROOT)}")
-    return 0 if overall == "PASS" else 1
+    return 1 if overall == "FAIL" else 0
 
 
 if __name__ == "__main__":

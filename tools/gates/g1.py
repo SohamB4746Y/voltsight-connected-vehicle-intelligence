@@ -270,8 +270,14 @@ def main() -> int:
     mutation_check(out)
     static_checks(out)
 
-    reg = run([sys.executable, "tools/gates/g0.py", "--no-evidence"], timeout=900)
-    crit("G1.12a_g0_regression", reg.returncode == 0, "tools/gates/g0.py (health + functional probes) re-run: exit %d" % reg.returncode)
+    # Regression: re-run G0. On a CI runner the host/toolchain criteria (G0.1-G0.3: 12+ CPUs, k6/kind/helm
+    # installed...) describe the developer machine, not the runner, so CI runs the stack-health criteria
+    # only (--stack-only); a local run executes all of G0.
+    g0_cmd = [sys.executable, "tools/gates/g0.py", "--no-evidence"] + (["--stack-only"] if os.environ.get("CI") else [])
+    reg = run(g0_cmd, timeout=900)
+    failing = [l.split(" - ")[0] for l in reg.stdout.splitlines() if ": FAIL" in l]
+    crit("G1.12a_g0_regression", reg.returncode == 0,
+         {"command": " ".join(g0_cmd[1:]), "exit_code": reg.returncode, "failing_g0_criteria": failing})
 
     overall = "PASS" if all(c["status"] == "PASS" for c in CRIT.values()) else "FAIL"
     results = {"gate": "G1", "status_local": overall, "git": {"sha": sha, "dirty": dirty}, "criteria": CRIT,
