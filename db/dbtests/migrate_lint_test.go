@@ -4,11 +4,13 @@ package dbtests
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"voltsight/db"
 	"voltsight/internal/dbtool"
 )
 
@@ -35,8 +37,8 @@ func TestMigrationsUpDownUp(t *testing.T) {
 		t.Fatal(err)
 	}
 	v, dirty, err := dbtool.Version(dsn)
-	if err != nil || dirty || v != 3 {
-		t.Fatalf("version after up = %d dirty=%v err=%v, want 3", v, dirty, err)
+	if err != nil || dirty || v != latestVersion {
+		t.Fatalf("version after up = %d dirty=%v err=%v, want %d", v, dirty, err, latestVersion)
 	}
 
 	if err := dbtool.MigrateDown(dsn); err != nil {
@@ -266,3 +268,19 @@ func TestSchemaLint_RolesAreLeastPrivilege(t *testing.T) {
 		}
 	}
 }
+
+// latestVersion is the number of the newest embedded migration (000004_... -> 4).
+var latestVersion = func() uint {
+	ents, err := db.Migrations.ReadDir("migrations")
+	if err != nil {
+		panic(err)
+	}
+	var max uint
+	for _, e := range ents {
+		var n uint
+		if _, err := fmt.Sscanf(e.Name(), "%d_", &n); err == nil && n > max {
+			max = n
+		}
+	}
+	return max
+}()
