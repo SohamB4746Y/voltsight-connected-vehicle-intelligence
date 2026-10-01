@@ -78,4 +78,58 @@ unchanged and remain in the repository; their measured results are in `docs/capa
 deployment result changes that. Nothing in this document claims 100K events/s, a 3x burst, or the latency
 targets on the free deployment.
 
-<!-- sections 5 onwards are completed after verification -->
+## 5. Public URL: GitHub Codespaces (free, no card)
+
+Both steps below need the repository owner's GitHub account; they cannot be done from the build sandbox.
+
+1. On the repository page: **Code → Codespaces → Create codespace on main**, machine type **4-core / 16 GB**
+   (the free personal allowance includes this size; 4 cores use the allowance at twice the 2-core rate).
+2. Wait. `.devcontainer/devcontainer.json` starts `deploy/live/up.sh` in the background: it pulls (or builds) the
+   image, starts the infrastructure, seeds the 100,000-vehicle fleet (first start only) and starts the platform
+   and simulator. Progress: `tail -f ~/voltsight-up.log`. When it ends it prints the URL, the demo logins and
+   the generated password.
+
+The URL has the form `https://<codespace-name>-8080.app.github.dev`. The script calls
+`gh codespace ports visibility 8080:public` so people without a GitHub login can open it; **this call was not
+exercised from the sandbox**. If it is refused: PORTS tab → 8080 → right-click → Port Visibility → Public.
+
+Limits you must plan around: a codespace stops after an idle timeout (default 30 min; Settings → Codespaces →
+idle timeout can raise it to 4 h) and the free allowance is finite. Start it ten minutes before the demo, keep the
+browser tab open, and run `deploy/live/up.sh --reset-demo` for a clean demo start. Data survives a stop/start of the
+codespace (named volumes); the device CA does not (dev-mode Vault) and is recreated by `up.sh`.
+
+## 6. Always-on alternative (any VM with a DNS name)
+
+```
+git clone https://github.com/SohamB4746Y/voltsight-connected-vehicle-intelligence && cd voltsight-connected-vehicle-intelligence
+PUBLIC_HOST=demo.example.com deploy/live/up.sh      # Caddy obtains a Let's Encrypt certificate (ports 80 and 443)
+```
+
+Needs Docker with Compose v2, Python 3, about 12 GB RAM and 30 GB disk. The measured working set of the whole
+platform at 2,000 simulated vehicles is about 2.9 GB (section 9), but the infrastructure containers are sized for
+bursts. An Oracle Cloud Always Free Ampere VM (12 GB) is the free option that fits; the image is multi-arch only if
+built on that architecture (`docker compose build`), which `up.sh` does automatically when the registry image
+is unavailable.
+
+## 7. Configuration
+
+| Variable | Meaning | Default |
+|---|---|---|
+| `PUBLIC_URL` | https origin users open (auto-detected in Codespaces) | `http://localhost:8080` |
+| `PUBLIC_HOST` | DNS name; enables the `tls` profile (Let's Encrypt) | unset |
+| `DEMO_VEHICLES` | vehicles streamed in real time | 2000 |
+| `VOLTSIGHT_IMAGE` | application image | `ghcr.io/sohamb4746y/voltsight-connected-vehicle-intelligence:main` |
+| `ANTHROPIC_API_KEY`, `COPILOT_MODEL` | real LLM for the Copilot | unset (stub provider) |
+| `COMPOSE_EXTRA` | extra compose file, e.g. `docker-compose.lowulimit.yml` on hosts with a low `nofile` limit | unset |
+
+All credentials (database roles, Redis, ClickHouse, Keycloak admin, Vault token, the demo users' password) are
+generated per deployment by `tools/dev/gen_env.py` into the git-ignored `.env`; none is stored in the repository
+or in an image. Secrets reach the services as environment variables from that file.
+
+## 8. Demo logins
+
+`up.sh` prints them. Users are `viewer@`, `dispatcher@`, `energy_manager@` and `tenant_admin@` at
+`meridian.example` (tenant A) and `coastal.example` (tenant B); the password is the generated
+`DEMO_USER_PASSWORD` shown at the end of `up.sh` (it is not a fixed, published password).
+
+<!-- sections 9 onwards are completed after verification -->

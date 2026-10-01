@@ -1,0 +1,17 @@
+NAME                         CPU %     MEM USAGE / LIMIT
+voltsight-alerts-1           0.00%     5.41MiB / 15.72GiB
+voltsight-api-1              0.00%     9.809MiB / 15.72GiB
+voltsight-caddy-1            0.00%     14.47MiB / 128MiB
+voltsight-clickhouse-1       10.56%    520.7MiB / 2GiB
+voltsight-gateway-1          4.57%     73.9MiB / 15.72GiB
+voltsight-grafana-1          0.28%     81.52MiB / 384MiB
+voltsight-kafka-1            167.58%   706.2MiB / 1.5GiB
+voltsight-keycloak-1         1.42%     795.9MiB / 1.25GiB
+voltsight-otel-collector-1   0.11%     32.73MiB / 384MiB
+voltsight-postgres-1         5.94%     226.9MiB / 1GiB
+voltsight-prometheus-1       0.74%     37.9MiB / 512MiB
+voltsight-redis-1            1.15%     9.695MiB / 512MiB
+voltsight-simulator-1        1.64%     48.66MiB / 15.72GiB
+voltsight-sink-1             2.28%     33.54MiB / 15.72GiB
+voltsight-vault-1            0.55%     171.5MiB / 256MiB
+voltsight-worker-1           1.45%     87.75MiB / 15.72GiB

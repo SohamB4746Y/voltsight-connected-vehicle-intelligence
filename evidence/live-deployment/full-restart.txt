@@ -1,0 +1,10 @@
+BEFORE full stop: 19:00:40
+alerts: 18
+vehicles: 100000
+clickhouse rows: 452887
+AFTER full stop/start via up.sh: 19:02:16
+alerts: 18
+vehicles: 100000
+clickhouse rows: 481783
+worker: rtp: 25347 events (798/s) new=0 late=0 dup=0 stale=25347 lag=0|rtp: 29377 events (806/s) new=0 late=0 dup=0 stale=29377 lag=0|
+sim: vssim: 20 connector certificates issued and registered; waiting 12 s for the gateway to refresh its directory|

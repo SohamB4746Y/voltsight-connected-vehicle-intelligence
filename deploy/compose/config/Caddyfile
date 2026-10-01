@@ -17,6 +17,13 @@
 		-Server
 	}
 
+	# never reachable from the internet, whatever the routing below becomes: the Keycloak admin console, the master
+	# realm and the management endpoints
+	@blocked path /admin /admin/* /realms/master /realms/master/* /metrics /health /health/*
+	handle @blocked {
+		respond 404
+	}
+
 	# OIDC login pages and assets for the one realm the console uses (no /admin, no /realms/master)
 	@keycloak path /realms/voltsight /realms/voltsight/* /resources/*
 	handle @keycloak {
