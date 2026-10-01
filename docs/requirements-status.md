@@ -72,10 +72,10 @@ Columns: Implementation = what exists; Live verification = what was actually run
 | LD5 | Real telemetry pipeline | simulator, mTLS gateway, Kafka, worker, sink | ~816 events/s, lag 0, 33 alerts | PASS (local profile) | demo scale |
 | LD6 | Range-risk alerts persisted and visible | worker risk engine, alert service, SSE | alert rows in PostgreSQL, alert detail screenshot | PASS (local profile) | |
 | LD7 | Copilot | typed tools, guardrails, audit | answered a tool-backed question | **PARTIAL** | deterministic stub provider; no LLM key |
-| LD8 | Docker production image builds and runs | `deploy/docker/Dockerfile`; CI `image` job | built, 74.5 MB, non-root, started in compose | PASS (local); CI job first run pending | sandbox needed a CA workaround, not part of the repo |
+| LD8 | Docker production image builds and runs | `deploy/docker/Dockerfile`; CI `image` job | built, 74.5 MB, non-root, started in compose | PASS (local, and CI run 36913328981 on a plain runner) | sandbox needed a CA workaround, not part of the repo; GHCR publish happens only on `main` and has not run |
 | LD9 | Image scan | Trivy in CI (report) | Trivy 0.57.1: 0 HIGH/CRITICAL | PASS | |
 | LD10 | Helm validates | chart + kubeconform | lint ok, 21/21 valid | PASS | |
-| LD11 | Chart accepted by a real Kubernetes API server | `.github/workflows/kubernetes.yml` (kind in CI) | could not run in the sandbox | **NOT RUN** (CI run pending) | no cluster, public or otherwise |
+| LD11 | Chart accepted by a real Kubernetes API server | `.github/workflows/kubernetes.yml` (kind in CI) | CI run 36913329082: ephemeral kind v1.32.2, dry run + real install + uninstall all passed (could not run in the sandbox) | **PASS (API-server acceptance only)** | pod readiness not asserted (needs external backing services); no public cluster |
 | LD12 | Terraform validates | AWS, GCP | fmt + validate pass | PASS | not applied |
 | LD13 | Survives restart | `up.sh`, named volumes, `vssim -seq-base` | single-service restarts and a full stop/start | PASS after one defect found and fixed | PostgreSQL failover, gateway kill, node loss not tested |
 | LD14 | Live event rate | | ~816 events/s at 2,000 configured vehicles | MEASURED | 100K/s NOT MEASURED live |

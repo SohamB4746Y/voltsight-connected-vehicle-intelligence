@@ -136,7 +136,7 @@ or in an image. Secrets reach the services as environment variables from that fi
 
 **Scope of every number below: the full live profile (`deploy/live/up.sh`, the same compose files and the same
 production image) running on the build sandbox (4 vCPU / 15 GiB, Linux), reached at `http://localhost:8080`
-through the Caddy edge, verified 2026-10-01 (final run 19:16 UTC, image `sha256:73ca5541...`).** It is a real,
+through the Caddy edge, verified 2026-10-01 (final run 19:16 UTC, image `sha256:73ca5541...`). CI results for the same commit are in the Containers/Kubernetes table below.** It is a real,
 complete deployment of the platform, but it is **not on a public URL**: see section 10.
 
 | Check | Result | Evidence |
@@ -173,10 +173,10 @@ complete deployment of the platform, but it is **not on a public URL**: see sect
 | Image vulnerability scan (Trivy 0.57.1, HIGH/CRITICAL, OS + Go binaries) | 0 findings (`evidence/live-deployment/image-scan.txt`) |
 | `docker compose config` for the live profile (with and without `tls`) | PASS locally; also a CI step |
 | Helm: `helm lint`, `helm template | kubeconform -strict` | PASS: 0 failed, 21/21 resources valid (`helm-terraform-validation.txt`). Chart default image now points at the real GHCR image |
-| **A real Kubernetes cluster** | **NOT RUN here.** A `kind` cluster cannot start in the build sandbox (kubelet: `write /proc/self/oom_score_adj: permission denied`). `.github/workflows/kubernetes.yml` creates an ephemeral kind cluster on a GitHub runner and does a server-side dry run plus a real install of the chart; **it had not run when this was written**. No public Kubernetes cluster exists and none is claimed |
+| **A real Kubernetes cluster** | **PASS in CI, API-server acceptance only.** `.github/workflows/kubernetes.yml` (run 36913329082, 2026-10-01): ephemeral `kind` v1.32.2 cluster on a GitHub runner, `helm lint`, server-side dry run, a real `helm install` (objects created), uninstall. Pod readiness was **not** asserted: the release needs external Kafka/PostgreSQL/Redis/ClickHouse/OIDC, so this shows the chart is accepted by a real API server, not that the platform runs on Kubernetes. A `kind` cluster cannot start in the build sandbox (kubelet: `write /proc/self/oom_score_adj: permission denied`). No public Kubernetes cluster exists and none is claimed |
 | Terraform | `fmt -check` and `validate` pass for AWS and GCP; **not applied** (paid resources) |
 | Secrets | gitleaks over all 37 commits and the tree: no leaks; `.env` untracked; no localhost reference in the web sources (`secrets-scan.txt`) |
-| CI | the `image` job (build, non-root check, scan, publish to GHCR on main/tags) and the live-compose validation are new in `ci.yml`; their first run is on the push that carries them |
+| CI | run 36913328981 on commit `abcac36`: all four jobs green, including the new `image` job (builds the committed Dockerfile on a plain runner with no workaround in ~2 min, checks non-root user and every binary, scans) and the live-compose validation. The publish-to-GHCR step is skipped off `main` by design, so the registry image has **not** been pushed yet |
 
 ## 10. What is not done, and why (limitations)
 
