@@ -37,6 +37,7 @@ func main() {
 		jwks    = flag.String("jwks", "http://127.0.0.1:8080/realms/voltsight/protocol/openid-connect/certs", "JWKS URL")
 		rps     = flag.Float64("rate", 50, "requests per second per user")
 		useTLS  = flag.Bool("tls", false, "serve HTTPS (TLS 1.3 only) with a server certificate issued by the platform CA in Vault")
+		origins = flag.String("origins", "", "comma-separated CORS allow-list; empty = the localhost development origins (set to the public URL in a deployment)")
 		llm     = flag.String("copilot", "auto", "copilot provider: auto | stub | anthropic (auto = anthropic when ANTHROPIC_API_KEY is set)")
 	)
 	flag.Parse()
@@ -80,7 +81,7 @@ func main() {
 	srv := api.New(api.Config{
 		Verifier: jwtverify.New(jwtverify.Config{Issuer: *issuer, Audience: "voltsight-api", JWKSURL: *jwks}),
 		Pool:     pool, Redis: rdb, CH: ch, Kafka: kc, RateRPS: *rps, StaticDir: *static,
-		Origins: []string{"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8081", "http://127.0.0.1:8081"},
+		Origins: corsOrigins(*origins),
 	})
 	if *llm == "anthropic" || (*llm == "auto" && os.Getenv("ANTHROPIC_API_KEY") != "") {
 		model := os.Getenv("COPILOT_MODEL")
@@ -116,6 +117,20 @@ func main() {
 	if err := hs.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		must(err)
 	}
+}
+
+// corsOrigins is the allow-list: exactly the configured origins, or the localhost development defaults.
+func corsOrigins(flagValue string) []string {
+	if flagValue == "" {
+		return []string{"http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8081", "http://127.0.0.1:8081"}
+	}
+	var out []string
+	for _, o := range strings.Split(flagValue, ",") {
+		if o = strings.TrimRight(strings.TrimSpace(o), "/"); o != "" && o != "*" {
+			out = append(out, o) // a wildcard is never accepted for an authenticated API
+		}
+	}
+	return out
 }
 
 func must(err error) {

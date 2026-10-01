@@ -1,4 +1,5 @@
-// Command vsrealm writes the generated Keycloak realm export (deploy/compose/config/keycloak).
+// Command vsrealm writes the generated Keycloak realm exports: the development realm (deploy/compose/config/keycloak)
+// and, with -public, the internet-facing one (deploy/compose/config/keycloak-live).
 package main
 
 import (
@@ -9,11 +10,15 @@ import (
 )
 
 func main() {
-	out := "deploy/compose/config/keycloak/voltsight-realm.json"
-	if len(os.Args) > 1 {
-		out = os.Args[1]
+	out, gen := "deploy/compose/config/keycloak/voltsight-realm.json", realm.JSON
+	args := os.Args[1:]
+	if len(args) > 0 && args[0] == "-public" {
+		out, gen, args = "deploy/compose/config/keycloak-live/voltsight-realm.json", realm.PublicJSON, args[1:]
 	}
-	b, err := realm.JSON()
+	if len(args) > 0 {
+		out = args[0]
+	}
+	b, err := gen()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "vsrealm:", err)
 		os.Exit(1)

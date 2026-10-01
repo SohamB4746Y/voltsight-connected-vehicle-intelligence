@@ -110,3 +110,28 @@ func TestUsersMatchSeedIdentities(t *testing.T) {
 		}
 	}
 }
+
+// The internet-facing realm must carry no localhost redirect, no DEV-only password-grant client and no secret
+// except the ${ENV} placeholders; its committed file must match the generator.
+func TestPublicRealmHasNoDevClientAndOnlyThePublicOrigin(t *testing.T) {
+	got, err := PublicJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	want, err := os.ReadFile("../../deploy/compose/config/keycloak-live/voltsight-realm.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != string(want) {
+		t.Fatal("deploy/compose/config/keycloak-live/voltsight-realm.json is stale: run `go run ./cmd/vsrealm -public`")
+	}
+	s := string(got)
+	for _, bad := range []string{"localhost", TestClient, "KC_TEST_CLIENT_SECRET", "directAccessGrantsEnabled\": true"} {
+		if strings.Contains(s, bad) {
+			t.Fatalf("public realm contains %q", bad)
+		}
+	}
+	if !strings.Contains(s, PublicURLPlaceholder+"/*") || !strings.Contains(s, "${DEMO_USER_PASSWORD}") {
+		t.Fatal("public realm must redirect only to ${PUBLIC_URL} and take user passwords from the environment")
+	}
+}

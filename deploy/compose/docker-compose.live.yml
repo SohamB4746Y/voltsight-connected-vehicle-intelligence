@@ -1,0 +1,212 @@
+# Live / public profile: use together with the base file (see deploy/live/up.sh).
+#
+#   docker compose -f deploy/compose/docker-compose.yml -f deploy/compose/docker-compose.live.yml --env-file .env up -d
+#
+# What changes relative to the development stack:
+#   * every infrastructure port is unpublished; the only way in is the Caddy proxy (one origin, HTTPS at the edge)
+#   * Keycloak runs in production mode (`start`) behind the proxy with the public hostname, and imports the
+#     public realm (no DEV-only password-grant client, redirect only to PUBLIC_URL)
+#   * the Go services run from the project image (deploy/docker/Dockerfile), read-only, no capabilities
+#   * the simulator is a service in demo scale (DEMO_VEHICLES, default 2000 at 1 Hz) - the same code and
+#     the same mTLS gateway path as the 100,000-vehicle benchmark
+# Required in .env (written by tools/dev/gen_env.py and deploy/live/up.sh): PUBLIC_URL, plus the usual secrets.
+
+x-app: &app
+  image: ${VOLTSIGHT_IMAGE:-ghcr.io/sohamb4746y/voltsight-connected-vehicle-intelligence:main}
+  build:
+    context: ../..
+    dockerfile: deploy/docker/Dockerfile
+  pull_policy: missing
+  restart: unless-stopped
+  env_file: ../../.env
+  environment: &appenv
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: "5432"
+    REDIS_ADDR: redis:6379
+    CLICKHOUSE_ADDR: clickhouse:9000
+    VAULT_ADDR: http://vault:8200
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  networks: [default]
+
+services:
+  # ---- infrastructure: same images as development, nothing published, bounded memory ----
+  kafka:
+    ports: !reset []
+  postgres:
+    ports: !reset []
+  clickhouse:
+    ports: !reset []
+    mem_limit: 2g
+    healthcheck:
+      # a cold first start on a small shared host can take more than the development default of 100 s
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8123/ping | grep -q Ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+  redis:
+    ports: !reset []
+  vault:
+    ports: !reset []
+  otel-collector:
+    ports: !reset []
+  prometheus:
+    ports: !reset []
+    mem_limit: 512m
+    volumes:
+      - ./config/prometheus.live.yml:/etc/prometheus/prometheus.yml:ro
+      - prom-data:/prometheus
+  grafana:
+    ports: !reset []
+    mem_limit: 384m
+  objectstore:
+    # cold-tier object store: not used by the live demo (Parquet archive is documented as not implemented)
+    profiles: ["disabled"]
+  keycloak:
+    ports: !reset []
+    command: ["start", "--import-realm"]
+    volumes: !override
+      - ./config/keycloak-live:/opt/keycloak/data/import:ro
+    environment:
+      KC_HOSTNAME: ${PUBLIC_URL:?set PUBLIC_URL (https origin users will open)}
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      PUBLIC_URL: ${PUBLIC_URL}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:?run make env}
+
+  # ---- one-shot initialisation (profile "init"; run in order by deploy/live/up.sh) ----
+  init-migrate:
+    <<: *app
+    profiles: ["init"]
+    restart: "no"
+    entrypoint: ["/app/vsdb"]
+    command: ["migrate-up"]
+  init-roles:
+    <<: *app
+    profiles: ["init"]
+    restart: "no"
+    entrypoint: ["/app/vsdb"]
+    command: ["bootstrap-roles"]
+  init-pki:
+    <<: *app
+    profiles: ["init"]
+    restart: "no"
+    entrypoint: ["/app/vspki"]
+    command: ["bootstrap"]
+  init-topics:
+    <<: *app
+    profiles: ["init"]
+    restart: "no"
+    entrypoint: ["/app/vstopics"]
+    command: ["-brokers", "kafka:9092"]
+  init-seed:
+    <<: *app
+    profiles: ["init"]
+    restart: "no"
+    entrypoint: ["/app/vsdb"]
+    command: ["seed"]
+  init-incidents:
+    <<: *app
+    profiles: ["init"]
+    restart: "no"
+    entrypoint: ["/app/vsincidents"]
+  batch:
+    <<: *app
+    profiles: ["init"]
+    restart: "no"
+    entrypoint: ["/app/vsbatch"]
+    command: ["-hours", "6"]
+
+  # ---- the platform ----
+  gateway:
+    <<: *app
+    entrypoint: ["/app/vsgateway"]
+    command: ["-listen", "0.0.0.0:8443", "-admin", "0.0.0.0:9100", "-brokers", "kafka:9092"]
+  worker:
+    <<: *app
+    entrypoint: ["/app/vsworker"]
+    command: ["-brokers", "kafka:9092", "-admin", "0.0.0.0:9102", "-vehicles", "100000"]
+  sink:
+    <<: *app
+    entrypoint: ["/app/vssink"]
+    command: ["-brokers", "kafka:9092"]
+  alerts:
+    <<: *app
+    entrypoint: ["/app/vsalerts"]
+    command: ["-brokers", "kafka:9092"]
+  api:
+    <<: *app
+    entrypoint: ["/app/vsapi"]
+    command:
+      - -listen=0.0.0.0:8081
+      - -brokers=kafka:9092
+      - -static=/app/web
+      - -issuer=${PUBLIC_URL}/realms/voltsight
+      - -jwks=http://keycloak:8080/realms/voltsight/protocol/openid-connect/certs
+      - -origins=${PUBLIC_URL}
+    environment:
+      <<: *appenv
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      COPILOT_MODEL: ${COPILOT_MODEL:-}
+  simulator:
+    <<: *app
+    entrypoint: ["/app/vssim"]
+    # a stressed fleet so range-risk alerts appear within minutes; the charger network degrades at +5 min
+    command:
+      - -vehicles=${DEMO_VEHICLES:-2000}
+      - -duration=604800
+      - -realtime
+      - -start-tod=27000
+      - -low-soc-fraction=0.3
+      - -low-soc-min=0.101
+      - -low-soc-max=0.13
+      - -charger-outage-at=300
+      - -charger-outage-duration=3000
+      - -charger-outage-fraction=0.99
+      - -dup-rate=0.02
+      - -ooo-rate=0.03
+      - -fault-rate=0.002
+      - -gateway=https://gateway:8443
+      - -brokers=kafka:9092
+    restart: on-failure
+
+  # ---- edge: one origin for the console, the API and the OIDC login pages ----
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    mem_limit: 128m
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    ports:
+      - "${HTTP_PORT:-8080}:8080"
+    environment:
+      SITE_ADDRESS: ":8080"
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [api, keycloak]
+  caddy-tls:
+    # internet-facing VM with a DNS name: automatic Let's Encrypt certificate (needs ports 80 and 443)
+    image: caddy:2-alpine
+    profiles: ["tls"]
+    restart: unless-stopped
+    mem_limit: 128m
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+    ports: ["80:80", "443:443"]
+    environment:
+      SITE_ADDRESS: ${PUBLIC_HOST:-}  # required for this profile; deploy/live/up.sh checks it
+    volumes:
+      - ./config/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [api, keycloak]
+
+volumes:
+  caddy-data:
+  caddy-config:

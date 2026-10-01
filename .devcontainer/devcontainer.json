@@ -1,0 +1,16 @@
+{
+  "name": "VoltSight live demo",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": { "moby": true },
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "hostRequirements": { "cpus": 4, "memory": "12gb", "storage": "32gb" },
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "VoltSight console (HTTPS)", "onAutoForward": "openBrowser" }
+  },
+  "postStartCommand": "bash -c 'nohup deploy/live/up.sh >> \"$HOME/voltsight-up.log\" 2>&1 &'",
+  "remoteEnv": { "DEMO_VEHICLES": "2000" }
+}
