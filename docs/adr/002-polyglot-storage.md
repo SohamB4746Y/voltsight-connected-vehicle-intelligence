@@ -1,0 +1,4 @@
+# ADR-002 Polyglot persistence
+**Decision:** PostgreSQL (+pgvector) for relational/transactional data, ClickHouse for telemetry history, Redis for live state, Kafka as the durable log. Rejected: a single relational database (write ceiling and row-store scans for billions of rows), Cassandra (poor ad-hoc analytics ⇒ a second system), TimescaleDB (single-node write ceiling), Qdrant (extra HA surface for ≤ 1M vectors).
+**Evidence:** insert benchmark — ClickHouse sink 453K rows/s insert-time throughput measured on a 4-vCPU sandbox (G4.7); API p95 26.8 ms on the 100K-vehicle PostgreSQL dataset (G9b). A PostgreSQL-vs-ClickHouse insert comparison (SC5) was **not** run.
+**Hot-spot analysis:** the Kafka key is the VIN (uniform); ClickHouse is partitioned by day and ordered by `(tenant, vin, ts, seq)`; there is no monotonically increasing shard key.

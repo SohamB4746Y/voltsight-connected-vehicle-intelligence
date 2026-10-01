@@ -1,0 +1,5 @@
+# ADR-001 Stream processing: consumer-group workers in Go, not Flink / Kafka Streams
+**Status:** accepted. **Context:** 100K events/s with a hard < 5 s decision latency, per-VIN ordering, small hand-written state (dedup window, last state, overlay lookup).
+**Decision:** plain Kafka consumer-group workers (franz-go). State is the source of truth in Redis, rebuilt by replay; a local per-partition cache removes round trips. Offsets commit after state is saved and alerts are acknowledged.
+**Why:** one language and one binary for every stage; a worker needs ~1.2 GB for 100K vehicles; the only non-trivial algorithms (exact sequence window, Bloom filter, Count-Min, graph overlay) are libraries we test directly (property tests vs reference implementations). Flink would add a JVM cluster, a state backend and a second programming model for logic that is a few hundred lines.
+**Consequences:** windows/dedup are hand-written (mitigated by property tests, replay-equivalence and crash tests: G4); scaling is up to the partition count (64) and by adding workers; no built-in exactly-once (ADR-003).

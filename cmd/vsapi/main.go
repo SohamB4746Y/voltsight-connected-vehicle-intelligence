@@ -3,8 +3,10 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -21,7 +23,9 @@ import (
 	"voltsight/internal/copilot"
 	"voltsight/internal/dbtool"
 	"voltsight/internal/dotenv"
+	"voltsight/internal/ingest"
 	"voltsight/internal/jwtverify"
+	"voltsight/internal/pki"
 )
 
 func main() {
@@ -32,6 +36,7 @@ func main() {
 		issuer  = flag.String("issuer", "http://localhost:8080/realms/voltsight", "OIDC issuer (exact `iss` claim)")
 		jwks    = flag.String("jwks", "http://127.0.0.1:8080/realms/voltsight/protocol/openid-connect/certs", "JWKS URL")
 		rps     = flag.Float64("rate", 50, "requests per second per user")
+		useTLS  = flag.Bool("tls", false, "serve HTTPS (TLS 1.3 only) with a server certificate issued by the platform CA in Vault")
 		llm     = flag.String("copilot", "auto", "copilot provider: auto | stub | anthropic (auto = anthropic when ANTHROPIC_API_KEY is set)")
 	)
 	flag.Parse()
@@ -93,6 +98,20 @@ func main() {
 		defer c()
 		_ = hs.Shutdown(sctx)
 	}()
+	if *useTLS {
+		vault := pki.NewVault(dotenv.GetOr(env, "VAULT_ADDR", "http://127.0.0.1:8200"), dotenv.Get(env, "VAULT_DEV_TOKEN"))
+		host, _, _ := net.SplitHostPort(*listen)
+		iss, err := vault.IssueServer(ctx, "localhost", []string{"localhost"}, []string{"127.0.0.1", host}, 24*time.Hour)
+		must(err)
+		cert, err := ingest.ParseKeyPair(iss)
+		must(err)
+		hs.TLSConfig = &tls.Config{MinVersion: tls.VersionTLS13, Certificates: []tls.Certificate{cert}}
+		fmt.Fprintf(os.Stderr, "vsapi: listening on https://%s (TLS 1.3 only, issuer %s)\n", *listen, *issuer)
+		if err := hs.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
+			must(err)
+		}
+		return
+	}
 	fmt.Fprintf(os.Stderr, "vsapi: listening on http://%s (issuer %s)\n", *listen, *issuer)
 	if err := hs.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		must(err)

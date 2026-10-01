@@ -364,3 +364,39 @@ func TestNoNPlusOneQueries(t *testing.T) {
 	}
 	t.Logf("MEASURED: vehicle list issues %d SQL statements per request for 5 and for 200 rows", small)
 }
+
+// N21: precise locations are masked for roles without geo.precise
+func TestLocationMaskingByRole(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	dsn, _ := dbtool.OwnerDSN(h.env)
+	owner, err := pgxpool.New(ctx, dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer owner.Close()
+	var id string
+	if err := owner.QueryRow(ctx, `INSERT INTO alert (tenant_id, vin, rule, severity, window_start, detected_at, evidence)
+		SELECT v.tenant_id, v.vin, 'RANGE_LOW', 'WARNING', now(), now(), '{"lat":13.123456,"lon":80.654321,"route":[[13.1,80.6],[13.2,80.7]]}'
+		FROM vehicle v JOIN tenant t ON t.id = v.tenant_id WHERE t.name = 'Meridian Logistics' LIMIT 1 RETURNING id::text`).Scan(&id); err != nil {
+		t.Skip("seed missing")
+	}
+	t.Cleanup(func() { _, _ = owner.Exec(ctx, `DELETE FROM alert WHERE id = $1`, id) })
+	fetch := func(user string) map[string]any {
+		_, body := h.do("GET", "/v1/alerts/"+id, h.token(user), "")
+		var r struct {
+			Alert struct {
+				Evidence map[string]any `json:"evidence"`
+			} `json:"alert"`
+		}
+		_ = json.Unmarshal(body, &r)
+		return r.Alert.Evidence
+	}
+	v, d := fetch("viewer@meridian.example"), fetch("dispatcher@meridian.example")
+	if v["lat"].(float64) != 13.12 || v["lon"].(float64) != 80.65 || v["route"] != nil {
+		t.Errorf("viewer sees precise data: %v", v)
+	}
+	if d["lat"].(float64) != 13.123456 || d["route"] == nil {
+		t.Errorf("dispatcher lost precision: %v", d)
+	}
+}

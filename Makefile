@@ -3,7 +3,7 @@ COMPOSE := docker compose -f deploy/compose/docker-compose.yml --env-file .env
 PY ?= python
 GO ?= go
 
-.PHONY: up-lowulimit build e2e env up bootstrap gateway simulate seed verify-seed down nuke ps logs health proto er realm lint secrets-scan \
+.PHONY: web demo chaos up-lowulimit build e2e env up bootstrap gateway simulate seed verify-seed down nuke ps logs health proto er realm lint secrets-scan \
         gate-G0 gate-G0-clean gate-G1 test test-integration
 
 env:  ## generate .env with random credentials (idempotent, appends only missing keys)
@@ -91,3 +91,13 @@ build:  ## build all binaries into ./bin
 
 e2e:  ## live 60 s run at 100K vehicles through every stage + reconciliation (evidence in $(OUT))
 	tools/live/e2e.sh $(or $(OUT),tmp/e2e) 100000 60 -dup-rate 0.02 -ooo-rate 0.03 -fault-rate 0.002
+
+web:  ## build the web console (served by vsapi from web/dist)
+	cd web && npm ci --no-audit --no-fund && npm run build
+
+demo: build web  ## start the full pipeline + simulated fleet + console (see docs/demo.md)
+	./bin/vsincidents
+	tools/live/demo.sh 100000 3000
+
+chaos:  ## all chaos scenarios (about 30 minutes; evidence in evidence/G13)
+	chaos/all.sh
