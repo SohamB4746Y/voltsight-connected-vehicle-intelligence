@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.idea/
+.vscode/
+bin/
+tmp/
+# the problem statement PDF is provided input, not part of the deliverable
+Motorq_Hackathon_Problem_Statement.pdf
