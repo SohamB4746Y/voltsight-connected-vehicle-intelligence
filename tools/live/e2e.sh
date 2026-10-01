@@ -11,16 +11,18 @@ CH="docker exec voltsight-clickhouse-1 clickhouse-client --user voltsight --pass
 KT="docker exec voltsight-kafka-1 /opt/kafka/bin"
 
 # clean slate
-pkill -f bin/vsgateway || true; pkill -f bin/vsworker || true; pkill -f bin/vssink || true; sleep 1
-$KT/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic 'telemetry.v1,telemetry.dlq.v1' >/dev/null 2>&1 || true
-for g in rt-processor sink; do $KT/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group $g >/dev/null 2>&1 || true; done
+pkill -f bin/vsgateway || true; pkill -f bin/vsworker || true; pkill -f bin/vssink || true; pkill -f bin/vsalerts || true; sleep 1
+$KT/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic 'telemetry.v1,telemetry.dlq.v1,alerts.v1,charger.status.v1' >/dev/null 2>&1 || true
+for g in rt-processor sink alert-svc; do $KT/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group $g >/dev/null 2>&1 || true; done
 $CH "drop table if exists telemetry_raw sync"
+docker exec voltsight-postgres-1 psql -q -U voltsight -d voltsight -c "delete from alert" >/dev/null 2>&1 || true
 docker exec voltsight-redis-1 redis-cli -a "$REDIS_PASSWORD" flushall >/dev/null 2>&1
 sleep 2; ./bin/vstopics >/dev/null
 
 nohup ./bin/vsgateway > "$OUT/gateway.log" 2>&1 &
 nohup ./bin/vsworker > "$OUT/worker.log" 2>&1 &
 nohup ./bin/vssink > "$OUT/sink.log" 2>&1 &
+nohup ./bin/vsalerts -latency-log "$OUT/alert_latency.ndjson" > "$OUT/alerts.log" 2>&1 &
 sleep 6
 
 # sampler: 1 Hz, ClickHouse tracked memory + container cgroup usage + host load + consumer lag
@@ -53,8 +55,11 @@ echo "drain loop iterations: $i" > "$OUT/drain.txt"
 sleep 5
 kill $SAMP ${ADV:-} 2>/dev/null || true
 ./bin/vsrecon -report "$OUT/recon.json" > "$OUT/recon.out" 2> "$OUT/recon.err" || echo "recon: books do not balance (see $OUT/recon.err)"
+for i in $(seq 1 30); do [ "$(group_lag alert-svc)" = "0" ] && break; sleep 1; done
+docker exec voltsight-postgres-1 psql -At -U voltsight -d voltsight -c "select rule, severity, count(*) from alert group by 1,2 order by 1,2" > "$OUT/alerts_pg.txt" 2>&1 || true
+$KT/kafka-get-offsets.sh --bootstrap-server localhost:9092 --topic alerts.v1 > "$OUT/alerts_topic_offsets.txt" 2>&1 || true
 $CH "system flush logs" >/dev/null
 $CH "select event_type, count(), formatReadableSize(max(peak_memory_usage)), max(rows) from system.part_log group by event_type format TSV" > "$OUT/ch_part_log.tsv"
 $CH "select count(), uniqExact(partition_id), sum(rows) from system.parts where table='telemetry_raw' and active format TSV" > "$OUT/ch_parts.tsv"
-pkill -f bin/vsgateway || true; pkill -f bin/vsworker || true; pkill -f bin/vssink || true
+pkill -f bin/vsgateway || true; pkill -f bin/vsworker || true; pkill -f bin/vssink || true; pkill -f bin/vsalerts || true
 echo "done: $OUT"

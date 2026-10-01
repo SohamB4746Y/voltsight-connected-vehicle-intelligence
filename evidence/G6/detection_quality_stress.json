@@ -1,0 +1,68 @@
+{
+  "detectors": {
+    "baseline-catalogue": {
+      "alert_totals": {
+        "RULE_RANGE_CRITICAL": 356,
+        "RULE_RANGE_LOW": 336
+      },
+      "critical_alert_vehicles_per_1000_vehicle_hours": 12.333333333333334,
+      "false_positive_vehicles": 49,
+      "lead_time_minutes": {
+        "median": 30.2156,
+        "p10": 15.5716,
+        "p90": 61.489266666666666
+      },
+      "precision": 0.33783783783783783,
+      "precision_unaware_drivers": 0.33783783783783783,
+      "recall": 1,
+      "true_positive_vehicles": 25,
+      "vehicles_with_critical_alert": 74
+    },
+    "ewma-soc-per-km": {
+      "alert_totals": {
+        "RULE_RANGE_CRITICAL": 463,
+        "RULE_RANGE_LOW": 553
+      },
+      "critical_alert_vehicles_per_1000_vehicle_hours": 14.166666666666666,
+      "false_positive_vehicles": 60,
+      "lead_time_minutes": {
+        "median": 53.32213333333333,
+        "p10": 28.965833333333332,
+        "p90": 77.5841
+      },
+      "precision": 0.29411764705882354,
+      "precision_unaware_drivers": 0.29411764705882354,
+      "recall": 1,
+      "true_positive_vehicles": 25,
+      "vehicles_with_critical_alert": 85
+    },
+    "soc-below-15pct-threshold": {
+      "critical_alert_vehicles_per_1000_vehicle_hours": 53.83333333333333,
+      "false_positive_vehicles": 300,
+      "lead_time_minutes": {
+        "median": 90.7997,
+        "p10": 49.39105,
+        "p90": 110.10076666666667
+      },
+      "precision": 0.07120743034055728,
+      "precision_unaware_drivers": 0.08098591549295775,
+      "recall": 0.92,
+      "true_positive_vehicles": 23,
+      "vehicles_with_critical_alert": 323
+    }
+  },
+  "horizon_minutes": 120,
+  "scenario": {
+    "charger_outage_fraction": 0.97,
+    "low_soc_start_fraction": 0.4,
+    "outage_at_hours": 0.17,
+    "outage_hours": 4,
+    "seed": 1,
+    "unaware_driver_fraction": 0.5
+  },
+  "simulated_hours": 4,
+  "strandings_ground_truth": 25,
+  "telemetry_events": 21600000,
+  "vehicles": 1500,
+  "wall_seconds": 26.141422273
+}

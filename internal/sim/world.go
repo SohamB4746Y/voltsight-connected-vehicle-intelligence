@@ -18,6 +18,17 @@ const (
 	gridSpacingM = 150.0
 )
 
+// CityGraphs builds the road network of every city of the world for a behaviour seed. The simulator drives on
+// these graphs and the range-risk engine computes distances on them, so both must call this with the same seed.
+func CityGraphs(seed uint64) []*roadnet.Graph {
+	cities := seedgen.Cities()
+	out := make([]*roadnet.Graph, len(cities))
+	for i, c := range cities {
+		out[i] = roadnet.Generate(c.Name, c.Lat, c.Lon, gridN, gridSpacingM, seed^uint64(i+1)*0x9e3779b9)
+	}
+	return out
+}
+
 type modelInfo struct {
 	oem        string
 	dialect    byte // 'A' or 'B'
@@ -62,8 +73,8 @@ func newWorld(cfg Config, stats *Stats) (*world, error) {
 	cityByName := map[string]int{}
 	for i, c := range w.cities {
 		cityByName[c.Name] = i
-		w.graphs = append(w.graphs, roadnet.Generate(c.Name, c.Lat, c.Lon, gridN, gridSpacingM, cfg.Seed^uint64(i+1)*0x9e3779b9))
 	}
+	w.graphs = CityGraphs(cfg.Seed)
 	w.amb = make([]float32, len(w.cities))
 
 	dialect := map[string]byte{}

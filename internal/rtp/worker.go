@@ -27,6 +27,13 @@ type Processor interface {
 	OnEvent(ev *telemetryv1.TelemetryEvent, v *state.Entry, recvNow time.Time)
 }
 
+// Flusher is optionally implemented by a Processor that publishes asynchronously: Flush must make everything
+// published so far durable. The worker calls it before committing offsets, so a failed flush means the batch is
+// reprocessed instead of its alerts being lost.
+type Flusher interface {
+	Flush(ctx context.Context) error
+}
+
 // Config configures a worker.
 type Config struct {
 	Brokers    []string
@@ -240,6 +247,11 @@ func (w *Worker) processBatch(ctx context.Context, fetches kgo.Fetches) error {
 			w.mStale.Inc()
 		}
 	}
+	if f, ok := w.cfg.Processor.(Flusher); ok {
+		if err := f.Flush(ctx); err != nil {
+			return fmt.Errorf("processor flush: %w", err)
+		}
+	}
 	if err := w.store.Save(ctx, dirty); err != nil {
 		return err
 	}
@@ -270,6 +282,9 @@ func (w *Worker) TopDTCs() []dedup.Item {
 	defer w.topMu.Unlock()
 	return w.dtcTop.Top()
 }
+
+// Registry exposes the worker's Prometheus registry so that a Processor can register its own metrics.
+func (w *Worker) Registry() *prometheus.Registry { return w.reg }
 
 // AdminHandler serves /healthz, /metrics and /topk/dtc.
 func (w *Worker) AdminHandler() http.Handler {
