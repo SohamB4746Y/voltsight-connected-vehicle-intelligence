@@ -27,15 +27,22 @@ type Processor interface {
 	OnEvent(ev *telemetryv1.TelemetryEvent, v *state.Entry, recvNow time.Time)
 }
 
+// Flusher is optionally implemented by a Processor that publishes asynchronously: Flush must make everything
+// published so far durable. The worker calls it before committing offsets, so a failed flush means the batch is
+// reprocessed instead of its alerts being lost.
+type Flusher interface {
+	Flush(ctx context.Context) error
+}
+
 // Config configures a worker.
 type Config struct {
-	Brokers            []string
-	Topic              string
-	Group              string
-	MaxPoll            int  // records per batch, default 20,000
-	StartFromBeginning bool // for a new group: replay the topic from the earliest offset
-	Processor          Processor
-	Logger             func(format string, args ...any)
+	Brokers    []string
+	Topic      string
+	Group      string
+	MaxPoll    int  // records per batch, default 20,000
+	StartAtEnd bool // for a group with no committed offset: skip the backlog (default: start at the earliest retained offset so nothing is lost)
+	Processor  Processor
+	Logger     func(format string, args ...any)
 }
 
 // Stats are the worker counters (also exported as Prometheus metrics).
@@ -82,10 +89,12 @@ func New(cfg Config, store *state.Store) (*Worker, error) {
 	w.mLag = prometheus.NewGauge(prometheus.GaugeOpts{Name: "rtp_consumer_lag_records", Help: "Records behind the log end across assigned partitions."})
 	w.reg.MustRegister(proc, w.mLatency, w.mLag)
 
-	// a group with no committed offset starts at the end (live) unless a full replay was requested
-	reset := kgo.NewOffset().AtEnd()
-	if cfg.StartFromBeginning {
-		reset = kgo.NewOffset().AtStart()
+	// A group with no committed offset starts at the earliest retained offset. "End" is resolved when partitions are
+	// assigned, which can be after producers started: events produced in between would be skipped, and the group
+	// would still report zero lag (live finding, evidence/G4/status.md).
+	reset := kgo.NewOffset().AtStart()
+	if cfg.StartAtEnd {
+		reset = kgo.NewOffset().AtEnd()
 	}
 	cl, err := kgo.NewClient(
 		kgo.SeedBrokers(cfg.Brokers...), kgo.ClientID("vs-rtp"), kgo.ConsumerGroup(cfg.Group), kgo.ConsumeTopics(cfg.Topic),
@@ -175,8 +184,8 @@ func (w *Worker) processBatch(ctx context.Context, fetches kgo.Fetches) error {
 		}
 	})
 	if len(need) > 0 {
-		loaded, err := w.store.Load(ctx, need)
-		if err != nil {
+		var loaded map[string]*state.Entry
+		if err := retry(ctx, "load state", func() (e error) { loaded, e = w.store.Load(ctx, need); return }); err != nil {
 			return err
 		}
 		part := map[string]int32{}
@@ -238,17 +247,49 @@ func (w *Worker) processBatch(ctx context.Context, fetches kgo.Fetches) error {
 			w.mStale.Inc()
 		}
 	}
-	if err := w.store.Save(ctx, dirty); err != nil {
+	if f, ok := w.cfg.Processor.(Flusher); ok {
+		if err := f.Flush(ctx); err != nil {
+			return fmt.Errorf("processor flush: %w", err)
+		}
+	}
+	if err := retry(ctx, "save state", func() error { return w.store.Save(ctx, dirty) }); err != nil {
 		return err
 	}
-	if err := w.cl.CommitUncommittedOffsets(ctx); err != nil {
-		return fmt.Errorf("commit: %w", err)
+	if err := retry(ctx, "commit offsets", func() error { return w.cl.CommitUncommittedOffsets(ctx) }); err != nil {
+		return err
 	}
 	w.Stats.Batches.Add(1)
 	w.Stats.Lag.Store(lag)
 	w.mLag.Set(float64(lag))
 	return nil
 }
+
+// retry runs op, retrying with capped exponential back-off for up to retryBudget. A Redis that is restarting or
+// loading its dataset must slow the worker down (Kafka absorbs the backlog; offsets are not committed until the state
+// is saved), not kill it.
+func retry(ctx context.Context, what string, op func() error) error {
+	deadline := time.Now().Add(retryBudget)
+	delay := 200 * time.Millisecond
+	for {
+		err := op()
+		if err == nil {
+			return nil
+		}
+		if ctx.Err() != nil || time.Now().After(deadline) {
+			return fmt.Errorf("%s: %w", what, err)
+		}
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("%s: %w", what, err)
+		case <-time.After(delay):
+		}
+		if delay *= 2; delay > 10*time.Second {
+			delay = 10 * time.Second
+		}
+	}
+}
+
+const retryBudget = 10 * time.Minute
 
 // Kill closes the client without committing, simulating a crash.
 func (w *Worker) Kill() {
@@ -268,6 +309,9 @@ func (w *Worker) TopDTCs() []dedup.Item {
 	defer w.topMu.Unlock()
 	return w.dtcTop.Top()
 }
+
+// Registry exposes the worker's Prometheus registry so that a Processor can register its own metrics.
+func (w *Worker) Registry() *prometheus.Registry { return w.reg }
 
 // AdminHandler serves /healthz, /metrics and /topk/dtc.
 func (w *Worker) AdminHandler() http.Handler {

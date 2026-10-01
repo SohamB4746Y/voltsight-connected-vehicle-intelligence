@@ -1,0 +1,370 @@
+Pager usage is off.
+Timing is off.
+SET
+              set_config              
+--------------------------------------
+ b0813b89-210d-585f-9c4e-856440224c40
+(1 row)
+
+INSERT 0 1500000
+INSERT 0 1500000
+INSERT 0 600000
+ANALYZE
+ANALYZE
+ANALYZE
+                    volume                     
+-----------------------------------------------
+ rows: alert=1500919 trip=1574922 audit=600125
+(1 row)
+
+=== (1) alert inbox BEFORE: ORDER BY ... LIMIT 50 OFFSET 30000 (page 600) ===
+                                                     QUERY PLAN                                                      
+---------------------------------------------------------------------------------------------------------------------
+ Limit (actual time=1298.186..1298.196 rows=50 loops=1)
+   Buffers: shared hit=64 read=31381, temp read=7933 written=14413
+   ->  Sort (actual time=1284.138..1287.790 rows=30050 loops=1)
+         Sort Key: detected_at DESC, id DESC
+         Sort Method: external merge  Disk: 57560kB
+         Buffers: shared hit=64 read=31381, temp read=7933 written=14413
+         ->  Seq Scan on alert (actual time=0.161..615.813 rows=740097 loops=1)
+               Filter: ((status = 'open'::text) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               Rows Removed by Filter: 760822
+               Buffers: shared hit=64 read=31381
+ Planning:
+   Buffers: shared hit=31
+ Planning Time: 0.288 ms
+ Execution Time: 1306.380 ms
+(14 rows)
+
+=== (1) alert inbox BEFORE: keyset page, no suitable index ===
+                                                                                                             QUERY PLAN                                                                                                             
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit (actual time=270.225..270.227 rows=0 loops=1)
+   Buffers: shared hit=96 read=31349
+   ->  Sort (actual time=270.223..270.224 rows=0 loops=1)
+         Sort Key: detected_at DESC, id DESC
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=96 read=31349
+         ->  Seq Scan on alert (actual time=270.216..270.217 rows=0 loops=1)
+               Filter: ((status = 'open'::text) AND (ROW(detected_at, id) < ROW((now() - '80:00:00'::interval), 'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               Rows Removed by Filter: 1500919
+               Buffers: shared hit=96 read=31349
+ Planning Time: 0.126 ms
+ Execution Time: 270.270 ms
+(12 rows)
+
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+=== (1) alert inbox AFTER: keyset page + partial index (same query) ===
+                                                                                              QUERY PLAN                                                                                              
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit (actual time=0.260..0.260 rows=0 loops=1)
+   Buffers: shared read=3
+   ->  Index Scan using alert_inbox_open_idx on alert (actual time=0.259..0.259 rows=0 loops=1)
+         Index Cond: ((tenant_id = (current_setting('app.bench_tenant'::text))::uuid) AND (ROW(detected_at, id) < ROW((now() - '80:00:00'::interval), 'ffffffff-ffff-ffff-ffff-ffffffffffff'::uuid)))
+         Buffers: shared read=3
+ Planning:
+   Buffers: shared hit=66 read=2
+ Planning Time: 0.457 ms
+ Execution Time: 0.280 ms
+(9 rows)
+
+=== (3) trips by vehicle and time BEFORE ===
+                                                 QUERY PLAN                                                 
+------------------------------------------------------------------------------------------------------------
+ Limit (actual time=0.627..0.641 rows=76 loops=1)
+   Buffers: shared hit=51 read=29
+   InitPlan 1 (returns $0)
+     ->  Limit (actual time=0.017..0.018 rows=1 loops=1)
+           Buffers: shared read=1
+           ->  Seq Scan on trip trip_1 (actual time=0.016..0.017 rows=1 loops=1)
+                 Filter: (tenant_id = (current_setting('app.bench_tenant'::text))::uuid)
+                 Buffers: shared read=1
+   ->  Sort (actual time=0.626..0.632 rows=76 loops=1)
+         Sort Key: trip.started_at DESC
+         Sort Method: quicksort  Memory: 30kB
+         Buffers: shared hit=51 read=29
+         ->  Index Scan using trip_tenant_vin_idx on trip (actual time=0.320..0.594 rows=76 loops=1)
+               Index Cond: ((tenant_id = (current_setting('app.bench_tenant'::text))::uuid) AND (vin = $0))
+               Filter: (started_at >= (now() - '10 days'::interval))
+               Buffers: shared hit=51 read=29
+ Planning:
+   Buffers: shared hit=28
+ Planning Time: 0.180 ms
+ Execution Time: 0.669 ms
+(20 rows)
+
+CREATE INDEX
+CREATE INDEX
+ANALYZE
+=== (3) trips by vehicle and time AFTER (composite index) ===
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit (actual time=0.050..0.165 rows=76 loops=1)
+   Buffers: shared hit=77 read=4
+   InitPlan 1 (returns $0)
+     ->  Limit (actual time=0.007..0.008 rows=1 loops=1)
+           Buffers: shared hit=1
+           ->  Seq Scan on trip trip_1 (actual time=0.007..0.007 rows=1 loops=1)
+                 Filter: (tenant_id = (current_setting('app.bench_tenant'::text))::uuid)
+                 Buffers: shared hit=1
+   ->  Index Scan using trip_vin_time_idx on trip (actual time=0.049..0.156 rows=76 loops=1)
+         Index Cond: ((tenant_id = (current_setting('app.bench_tenant'::text))::uuid) AND (vin = $0) AND (started_at >= (now() - '10 days'::interval)))
+         Buffers: shared hit=77 read=4
+ Planning:
+   Buffers: shared hit=36 read=1
+ Planning Time: 0.300 ms
+ Execution Time: 0.190 ms
+(15 rows)
+
+=== (4) fleet daily energy report BEFORE: aggregate over 1.5M trips ===
+                                      QUERY PLAN                                       
+---------------------------------------------------------------------------------------
+ Sort (actual time=1310.126..1310.128 rows=3 loops=1)
+   Sort Key: (date_trunc('day'::text, started_at)) DESC
+   Sort Method: quicksort  Memory: 25kB
+   Buffers: shared hit=15283 read=8932
+   ->  HashAggregate (actual time=1310.108..1310.117 rows=3 loops=1)
+         Group Key: date_trunc('day'::text, started_at)
+         Batches: 1  Memory Usage: 73kB
+         Buffers: shared hit=15283 read=8932
+         ->  Seq Scan on trip (actual time=0.013..1015.630 rows=1530006 loops=1)
+               Filter: (tenant_id = (current_setting('app.bench_tenant'::text))::uuid)
+               Rows Removed by Filter: 44916
+               Buffers: shared hit=15283 read=8932
+ Planning:
+   Buffers: shared hit=6 read=3
+ Planning Time: 0.330 ms
+ Execution Time: 1310.171 ms
+(16 rows)
+
+SELECT 7
+CREATE INDEX
+=== (4) AFTER: read the materialised view ===
+                                   QUERY PLAN                                    
+---------------------------------------------------------------------------------
+ Sort (actual time=0.013..0.014 rows=3 loops=1)
+   Sort Key: day DESC
+   Sort Method: quicksort  Memory: 25kB
+   Buffers: shared hit=1
+   ->  Seq Scan on trip_daily (actual time=0.006..0.008 rows=3 loops=1)
+         Filter: (tenant_id = (current_setting('app.bench_tenant'::text))::uuid)
+         Rows Removed by Filter: 4
+         Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=22 read=1
+ Planning Time: 0.119 ms
+ Execution Time: 0.024 ms
+(12 rows)
+
+=== (4) REFRESH MATERIALIZED VIEW CONCURRENTLY works (readers are not blocked) ===
+REFRESH MATERIALIZED VIEW
+=== (5) audit by actor, last hour BEFORE ===
+                                                                               QUERY PLAN                                                                               
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit (actual time=0.569..0.582 rows=72 loops=1)
+   Buffers: shared hit=92
+   ->  Sort (actual time=0.568..0.575 rows=72 loops=1)
+         Sort Key: audit_log.ts DESC
+         Sort Method: quicksort  Memory: 30kB
+         Buffers: shared hit=92
+         ->  Append (actual time=0.172..0.554 rows=72 loops=1)
+               Buffers: shared hit=92
+               Subplans Removed: 9
+               ->  Bitmap Heap Scan on audit_log_2026_10 audit_log_1 (actual time=0.171..0.521 rows=72 loops=1)
+                     Recheck Cond: ((tenant_id = (current_setting('app.bench_tenant'::text))::uuid) AND (ts >= (now() - '01:00:00'::interval)))
+                     Filter: (actor = 'bench-7'::text)
+                     Rows Removed by Filter: 3622
+                     Heap Blocks: exact=67
+                     Buffers: shared hit=92
+                     ->  Bitmap Index Scan on audit_log_2026_10_tenant_id_ts_idx (actual time=0.140..0.140 rows=3694 loops=1)
+                           Index Cond: ((tenant_id = (current_setting('app.bench_tenant'::text))::uuid) AND (ts >= (now() - '01:00:00'::interval)))
+                           Buffers: shared hit=25
+               ->  Seq Scan on audit_log_2026_11 audit_log_2 (actual time=0.002..0.002 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2026_12 audit_log_3 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_01 audit_log_4 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_02 audit_log_5 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_03 audit_log_6 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_04 audit_log_7 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_05 audit_log_8 (actual time=0.000..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_06 audit_log_9 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_07 audit_log_10 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_08 audit_log_11 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_09 audit_log_12 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_10 audit_log_13 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_11 audit_log_14 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_12 audit_log_15 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_01 audit_log_16 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_02 audit_log_17 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_03 audit_log_18 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_04 audit_log_19 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_05 audit_log_20 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_06 audit_log_21 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_07 audit_log_22 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_08 audit_log_23 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_09 audit_log_24 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_10 audit_log_25 (actual time=0.000..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_11 audit_log_26 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_12 audit_log_27 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_default audit_log_28 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+ Planning:
+   Buffers: shared hit=337 dirtied=3
+ Planning Time: 1.838 ms
+ Execution Time: 0.680 ms
+(76 rows)
+
+CREATE INDEX
+ANALYZE
+=== (5) audit by actor, last hour AFTER ===
+                                                                                 QUERY PLAN                                                                                 
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit (actual time=0.173..0.186 rows=72 loops=1)
+   Buffers: shared hit=62 read=3
+   ->  Sort (actual time=0.172..0.179 rows=72 loops=1)
+         Sort Key: audit_log.ts DESC
+         Sort Method: quicksort  Memory: 30kB
+         Buffers: shared hit=62 read=3
+         ->  Append (actual time=0.045..0.157 rows=72 loops=1)
+               Buffers: shared hit=62 read=3
+               Subplans Removed: 9
+               ->  Index Scan using audit_log_2026_10_tenant_id_actor_ts_idx on audit_log_2026_10 audit_log_1 (actual time=0.044..0.121 rows=72 loops=1)
+                     Index Cond: ((tenant_id = (current_setting('app.bench_tenant'::text))::uuid) AND (actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)))
+                     Buffers: shared hit=62 read=3
+               ->  Seq Scan on audit_log_2026_11 audit_log_2 (actual time=0.010..0.010 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2026_12 audit_log_3 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_01 audit_log_4 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_02 audit_log_5 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_03 audit_log_6 (actual time=0.000..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_04 audit_log_7 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_05 audit_log_8 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_06 audit_log_9 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_07 audit_log_10 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_08 audit_log_11 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_09 audit_log_12 (actual time=0.000..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_10 audit_log_13 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_11 audit_log_14 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2027_12 audit_log_15 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_01 audit_log_16 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_02 audit_log_17 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_03 audit_log_18 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_04 audit_log_19 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_05 audit_log_20 (actual time=0.000..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_06 audit_log_21 (actual time=0.000..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_07 audit_log_22 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_08 audit_log_23 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_09 audit_log_24 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_10 audit_log_25 (actual time=0.000..0.000 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_11 audit_log_26 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_2028_12 audit_log_27 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+               ->  Seq Scan on audit_log_default audit_log_28 (actual time=0.001..0.001 rows=0 loops=1)
+                     Filter: ((actor = 'bench-7'::text) AND (ts >= (now() - '01:00:00'::interval)) AND (tenant_id = (current_setting('app.bench_tenant'::text))::uuid))
+ Planning:
+   Buffers: shared hit=240 read=37
+ Planning Time: 2.713 ms
+ Execution Time: 0.278 ms
+(70 rows)
+
+              set_config              
+--------------------------------------
+ b0813b89-210d-585f-9c4e-856440224c40
+(1 row)
+
+SELECT 100000
+CREATE INDEX
+ANALYZE
+=== (6) RLS predicate as a bare function call: evaluated per row candidate ===
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Aggregate (actual time=10.139..10.141 rows=1 loops=1)
+   Buffers: shared hit=334 read=36
+   ->  Bitmap Heap Scan on rls_scratch (actual time=1.179..6.905 rows=40000 loops=1)
+         Recheck Cond: (tenant_id = (NULLIF(current_setting('app.tenant_id'::text, true), ''::text))::uuid)
+         Heap Blocks: exact=334
+         Buffers: shared hit=334 read=36
+         ->  Bitmap Index Scan on rls_scratch_tenant_id_idx (actual time=1.128..1.128 rows=40000 loops=1)
+               Index Cond: (tenant_id = (NULLIF(current_setting('app.tenant_id'::text, true), ''::text))::uuid)
+               Buffers: shared read=36
+ Planning:
+   Buffers: shared hit=7 read=2
+ Planning Time: 0.369 ms
+ Execution Time: 10.172 ms
+(13 rows)
+
+=== (6) RLS predicate as (SELECT app_tenant()): InitPlan, index usable (what the policies use) ===
+                                                QUERY PLAN                                                
+----------------------------------------------------------------------------------------------------------
+ Aggregate (actual time=9.850..9.853 rows=1 loops=1)
+   Buffers: shared hit=370
+   InitPlan 1 (returns $0)
+     ->  Result (actual time=0.008..0.008 rows=1 loops=1)
+   ->  Bitmap Heap Scan on rls_scratch (actual time=1.148..6.686 rows=40000 loops=1)
+         Recheck Cond: (tenant_id = $0)
+         Heap Blocks: exact=334
+         Buffers: shared hit=370
+         ->  Bitmap Index Scan on rls_scratch_tenant_id_idx (actual time=1.101..1.102 rows=40000 loops=1)
+               Index Cond: (tenant_id = $0)
+               Buffers: shared hit=36
+ Planning Time: 0.103 ms
+ Execution Time: 9.880 ms
+(13 rows)
+
+DROP TABLE
+DROP MATERIALIZED VIEW
+DROP INDEX
+DELETE 1500000
+DELETE 1530006
+DELETE 600000

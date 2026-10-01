@@ -1,0 +1,5 @@
+# Gate G11 status (web console) — PARTIAL
+`tests/e2e/smoke.mjs` (Playwright + Chromium) drives the real stack: Keycloak sign-in (authorization code + PKCE) → dashboard (live cards, server-aggregated map, SSE feed) → vehicles (keyset list, detail drawer with ClickHouse history) → alerts (list, evidence drawer with the A* route, acknowledge/resolve). Last run: signed in as a dispatcher, 50 vehicle rows, 24 alert rows, **0 console/page errors**. Screenshots: `evidence/G11/*.png`.
+**Not done:** accessibility (axe) scan, behave/BDD scenarios, map frame-rate measurement, ingest→UI latency probe (N3), assertions beyond "renders without errors" (the script is a journey smoke test, not an assertion suite).
+
+A silent recording of the full journey (including the energy manager proposing a plan with 194 vehicles at 42% lower cost than plug-in charging, and the viewer's masked view) is in `docs/demo/`.

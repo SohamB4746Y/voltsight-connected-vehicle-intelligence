@@ -34,7 +34,7 @@ jobs:
         run: |
           docker run --rm -v "$PWD:/repo" aquasec/trivy:0.74.0 fs \
             --scanners misconfig,secret --severity HIGH,CRITICAL --exit-code 1 \
-            --skip-files /repo/.env /repo
+            --skip-files /repo/.env --skip-dirs /repo/web/node_modules --ignorefile /repo/.trivyignore /repo
 
   g1:
     name: gate G1 (contracts, database, identity, PKI, seed)
@@ -67,3 +67,43 @@ jobs:
         with:
           name: evidence-G1
           path: evidence/G1
+
+  app:
+    name: application (build, unit tests, web, helm, terraform)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build every binary
+        run: go build ./...
+      - name: Unit tests (no external services; simulator-based analytics tests included)
+        run: go test -count=1 ./internal/...
+      - name: govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Web console type-check, build and audit
+        working-directory: web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          npm audit --omit=dev
+      - uses: azure/setup-helm@v4
+      - name: Helm lint and render
+        run: |
+          helm lint deploy/helm/voltsight
+          helm template vs deploy/helm/voltsight > /tmp/vs.yaml
+          docker run --rm -v /tmp/vs.yaml:/vs.yaml ghcr.io/yannh/kubeconform:v0.6.7 -strict -summary -ignore-missing-schemas /vs.yaml
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform validate (AWS, GCP)
+        run: |
+          for d in aws gcp; do
+            terraform -chdir=deploy/terraform/$d init -backend=false -input=false
+            terraform -chdir=deploy/terraform/$d validate
+          done

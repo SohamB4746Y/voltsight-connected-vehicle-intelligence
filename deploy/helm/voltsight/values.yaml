@@ -1,0 +1,93 @@
+# Cloud-agnostic: the services speak only standard protocols (Kafka, PostgreSQL, Redis, ClickHouse native, OIDC,
+# S3/Vault HTTP). Pointing `config` at managed services (MSK/Confluent, RDS/Cloud SQL, ElastiCache/Memorystore ...)
+# or at the in-cluster dev stack (`infra.enabled=true`) needs no code change.
+image:
+  repository: voltsight/platform
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+config:
+  kafkaBrokers: kafka:9092
+  redisAddr: redis:6379
+  clickhouseAddr: clickhouse:9000
+  postgresHost: postgres
+  postgresPort: "5432"
+  oidcIssuer: http://localhost:8080/realms/voltsight          # the `iss` claim the console's tokens carry
+  oidcJwks: http://keycloak:8080/realms/voltsight/protocol/openid-connect/certs
+  vaultAddr: http://vault:8200
+
+# Secret with POSTGRES_PASSWORD, DB_APP_PASSWORD, DB_GATEWAY_PASSWORD, DB_ALERTS_PASSWORD, DB_BATCH_PASSWORD,
+# DB_PRIVACY_PASSWORD, DB_SEALER_PASSWORD, REDIS_PASSWORD, CLICKHOUSE_PASSWORD, VAULT_DEV_TOKEN.
+# Create it with External Secrets / Vault Agent in a cloud; `make k8s-secret` creates it for kind.
+secrets:
+  existingSecret: voltsight-secrets
+
+ingress:
+  enabled: false
+  className: nginx
+  host: voltsight.example.com
+  tlsSecret: voltsight-tls          # TLS 1.3 is enforced by the controller's ssl-protocols setting
+
+securityContext:                      # applied to every pod
+  runAsNonRoot: true
+  runAsUser: 65532
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities: { drop: ["ALL"] }
+
+services:
+  api:
+    command: /app/vsapi
+    args: ["-listen", "0.0.0.0:8081", "-static", "/app/web", "-brokers", "$(KAFKA_BROKERS)", "-issuer", "$(OIDC_ISSUER)", "-jwks", "$(OIDC_JWKS)"]
+    port: 8081
+    replicas: 2
+    probe: /healthz
+    ready: /readyz
+    resources: { requests: { cpu: 250m, memory: 256Mi }, limits: { cpu: "1", memory: 512Mi } }
+    hpa: { min: 2, max: 8, cpu: 70 }
+  gateway:
+    command: /app/vsgateway
+    args: ["-listen", "0.0.0.0:8443", "-admin", "0.0.0.0:9100", "-brokers", "$(KAFKA_BROKERS)"]
+    port: 8443
+    adminPort: 9100
+    replicas: 3
+    probe: /healthz
+    ready: /readyz
+    serviceType: LoadBalancer         # device mTLS terminates in the gateway itself (TLS 1.3, client certificates)
+    resources: { requests: { cpu: "1", memory: 512Mi }, limits: { cpu: "2", memory: 1Gi } }
+    hpa: { min: 3, max: 24, cpu: 65 }
+  worker:
+    command: /app/vsworker
+    args: ["-admin", "0.0.0.0:9102", "-brokers", "$(KAFKA_BROKERS)"]
+    adminPort: 9102
+    replicas: 4                       # consumer-group members; at most the topic's 64 partitions
+    probe: /healthz
+    ready: /healthz
+    resources: { requests: { cpu: "1", memory: 768Mi }, limits: { cpu: "2", memory: 1536Mi } }
+    hpa: { min: 4, max: 64, cpu: 70 }
+  sink:
+    command: /app/vssink
+    args: ["-brokers", "$(KAFKA_BROKERS)"]
+    replicas: 2
+    resources: { requests: { cpu: 500m, memory: 512Mi }, limits: { cpu: "1", memory: 1Gi } }
+  alerts:
+    command: /app/vsalerts
+    args: ["-brokers", "$(KAFKA_BROKERS)"]
+    replicas: 2
+    resources: { requests: { cpu: 100m, memory: 128Mi }, limits: { cpu: 500m, memory: 256Mi } }
+  privacy:
+    command: /app/vsprivacy
+    args: ["-loop", "30s"]
+    replicas: 1
+    resources: { requests: { cpu: 50m, memory: 64Mi }, limits: { cpu: 250m, memory: 128Mi } }
+
+cronjobs:
+  batch:       { schedule: "0 * * * *",  command: /app/vsbatch, args: ["-hours", "2"], resources: { requests: { cpu: "1", memory: 1Gi }, limits: { cpu: "2", memory: 2Gi } } }
+  audit-sealer: { schedule: "*/5 * * * *", command: /app/vsseal,  args: ["seal"],       resources: { requests: { cpu: 50m, memory: 64Mi }, limits: { cpu: 250m, memory: 128Mi } } }
+
+networkPolicy:
+  enabled: true
+
+# Single-replica development stack for kind / demos (not for production: use managed services or operators).
+infra:
+  enabled: false

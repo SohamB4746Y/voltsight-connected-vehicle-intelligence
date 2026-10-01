@@ -77,6 +77,8 @@ type Config struct {
 	ChargerOutageFraction                  float64
 
 	LowSoCStartFraction   float64 // share of vehicles that start with a low battery; default 0.08
+	LowSoCStartMin        float64 // lowest start fraction of such a vehicle (0..1); default 0.14
+	LowSoCStartMax        float64 // highest start fraction of such a vehicle; default 0.34
 	UnawareDriverFraction float64 // share of drivers that ignore low-battery warnings; default 0.15
 	FaultFraction         float64 // share of vehicles that develop a battery DTC; default 0.02
 
@@ -107,6 +109,9 @@ func (c *Config) defaults() {
 	}
 	if c.LowSoCStartFraction == 0 {
 		c.LowSoCStartFraction = 0.08
+	}
+	if c.LowSoCStartMin == 0 && c.LowSoCStartMax == 0 {
+		c.LowSoCStartMin, c.LowSoCStartMax = 0.14, 0.34
 	}
 	if c.UnawareDriverFraction == 0 {
 		c.UnawareDriverFraction = 0.15

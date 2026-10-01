@@ -75,6 +75,8 @@ services:
         hard: 262144
     volumes:
       - ch-data:/var/lib/clickhouse
+      - ./config/clickhouse/voltsight-memory.xml:/etc/clickhouse-server/config.d/voltsight-memory.xml:ro
+      - ./config/clickhouse/voltsight-profile.xml:/etc/clickhouse-server/users.d/voltsight-profile.xml:ro
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8123/ping | grep -q Ok"]
       interval: 5s

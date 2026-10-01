@@ -1,0 +1,14 @@
+{
+  "alerts": 236,
+  "gateway_receive_to_decision_s": {
+    "p50": 9.471,
+    "p95": 13.678,
+    "p99": 16.916
+  },
+  "gateway_receive_to_persisted_s": {
+    "p50": 9.766,
+    "p95": 13.732,
+    "p99": 17.035,
+    "max": 17.409
+  }
+}

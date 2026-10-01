@@ -110,3 +110,7 @@ Key `id`. `id → tenant_id, session_id, tool, args_hash, status, approver_id, r
 
 ### `incident_embedding`
 Key `id`. `id → tenant_id, kind, source_ref, body, embedding, meta, created_at`. `embedding` is a function of `body` and the model, stored for indexing (derived data with a documented source). **3NF.**
+
+## Added after the original analysis (migration 000004, performance)
+- `trip_daily` (materialised view) and `trip_daily_v` (security-barrier view): **derived** rollups of `trip` (tenant, day, trips, km, kWh). Not base tables: they hold no independent facts, are refreshed by the batch job through `refresh_trip_daily()`, and the application role can only read the tenant-filtered view because materialised views cannot carry row-level security.
+- Indexes `alert_inbox_*_idx`, `trip_vin_time_idx`, `audit_actor_time_idx` change no dependencies.
