@@ -1,7 +1,7 @@
 # VoltSight v1.0 Submission Code Freeze
 
 Freeze commit:
-the commit titled `release: VoltSight v1.0 submission freeze` (hash recorded in the next section by a documentation-only follow-up commit)
+`dad7768bfaba931dda28ab2332263d00222578d9` (`release: VoltSight v1.0 submission freeze`)
 
 Branch:
 `claude/jolly-clarke-65flh3`
