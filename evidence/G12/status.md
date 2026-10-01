@@ -9,5 +9,5 @@
 | Filesystem / IaC | Trivy 0.57.1 (HIGH, CRITICAL; vuln + secret + misconfig) | go.mod findings fixed by upgrading `golang.org/x/crypto` and `github.com/moby/go-archive` (both indirect, test-time only); 2 GCP Terraform findings waived in `.trivyignore` with reasons (the checks look for a deprecated argument / do not follow the node-pool block) | `trivy-fs.json` |
 | Container image | Trivy image scan | **NOT RUN** - the image build was not executed in this sandbox |  |
 | DAST | OWASP ZAP | **NOT RUN** |  |
-| TLS 1.3 scan of the edge | testssl / nmap | **NOT RUN** (the API listener here is plain HTTP for local use; the gateway enforces TLS 1.3 + mTLS, proven by the G3 handshake tests; the Helm ingress pins TLSv1.3) |  |
+| TLS 1.3 of the API edge | `openssl s_client` against `vsapi -tls` | **TLS 1.3 accepted, TLS 1.2 refused** (`tls_api.txt`); no full scanner (testssl/nmap) run. The default local listener is plain HTTP; the gateway enforces TLS 1.3 + mTLS (G3 handshake tests); the Helm ingress pins TLSv1.3 |
 | Encryption at rest | - | local volumes are NOT encrypted: LIMITATION. Terraform enables KMS/CMEK for RDS/Cloud SQL, S3/GCS, ElastiCache/Memorystore, MSK, EKS secrets (validated, not applied) | `deploy/terraform/*` |
