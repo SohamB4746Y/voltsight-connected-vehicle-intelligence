@@ -6,12 +6,12 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 |---|---|---|---|
 | SC1 | 100,000 vehicles | PASS | seeded + verified against `db/seed/manifest.json`; simulator runs all 100K in ~200 MB heap |
 | SC2/N1 | ~100K events/s sustained | **MEASURED, below target, short**: 6.0M events at **98.3K ev/s for 60 s** (box, everything on one 4-vCPU host, CPU oversubscribed) | `evidence/G4/live_fixed_faults_adversarial` — not a sustained/soak result |
-| SC3/N2 | 3× burst for 5 min, no loss | see `evidence/G14/status.md` | |
+| SC3/N2 | 3× burst for 5 min, no loss | **PARTIAL**: 3× burst for **40 s** inside a 100 s run: 18.0M events, 0 lost/DLQ/failed, no 429s, books balanced (164K ev/s average); the 5-minute duration was not run | `evidence/G14/burst_3x` |
 | SC4 | ~1 KB event, TB/day analysis | PARTIAL | measured bytes/event in `docs/capacity.md`; the TB/day figure is an extrapolation |
-| SC5 | single SQL DB vs right store, with a benchmark | PARTIAL | argument in ADR-002; ClickHouse insert rate measured; **no PostgreSQL-vs-ClickHouse insert comparison was run** |
+| SC5 | single SQL DB vs right store, with a benchmark | PASS (benchmark) | 1M rows: PostgreSQL COPY 97K rows/s, 299 B/row with PK index vs ClickHouse 405K rows/s (4.2×); the 2.7 B/row ClickHouse figure is inflated by uniform synthetic rows — simulated telemetry measures 17.3 B/row (`evidence/G14/pg_vs_clickhouse.txt`) |
 | SC6 | ACID for ownership/billing/access/audit | PASS | G1 transaction + RLS tests |
 | N3 | ingest → dashboard < 2 s | NOT MEASURED | SSE path built; no latency probe was run |
-| N4 | critical alert < 5 s | NOT MEASURED | `vsalerts -latency-log` is ready; the live run was aborted (priority change) and the one overloaded demo run showed ~90 s lag when the 4 cores were shared with training/test jobs |
+| N4 | critical alert < 5 s | **MEASURED, NOT met on this host** | receive→persisted p50 9.8 s, p99 17.0 s (236 alerts, full stack on one 4-vCPU box at ~100K ev/s); worker-only ingest→process mean 1.9 s, ≤ 5 s for all sampled events (`evidence/G14/status.md`). Multi-host sizing was not tested |
 | N5 | API p95 < 200 ms, p99 < 500 ms | PASS (ingest idle) | p95 26.8 ms, p99 41.0 ms, 829 req/s, 16 clients (`evidence/G9b/api_latency.json`); not measured under 100K ev/s ingest |
 | N6/N7 | horizontal scale, add brokers without code change | NOT MEASURED | stateless services + 64 partitions by design; no scale-out experiment |
 | N8/N9/N10 | no SPOF, 99.9%, recovery | N10 PARTIAL (`evidence/G13/status.md`: worker/sink kill, Redis/ClickHouse/Kafka restart recover with zero loss; gateway kill, PostgreSQL failover and Kubernetes pod kills not run); N8 LIMITATION (single broker/ClickHouse/Redis locally); N9 NOT MEASURED | |
@@ -33,7 +33,7 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | MB6 | PASS | Playwright journey through real Keycloak sign-in (`tests/e2e`, screenshots in `evidence/G11`); accessibility scan not run |
 | MB7/DL10 | PARTIAL | Dockerfile written; **image never built** here; hadolint not run |
 | MB9/T12/DL11/DL12 | PARTIAL | Helm lint + kubeconform 21/21; `terraform validate` AWS+GCP; **no kind install, no cloud apply** |
-| T5 | PARTIAL | batch over 22M rows measured (trips in 15 s); the "billion-row" benchmark was **not** run |
+| T5 | PARTIAL | batch over 22M rows measured (trips in 15 s); ClickHouse history queries on 29.2M synthetic rows 129–720 ms (`evidence/G14/ch_bench.json`); the "billion-row" benchmark was **not** run |
 | T11 | PARTIAL | Prometheus metrics on gateway/worker; no Loki/Tempo traces |
 | D1–D3, D8–D13 | PASS | `docs/3nf.md`, `docs/er`, `docs/sql-optimisation.md`, migration 4; D5 skew histogram not run |
 | AL1–AL6, AL8–AL11 | PASS | `docs/algorithms.md` |

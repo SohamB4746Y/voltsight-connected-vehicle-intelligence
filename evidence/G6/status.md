@@ -13,7 +13,7 @@ Criteria: [`docs/gates/G6.md`](../../docs/gates/G6.md).
 | G6.7 charger outage changes the decision | PASS at unit level (`TestChargerOutageChangesTheDecision`); the Kafka status feed (`StatusFeed`) is built but its live behaviour was **not** exercised |
 | G6.8 alert idempotency + tenant isolation | PASS | `internal/alerts/service_stack_test.go`: 1 alert delivered 5× + 1 garbage record → 1 row, 4 duplicates counted, 1 decode error, Redis message received, other tenant sees 0 rows via the app role |
 | G6.9 detection quality vs ground truth | MEASURED (stress scenario) | below |
-| G6.10 live ingest→alert latency p99 < 5 s | **NOT MEASURED** | the live run was aborted by the user's change of priorities; `tools/live/e2e.sh` + `vsalerts -latency-log` are ready to produce it (G14) |
+| G6.10 live ingest→alert latency p99 < 5 s | **MEASURED, target NOT met on this host**: 236 alerts, receive→persisted p50 9.8 s / p95 13.7 s / p99 17.0 s (whole stack on one 4-vCPU box at ~100K ev/s); worker-only context: ingest→process mean 1.9 s, all ≤ 5 s | [`../G14/status.md`](../G14/status.md), `evidence/G6/live_alert_latency/` |
 
 ## G6.9 detection quality (MEASURED; simulated world, declared limitation)
 `go run ./cmd/vseval -vehicles 1500 -hours 4 -low-soc-fraction 0.4 -unaware 0.5 -charger-outage-fraction 0.97 -outage-at-hours 0.17 -outage-hours 4` — 21.6M telemetry events, 25 ground-truth strandings (all by drivers who ignore low-battery warnings). Alert is correct if the vehicle strands within 2 h. Thresholds were set by design, **not tuned on this run**. Result file: `detection_quality_stress.json`.

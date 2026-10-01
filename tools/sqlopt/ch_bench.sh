@@ -7,6 +7,7 @@ cd "$(dirname "$0")/../.."
 set -a; source .env; set +a
 S=${1:-300}; OUT=${2:-evidence/G14/ch_bench.json}
 CH="docker exec -i voltsight-clickhouse-1 clickhouse-client --user voltsight --password $CLICKHOUSE_PASSWORD"
+if [ -z "${SKIP_GEN:-}" ]; then
 $CH -q "drop table if exists telemetry_big sync"
 # same DDL as the sink (printed by the sink package through a tiny helper below)
 DDL=$(cat <<'SQL'
@@ -24,7 +25,7 @@ SQL
 )
 $CH -q "$DDL"
 START=$(date +%s)
-CHUNK=20   # sample rows per vehicle per INSERT (2M rows per statement keeps memory low)
+CHUNK=4   # sample rows per vehicle per INSERT (400K rows per statement keeps memory low)
 for ((a=0; a<S; a+=CHUNK)); do
   b=$((a+CHUNK)); [ $b -gt $S ] && b=$S
   $CH -q "INSERT INTO telemetry_big
@@ -35,10 +36,11 @@ for ((a=0; a<S; a+=CHUNK)); do
            toFloat32(30 + 20 * sin(s / 9.0 + v)), toFloat32(20 + 80 * (1 - ((s * 7 + v) % 600) / 600.0)), 5000 + s * 0.4 + (v % 100),
            toFloat32(s % 360), toFloat32(28 + 6 * sin(s / 30.0)), toFloat32(30), toFloat32(350 + (s % 50)), toFloat32(-20 + (s % 40)),
            if(s % 9 = 0, 'CHARGING', 'NONE'), '', 'UNSPECIFIED', if(v % 2 = 0, 'AURORA', 'BOREAS'), 1, []
-    FROM (SELECT number % 100000 AS v, intDiv(number, 100000) + $a AS s FROM numbers(100000 * ($b - $a)))" > /dev/null
+    FROM (SELECT number % 100000 AS v, intDiv(number, 100000) + $a AS s FROM numbers(100000 * ($b - $a))) SETTINGS max_insert_threads = 1, max_threads = 2, max_block_size = 65536, min_insert_block_size_rows = 200000" > /dev/null
 done
-$CH -q "optimize table telemetry_big final" > /dev/null
-WALL=$(( $(date +%s) - START ))
+fi
+$CH -q "optimize table telemetry_big final" > /dev/null 2>&1 || true
+WALL=$(( $(date +%s) - ${START:-$(date +%s)} ))
 ROWS=$($CH -q "select count() from telemetry_big")
 read BYTES COMP <<< $($CH -q "select sum(bytes_on_disk), sum(data_uncompressed_bytes) from system.parts where table='telemetry_big' and active format TSV")
 q() { # run a query, print wall ms and rows read (from the query log)
@@ -50,10 +52,10 @@ q() { # run a query, print wall ms and rows read (from the query log)
 T=00000000-0000-0000-0000-000000000001
 Q=$(cat <<JSON
 [
-$(q "SELECT ts, soc_pct FROM telemetry_big WHERE tenant_id = '$T' AND vin = 'ZAR00000000000007' AND ts >= '2026-09-02 00:00:00' AND ts < '2026-09-03 00:00:00' ORDER BY ts /*q_vehicle_day*/" q_vehicle_day),
-$(q "SELECT toStartOfHour(ts) h, avg(soc_pct), min(soc_pct) FROM telemetry_big WHERE tenant_id = '$T' AND ts >= '2026-09-02 00:00:00' AND ts < '2026-09-05 00:00:00' GROUP BY h ORDER BY h /*q_tenant_hourly_3d*/" q_tenant_hourly_3d),
-$(q "SELECT uniqExact(vin) FROM telemetry_big WHERE tenant_id = '$T' AND soc_pct < 8 AND ts >= '2026-09-03 00:00:00' AND ts < '2026-09-03 01:00:00' /*q_low_soc_hour*/" q_low_soc_hour),
-$(q "SELECT vin, max(odo_km) - min(odo_km) km FROM telemetry_big WHERE tenant_id = '$T' AND ts >= '2026-09-02 00:00:00' AND ts < '2026-09-03 00:00:00' GROUP BY vin ORDER BY km DESC LIMIT 10 /*q_km_per_vehicle_day*/" q_km_per_vehicle_day),
+$(q "SELECT ts, soc_pct FROM telemetry_big WHERE tenant_id = '$T' AND vin = 'ZAR00000000000007' AND ts >= '2026-09-01 00:00:00' AND ts < '2026-09-01 05:00:00' ORDER BY ts /*q_vehicle_day*/" q_vehicle_day),
+$(q "SELECT toStartOfHour(ts) h, avg(soc_pct), min(soc_pct) FROM telemetry_big WHERE tenant_id = '$T' AND ts >= '2026-09-01 00:00:00' AND ts < '2026-09-01 05:00:00' GROUP BY h ORDER BY h /*q_tenant_hourly_5h*/" q_tenant_hourly_5h),
+$(q "SELECT uniqExact(vin) FROM telemetry_big WHERE tenant_id = '$T' AND soc_pct < 8 AND ts >= '2026-09-01 02:00:00' AND ts < '2026-09-01 03:00:00' /*q_low_soc_hour*/" q_low_soc_hour),
+$(q "SELECT vin, max(odo_km) - min(odo_km) km FROM telemetry_big WHERE tenant_id = '$T' AND ts >= '2026-09-01 00:00:00' AND ts < '2026-09-01 05:00:00' GROUP BY vin ORDER BY km DESC LIMIT 10 /*q_km_per_vehicle_day*/" q_km_per_vehicle_day),
 $(q "SELECT count(), avg(soc_pct), uniqExact(vin) FROM telemetry_big /*q_full_scan*/" q_full_scan)
 ]
 JSON

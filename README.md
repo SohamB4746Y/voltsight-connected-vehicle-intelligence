@@ -27,7 +27,11 @@ Tells every EV in a **100,000-vehicle** connected fleet whether it can still rea
 | Chaos: kill/restart one component mid-run at 100K vehicles; the faulted path must equal a clean replay of the log | worker-kill, sink-kill, redis-restart, clickhouse-restart, kafka-restart: **0 events lost** (7.5M = 7.5M each); the method found and fixed 2 real defects (worker exited on a Redis restart / on a failed commit during a broker restart) | [`evidence/G13/status.md`](evidence/G13/status.md) |
 | Security scans | gitleaks clean, govulncheck clean, npm audit 0, semgrep 1 waived, Trivy fs clean after fixes/waivers | [`evidence/G12/status.md`](evidence/G12/status.md) |
 
-**Not measured / not done** (full list in [`docs/requirements-status.md`](docs/requirements-status.md)): ≥100K ev/s sustained, 3× burst for 5 minutes, soak, scale-out, alert latency percentiles, billion-row benchmark, DAST, container image build/scan, Kubernetes install, real-cloud deployment, Pact/BDD suites, the Solution Document (template not provided), demo video.
+| 3× burst (40 s inside a 100 s run, 100K vehicles) | 18.0M events, **0 lost**, no 429s, books balance | [`evidence/G14`](evidence/G14/status.md) |
+| **Alert latency (target p99 < 5 s): NOT met on this host** | receive→persisted p50 9.8 s / p99 17.0 s with the whole stack on one 4-vCPU box; worker-only ingest→process mean 1.9 s, all ≤ 5 s | [`evidence/G14`](evidence/G14/status.md) |
+| PostgreSQL vs ClickHouse insert (1M rows) | 97K vs 405K rows/s (4.2×); simulated telemetry 17.3 B/row in ClickHouse | `evidence/G14/pg_vs_clickhouse.txt` |
+
+**Not measured / not done** (full list in [`docs/requirements-status.md`](docs/requirements-status.md)): ≥100K ev/s sustained beyond 60 s, 3× burst for 5 minutes, soak, scale-out, billion-row benchmark, DAST, container image build/scan, Kubernetes install, real-cloud deployment, Pact/BDD suites, the Solution Document (template not provided), demo video.
 
 ## Run it
 Prerequisites: Docker (≥ 12 GB RAM), Go ≥ 1.27, Node 22, `make`, Python ≥ 3.11 (ML only).

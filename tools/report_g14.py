@@ -16,7 +16,10 @@ else:
 # latency
 l = "evidence/G6/live_alert_latency/alert_latency.ndjson"
 if os.path.exists(l):
-    rows = [json.loads(x) for x in open(l) if x.strip()]
+    rows = []
+    for x in open(l):
+        try: rows.append(json.loads(x))
+        except ValueError: pass  # the last buffered line is cut off when the service is killed
     if rows:
         rp = [r["recv_to_persist_ms"] / 1000 for r in rows]; rd = [r["recv_to_decision_ms"] / 1000 for r in rows]
         res = {"alerts": len(rows), "gateway_receive_to_decision_s": {"p50": pct(rd, .5), "p95": pct(rd, .95), "p99": pct(rd, .99)},
@@ -37,6 +40,7 @@ if os.path.exists("evidence/G14/ch_bench.json"):
     out += ["## ClickHouse history benchmark (SYNTHETIC rows generated inside ClickHouse, production schema/ordering/codecs)",
             f"- {c['synthetic_rows']:,} rows ({c['vehicles']:,} vehicles × {c['samples_per_vehicle']} samples), {c['bytes_per_row_on_disk']} B/row on disk, compression {c['compression_ratio']}×"]
     out += [f"- `{q['name']}`: {q['wall_ms']} ms wall, {q['rows_read']:,} rows read" for q in c["queries"]]
-    out += ["- smooth synthetic signals compress better than real telemetry; this is **not** a billion-row run (disk budget) and not real data", ""]
+    out += ["- wall times include a `docker exec` client round trip (~100 ms); `rows_read` is from the query log (index pruning: a one-vehicle one-day scan reads 8,192 rows of 29.2M)",
+            "- the generator stopped at 29.2M rows because background merges exceeded the 3 GB container's memory limit (a limit this very benchmark exposed); smooth synthetic signals compress better (9.1×) than the simulated telemetry (6.8×, 17.3 B/row); this is **not** a billion-row run and not real data", ""]
 out += ["## Not measured", "- ≥ 100K events/s *sustained* beyond the 60 s run in `evidence/G4`; 5-minute 3× burst; soak (heap/RSS/lag trend); scale-out 1→2→4→8 workers; adding Kafka brokers; per-hop ceilings under isolation; billion-row batch scan; CPU/memory plots."]
 open("evidence/G14/status.md", "w").write("\n".join(out) + "\n"); print("\n".join(out))

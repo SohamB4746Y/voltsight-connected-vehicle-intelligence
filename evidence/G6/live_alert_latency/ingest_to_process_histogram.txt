@@ -1,0 +1,15 @@
+# HELP rtp_ingest_to_process_seconds Gateway receive to worker processing (sampled).
+# TYPE rtp_ingest_to_process_seconds histogram
+rtp_ingest_to_process_seconds_bucket{le="0.01"} 0
+rtp_ingest_to_process_seconds_bucket{le="0.025"} 0
+rtp_ingest_to_process_seconds_bucket{le="0.05"} 0
+rtp_ingest_to_process_seconds_bucket{le="0.1"} 75
+rtp_ingest_to_process_seconds_bucket{le="0.25"} 216
+rtp_ingest_to_process_seconds_bucket{le="0.5"} 2609
+rtp_ingest_to_process_seconds_bucket{le="1"} 13266
+rtp_ingest_to_process_seconds_bucket{le="2"} 58199
+rtp_ingest_to_process_seconds_bucket{le="5"} 109555
+rtp_ingest_to_process_seconds_bucket{le="10"} 109555
+rtp_ingest_to_process_seconds_bucket{le="+Inf"} 109555
+rtp_ingest_to_process_seconds_sum 212900.84433321503
+rtp_ingest_to_process_seconds_count 109555
