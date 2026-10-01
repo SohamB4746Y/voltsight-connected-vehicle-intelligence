@@ -57,6 +57,6 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | DL2/DL3/DL8 | PARTIAL | `make up-lowulimit && make seed && make build && make web && tools/live/demo.sh` works in this sandbox; no clean-clone run |
 | DL4–DL7, DL13, DL14 | PASS | |
 | DL9 | PARTIAL | evidence folders; no rendered claims-check tooling |
-| DL15 demo video | **NOT DONE** | script in `docs/demo.md` |
+| DL15 demo video | PARTIAL | three silent screen-recording clips of the real journey (dispatcher, energy manager, viewer; 49 s + 17 s + 13 s) in `docs/demo/*.webm`, recorded by `tests/e2e/record_demo.mjs` against the live system; **no narration**, shorter than the 5-minute slot; the spoken script is `docs/demo.md` |
 | RL1, RL2, RL5 | PASS | `docs/ai-oss-declaration.md` (SBOM not generated) |
 | RL3 | see git tags | |
