@@ -21,7 +21,16 @@ Commit under test: see `evidence/G0/20261001T090257Z-602191d/` for the cold-star
 | G0.6 idle memory | PASS (measured 1.8 GB total idle) |
 | G0.7 OTLP -> Prometheus | PASS |
 | G0.8 static checks | PASS locally (see caveat above) |
-| G0.9 CI green on GitHub | **BLOCKED** — no GitHub remote exists yet; creating a repository is an outward-facing action awaiting the owner's go-ahead |
+| G0.9 CI green on GitHub | PASS — real run, see below |
 | G0.10 no fixed secrets | PASS |
 
-**Overall G0: PARTIAL** (9/10; G0.9 blocked on a GitHub repository).
+**Overall G0: PASS** (10/10).
+
+## G0.9 — GitHub repository and CI run
+- Repository (PRIVATE, verified with `gh repo view`): https://github.com/SohamB4746Y/voltsight-connected-vehicle-intelligence
+- CI run: https://github.com/SohamB4746Y/voltsight-connected-vehicle-intelligence/actions/runs/36840570292
+- Result: `conclusion=success`, event `push`, branch `main`, tested commit `c9748c8df4f0259d53987abc56de839e13e6dd65`, 24 s. Every step green: .env generation, compose validity, yamllint, gitleaks, trivy fs.
+- Raw record: `evidence/G0/ci-run-36840570292.json` (from `gh run view --json`).
+- No gate or check was changed to obtain this result; the first push passed unchanged.
+- Observation, not a failure: GitHub annotates that `actions/checkout@v4` and `actions/setup-python@v5` target Node 20 (deprecated, forced to Node 24). Action versions will be bumped when the workflow is next extended.
+- Note: the CI link is only reachable by accounts with access to the private repository; reviewer access must be arranged before submission.

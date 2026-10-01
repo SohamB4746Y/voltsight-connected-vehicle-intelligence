@@ -8,6 +8,9 @@ reference in the problem statement; this project has no affiliation with Motorq.
 has not been demonstrated by evidence under [`evidence/`](evidence/). Numbers will appear here
 only when rendered from that evidence.
 
+CI: [GitHub Actions](https://github.com/SohamB4746Y/voltsight-connected-vehicle-intelligence/actions)
+(private repository). Gate G0 evidence: [`evidence/G0/`](evidence/G0/static-and-status.md).
+
 ## Quick start (base infrastructure only, so far)
 
 Prerequisites: Docker Desktop (WSL2 backend, >= 11 GB memory), Python 3.12, GNU make.
