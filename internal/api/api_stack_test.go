@@ -274,9 +274,12 @@ func TestErasureFlowEndToEnd(t *testing.T) {
 	}
 	defer owner.Close()
 	var subject, other string
-	if err := owner.QueryRow(ctx, `SELECT d.id::text FROM driver d JOIN tenant t ON t.id = d.tenant_id WHERE t.name = 'Meridian Logistics' AND d.erased_at IS NULL LIMIT 1`).Scan(&subject); err != nil {
+	// a dedicated test driver: erasing a seeded driver would make the seed digest check fail afterwards
+	if err := owner.QueryRow(ctx, `INSERT INTO driver (id, tenant_id, pseudonym, pii_enc) SELECT gen_random_uuid(), t.id, 'erasure-test-' || left(gen_random_uuid()::text, 8), '\x0102'::bytea
+		FROM tenant t WHERE t.name = 'Meridian Logistics' RETURNING id::text`).Scan(&subject); err != nil {
 		t.Skip("seed missing")
 	}
+	t.Cleanup(func() { _, _ = owner.Exec(ctx, `DELETE FROM driver WHERE id = $1`, subject) })
 	_ = owner.QueryRow(ctx, `SELECT d.id::text FROM driver d JOIN tenant t ON t.id = d.tenant_id WHERE t.name = 'Coastal Rentals' LIMIT 1`).Scan(&other)
 	var piiBefore int
 	_ = owner.QueryRow(ctx, `SELECT count(*) FROM driver WHERE id = $1 AND pii_enc IS NOT NULL`, subject).Scan(&piiBefore)
