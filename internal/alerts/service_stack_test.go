@@ -104,7 +104,12 @@ func TestAlertServiceIsIdempotentAndTenantIsolated(t *testing.T) {
 	done := make(chan error, 1)
 	go func() { done <- svc.Run(ctx) }()
 	deadline := time.Now().Add(30 * time.Second)
-	for svc.Stats.Consumed.Load() < 6 && time.Now().Before(deadline) {
+	// Consumed is counted before the write; wait for every record's outcome (insert, duplicate, decode error)
+	// so the cancel cannot land between the poll and the persist.
+	processed := func() int64 {
+		return svc.Stats.Inserted.Load() + svc.Stats.Duplicates.Load() + svc.Stats.DecodeErrors.Load()
+	}
+	for processed() < 6 && time.Now().Before(deadline) {
 		time.Sleep(50 * time.Millisecond)
 	}
 	cancel()
