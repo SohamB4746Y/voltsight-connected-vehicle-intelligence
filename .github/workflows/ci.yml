@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: static checks
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate throwaway .env
+        run: python tools/dev/gen_env.py
+      - name: Compose file is valid
+        run: docker compose -f deploy/compose/docker-compose.yml --env-file .env config -q
+      - name: yamllint
+        run: |
+          pip install yamllint==1.37.1
+          yamllint -s -c .yamllint.yml deploy .github
+      - name: Secret scan (gitleaks)
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.30.1 detect \
+            --source /repo --no-banner --redact --verbose
+      - name: Misconfiguration and secret scan (trivy fs)
+        run: |
+          docker run --rm -v "$PWD:/repo" aquasec/trivy:0.74.0 fs \
+            --scanners misconfig,secret --severity HIGH,CRITICAL --exit-code 1 \
+            --skip-files /repo/.env /repo
