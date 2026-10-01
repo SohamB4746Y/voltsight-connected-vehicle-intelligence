@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { api } from "../api";
 import { usePoll, fmtTime, ago } from "../hooks";
@@ -99,20 +99,20 @@ export function GeoMap({ city, refreshKey, selection, onSelect, live }: { city: 
       });
       map.addLayer({ id: "veh-selected", type: "circle", source: "vehicles", filter: ["==", ["get", "vin"], ""], paint: { "circle-radius": 15, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#2563eb", "circle-stroke-width": 3 } });
 
-      map.on("click", "veh-clusters", async (e) => {
+      map.on("click", "veh-clusters", async (e: maplibregl.MapLayerMouseEvent) => {
         const f = e.features?.[0];
         if (!f) return;
         const z = await (map.getSource("vehicles") as maplibregl.GeoJSONSource).getClusterExpansionZoom(f.properties!.cluster_id);
         map.easeTo({ center: (f.geometry as any).coordinates, zoom: z + 0.5 });
       });
-      map.on("click", "veh-points", (e) => {
+      map.on("click", "veh-points", (e: maplibregl.MapLayerMouseEvent) => {
         const p = e.features?.[0]?.properties as any;
         if (p) {
           setCharger(null);
           onSelect({ vin: p.vin, alertId: p.alert_id || undefined });
         }
       });
-      map.on("click", "chargers", (e) => {
+      map.on("click", "chargers", (e: maplibregl.MapLayerMouseEvent) => {
         const p = e.features?.[0]?.properties as any;
         if (p) setCharger(p);
       });

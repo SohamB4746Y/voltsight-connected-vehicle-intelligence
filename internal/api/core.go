@@ -12,6 +12,8 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -149,7 +151,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.Set("X-Content-Type-Options", "nosniff")
 	h.Set("X-Frame-Options", "DENY")
 	h.Set("Referrer-Policy", "no-referrer")
-	h.Set("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080; frame-ancestors 'none'")
+	h.Set("Content-Security-Policy", contentSecurityPolicy())
 	h.Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 	h.Set("Cache-Control", "no-store")
 	if o := r.Header.Get("Origin"); o != "" {
@@ -450,4 +452,28 @@ func (s *Server) ApprovePlan(ctx context.Context, p *Principal, id uuid.UUID) (b
 		return e
 	})
 	return n > 0, err
+}
+
+// mapTileHost serves the OpenFreeMap style, vector tiles and glyphs the console's map loads (see ADR-008).
+const mapTileHost = "https://tiles.openfreemap.org"
+
+var (
+	cspOnce sync.Once
+	cspVal  string
+)
+
+// contentSecurityPolicy is the console's policy: scripts only from this origin; the browser may call this origin,
+// the OIDC issuer (the token endpoint, when it is a different origin) and the map tile host; MapLibre needs blob:
+// web workers. Nothing is allowed to embed the console, load plugins or post forms elsewhere.
+func contentSecurityPolicy() string {
+	cspOnce.Do(func() {
+		connect := "'self' " + mapTileHost
+		if u, err := url.Parse(os.Getenv("OIDC_PUBLIC_ISSUER")); err == nil && u.Scheme != "" && u.Host != "" {
+			connect += " " + u.Scheme + "://" + u.Host
+		}
+		cspVal = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; " +
+			"font-src 'self' data: " + mapTileHost + "; connect-src " + connect + "; worker-src 'self' blob:; child-src blob:; " +
+			"object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+	})
+	return cspVal
 }
