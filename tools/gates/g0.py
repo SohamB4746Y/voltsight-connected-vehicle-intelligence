@@ -110,7 +110,7 @@ def collect_env() -> dict:
         "host": {"os": platform.platform(), "cpu_logical": os.cpu_count(),
                  "disk_total_gb": round(total / 2**30, 1), "disk_free_gb": round(free / 2**30, 1)},
         "docker_engine": {"server_version": info.get("ServerVersion"), "ncpu": info.get("NCPU"),
-                          "mem_gb": round(info.get("MemTotal", 0) / 2**30, 2)},
+                          "mem_gb": round(info.get("MemTotal", 0) / 1e9, 2)},
         "tool_versions": versions,
     }
 

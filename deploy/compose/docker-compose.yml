@@ -115,7 +115,7 @@ services:
     volumes:
       - s3-data:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:9333/cluster/status | grep -q IsLeader"]
+      test: ["CMD-SHELL", "wget -qO- http://objectstore:9333/cluster/status | grep -q '\"IsLeader\":true'"]
       interval: 5s
       timeout: 5s
       retries: 30
