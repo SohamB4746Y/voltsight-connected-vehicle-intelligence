@@ -1,0 +1,8 @@
+# ADR-008 Map technology: MapLibre GL JS with the OpenFreeMap basemap
+**Status:** accepted (2026-10) · **Context:** the first console drew an abstract canvas of grid cells; judges expect a real geographic map of vehicles and chargers, and the demo must work with no API key, no billing and no user-supplied credentials.
+
+**Decision.** MapLibre GL JS (BSD-3-Clause), pinned to exactly 5.6.0, rendering the OpenFreeMap "liberty" style (OpenStreetMap data, public tile service, no key). Vehicles and chargers are GeoJSON sources with layers (clustering for vehicles), not thousands of DOM markers. The visible attribution is "© OpenStreetMap contributors" plus the style's own OpenFreeMap / OpenMapTiles credit, kept in an always-expanded control.
+
+**Alternatives.** Google Maps / Mapbox (need keys and billing; rejected). Leaflet + raster tiles (DOM/canvas markers scale worse and the public OSM tile servers forbid heavy use). Self-hosted tiles (heavy for a demo; the 100K-vehicle area is three metros but still gigabytes). Rendering our own canvas (what we replaced).
+
+**Consequences.** The browser fetches tiles directly from tiles.openfreemap.org (no scraping or bulk download by us; normal on-demand browser requests with the library's tile cache). A judge's browser needs internet access to the tile host; if it is blocked, the map shows markers over a blank background and the rest of the console is unaffected. The service has no SLA: for production use, self-host or buy a plan. Data on the map is **only** backend data: `/v1/map/vehicles` (hot Redis state + open alerts, tenant-bound, masked for roles without `geo.precise`) and `/v1/map/chargers` (RLS-filtered, live status); the only route drawn is the A* route the risk engine stored in the alert's evidence.

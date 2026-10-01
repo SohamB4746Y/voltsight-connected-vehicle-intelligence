@@ -24,3 +24,16 @@ Hot: Kafka 72 h + Redis. Warm: ClickHouse, TTL 30 days (`internal/sink` DDL; enf
 
 ## What was measured at scale on this machine
 Ingest through the gateway at ~266K events/s (6.0M events in 22.6 s, generator-limited, 4 vCPU), end-to-end 98.3K events/s for 60 s (see `evidence/G4`), ClickHouse insert 453K rows/s (insert time only). One host cannot reproduce a production deployment; horizontal scaling is by design (stateless services, 64 partitions) and **not measured** (`evidence/G14/status.md`).
+
+## Evidence classes (what each number is)
+| Class | Item | Value | Where |
+|---|---|---|---|
+| **MEASURED** | wire size per event, protobuf | see "Measured sizes" above | `internal/contract` test |
+| **MEASURED** | sustained ingest, 100,000 simulated vehicles, one 4-vCPU host, everything co-located | 6.0M events at 98.3K events/s for 60 s | `evidence/G4/` |
+| **MEASURED** | 3x burst | 3x for 40 s inside a 100 s run: 18.0M events, 0 lost, no 429s | `evidence/G14/burst_3x/` |
+| **MEASURED** | PostgreSQL vs ClickHouse, 1M synthetic rows | PG COPY 97K rows/s vs ClickHouse 405K rows/s | `evidence/G14/pg_vs_clickhouse.txt` |
+| **MEASURED** | ClickHouse history queries over 29.2M synthetic rows | 129-720 ms | `evidence/G14/ch_bench.json` |
+| **MEASURED** | live demo profile (2,000 configured vehicles) | ~816 events/s, 2.4 GiB working set, 16 containers | `evidence/live-deployment/` |
+| **CALCULATED** | daily volume at 100K events/s | see "Extrapolation" above (bytes/event x rate x 86,400) | arithmetic from measured sizes |
+| **DESIGN TARGET** | 64 partitions, RF=3 brokers, horizontally scaled stateless workers, ClickHouse replicas | not run | `deploy/helm`, `deploy/terraform` |
+| **NOT YET VERIFIED** | 3x burst for the full 5 minutes; soak; scale-out; critical alert < 5 s at 100K events/s (measured p50 9.8 s, p99 17.0 s on one host: NOT met); billion-row batch | - | `docs/compliance/FINAL_SUBMISSION_STATUS.md` |

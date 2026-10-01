@@ -7,7 +7,7 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | SC1 | 100,000 vehicles | PASS | seeded + verified against `db/seed/manifest.json`; simulator runs all 100K in ~200 MB heap |
 | SC2/N1 | ~100K events/s sustained | **MEASURED, below target, short**: 6.0M events at **98.3K ev/s for 60 s** (box, everything on one 4-vCPU host, CPU oversubscribed) | `evidence/G4/live_fixed_faults_adversarial` — not a sustained/soak result |
 | SC3/N2 | 3× burst for 5 min, no loss | **PARTIAL**: 3× burst for **40 s** inside a 100 s run: 18.0M events, 0 lost/DLQ/failed, no 429s, books balanced (164K ev/s average); the 5-minute duration was not run | `evidence/G14/burst_3x` |
-| SC4 | ~1 KB event, TB/day analysis | PARTIAL | measured bytes/event in `docs/capacity.md`; the TB/day figure is an extrapolation |
+| SC4 | ~1 KB event, TB/day analysis | PARTIAL | measured bytes/event in `docs/performance/CAPACITY_ANALYSIS.md`; the TB/day figure is an extrapolation |
 | SC5 | single SQL DB vs right store, with a benchmark | PASS (benchmark) | 1M rows: PostgreSQL COPY 97K rows/s, 299 B/row with PK index vs ClickHouse 405K rows/s (4.2×); the 2.7 B/row ClickHouse figure is inflated by uniform synthetic rows — simulated telemetry measures 17.3 B/row (`evidence/G14/pg_vs_clickhouse.txt`) |
 | SC6 | ACID for ownership/billing/access/audit | PASS | G1 transaction + RLS tests |
 | N3 | ingest → dashboard < 2 s | NOT MEASURED | SSE path built; no latency probe was run |
@@ -58,7 +58,7 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | DL4–DL7, DL13, DL14 | PASS | |
 | DL9 | PARTIAL | evidence folders; no rendered claims-check tooling |
 | DL15 demo video | PARTIAL | three silent screen-recording clips of the real journey (dispatcher, energy manager, viewer; 49 s + 17 s + 13 s) in `docs/demo/*.webm`, recorded by `tests/e2e/record_demo.mjs` against the live system; **no narration**, shorter than the 5-minute slot; the spoken script is `docs/demo.md` |
-| RL1, RL2, RL5 | PASS | `docs/ai-oss-declaration.md` (SBOM not generated) |
+| RL1, RL2, RL5 | PASS | `docs/AI_OSS_DISCLOSURE.md` (SBOM not generated) |
 | RL3 | see git tags | |
 
 ## Live deployment (added 2026-10-01; scope: the live profile on the build sandbox unless stated)

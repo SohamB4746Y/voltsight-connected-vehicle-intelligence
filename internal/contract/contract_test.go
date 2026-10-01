@@ -151,7 +151,7 @@ func TestBatchRoundTripAndGarbageIsRejected(t *testing.T) {
 	}
 }
 
-// Wire size is a measured fact used by the capacity analysis (docs/capacity.md), not a guess.
+// Wire size is a measured fact used by the capacity analysis (docs/performance/CAPACITY_ANALYSIS.md), not a guess.
 func TestWireSizeIsMeasuredAndWithinBudget(t *testing.T) {
 	r := rand.New(rand.NewPCG(1, 2))
 	const n = 5000
