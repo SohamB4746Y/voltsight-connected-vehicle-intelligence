@@ -180,9 +180,9 @@ complete deployment of the platform, but it is **not on a public URL**: see sect
 
 ## 10. What is not done, and why (limitations)
 
-* **No public URL has been created.** Every free host that can run this stack needs the owner's account, a
+* **No production public URL exists; the Codespaces demo URL is a live demo environment that stops when idle (not tested from this environment).** Every free host that can run this stack needs the owner's account, a
   step that cannot be done from here (section 2 and 5). The deliverable is the one-command, verified profile plus the
-  exact steps; until those are executed there is nothing to open on the internet.
+  exact steps; the Codespaces URL is a live demo that exists only while the owner's Codespace is running.
 * The free deployment is a **demo scale** (default 2,000 simulated vehicles, ~816 events/s). 100K events/s, the 3x
   burst for 5 minutes, soak, and the 5 s alert-latency target are **not claimed** for it; the 100K measurements and the
   unmet latency target are in `docs/performance/CAPACITY_ANALYSIS.md` and `evidence/G14/`.

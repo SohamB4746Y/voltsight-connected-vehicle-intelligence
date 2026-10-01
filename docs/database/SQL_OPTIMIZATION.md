@@ -1,5 +1,5 @@
 # SQL optimisation (G9b)
-Real `EXPLAIN (ANALYZE, BUFFERS)` plans before and after each change are in [`evidence/G9b/plans/sqlopt.txt`](../evidence/G9b/plans/sqlopt.txt), produced by `tools/sqlopt/bench.sql` (`docker exec -i voltsight-postgres-1 psql -U voltsight -d voltsight < tools/sqlopt/bench.sql`) on a database with **1.5M alerts, 1.5M trips, 600K audit rows** for one tenant (box: 4 vCPU, parallelism disabled for comparability). The kept changes are migration `000004_performance`.
+Real `EXPLAIN (ANALYZE, BUFFERS)` plans before and after each change are in [`evidence/G9b/plans/sqlopt.txt`](../../evidence/G9b/plans/sqlopt.txt), produced by `tools/sqlopt/bench.sql` (`docker exec -i voltsight-postgres-1 psql -U voltsight -d voltsight < tools/sqlopt/bench.sql`) on a database with **1.5M alerts, 1.5M trips, 600K audit rows** for one tenant (box: 4 vCPU, parallelism disabled for comparability). The kept changes are migration `000004_performance`.
 
 | # | Query | Change | Before | After |
 |---|---|---|---|---|

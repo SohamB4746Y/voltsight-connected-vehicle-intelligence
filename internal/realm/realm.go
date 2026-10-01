@@ -101,7 +101,7 @@ func build(public bool) obj {
 	if !public {
 		clients = append(clients, obj{
 			// DEV/TEST ONLY: lets automated tests obtain tokens with the demo users' passwords.
-			// Production realms must omit this client (see docs/threat-model.md).
+			// Production realms must omit this client (see docs/security/STRIDE.md).
 			"clientId": TestClient, "name": "VoltSight test client (DEV ONLY)", "enabled": true,
 			"publicClient": false, "secret": "${KC_TEST_CLIENT_SECRET}", "standardFlowEnabled": false,
 			"directAccessGrantsEnabled": true, "implicitFlowEnabled": false, "serviceAccountsEnabled": false,
