@@ -1,17 +1,19 @@
-NAME                         CPU %     MEM USAGE / LIMIT
-voltsight-alerts-1           0.00%     5.41MiB / 15.72GiB
-voltsight-api-1              0.00%     9.809MiB / 15.72GiB
-voltsight-caddy-1            0.00%     14.47MiB / 128MiB
-voltsight-clickhouse-1       10.56%    520.7MiB / 2GiB
-voltsight-gateway-1          4.57%     73.9MiB / 15.72GiB
-voltsight-grafana-1          0.28%     81.52MiB / 384MiB
-voltsight-kafka-1            167.58%   706.2MiB / 1.5GiB
-voltsight-keycloak-1         1.42%     795.9MiB / 1.25GiB
-voltsight-otel-collector-1   0.11%     32.73MiB / 384MiB
-voltsight-postgres-1         5.94%     226.9MiB / 1GiB
-voltsight-prometheus-1       0.74%     37.9MiB / 512MiB
-voltsight-redis-1            1.15%     9.695MiB / 512MiB
-voltsight-simulator-1        1.64%     48.66MiB / 15.72GiB
-voltsight-sink-1             2.28%     33.54MiB / 15.72GiB
-voltsight-vault-1            0.55%     171.5MiB / 256MiB
-voltsight-worker-1           1.45%     87.75MiB / 15.72GiB
+docker stats snapshot 2026-10-01T19:17:15Z (2,000-vehicle demo, ~810 events/s, host: 4 vCPU / 15 GiB sandbox)
+NAME CPU% MEM
+voltsight-alerts-1 0.00% 5.883MiB / 15.72GiB
+voltsight-api-1 0.00% 9.695MiB / 15.72GiB
+voltsight-caddy-1 0.00% 13.89MiB / 128MiB
+voltsight-clickhouse-1 16.08% 622.7MiB / 2GiB
+voltsight-gateway-1 3.11% 61.48MiB / 15.72GiB
+voltsight-grafana-1 0.30% 74.26MiB / 384MiB
+voltsight-kafka-1 57.30% 640.6MiB / 1.5GiB
+voltsight-keycloak-1 0.47% 593.4MiB / 1.25GiB
+voltsight-otel-collector-1 0.23% 33.31MiB / 384MiB
+voltsight-postgres-1 0.02% 71.16MiB / 1GiB
+voltsight-prometheus-1 0.12% 40.96MiB / 512MiB
+voltsight-redis-1 1.25% 6.727MiB / 512MiB
+voltsight-simulator-1 2.87% 49.21MiB / 15.72GiB
+voltsight-sink-1 1.90% 49.55MiB / 15.72GiB
+voltsight-vault-1 0.60% 36.06MiB / 256MiB
+voltsight-worker-1 2.37% 101.7MiB / 15.72GiB
+TOTAL_MiB_approx 2410.58

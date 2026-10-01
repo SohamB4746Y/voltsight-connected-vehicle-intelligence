@@ -8,3 +8,11 @@ vehicles: 100000
 clickhouse rows: 481783
 worker: rtp: 25347 events (798/s) new=0 late=0 dup=0 stale=25347 lag=0|rtp: 29377 events (806/s) new=0 late=0 dup=0 stale=29377 lag=0|
 sim: vssim: 20 connector certificates issued and registered; waiting 12 s for the gateway to refresh its directory|
+
+AFTER FIX (vssim -seq-base=-1), full stop/start via up.sh again: 19:06:08
+worker before sampling: first batch after restart new=18584 stale=9031 (stale = old-run backlog already in the topic)
+worker steady state, 4 consecutive samples, stale frozen at 9031 while new grows:
+rtp: 40039 events (811/s) new=30211 late=291 dup=506 stale=9031 lag=0
+rtp: 44080 events (808/s) new=34092 late=371 dup=586 stale=9031 lag=0
+rtp: 48138 events (812/s) new=37975 late=469 dup=663 stale=9031 lag=0
+rtp: 52190 events (810/s) new=41851 late=574 dup=734 stale=9031 lag=0

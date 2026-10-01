@@ -132,4 +132,75 @@ or in an image. Secrets reach the services as environment variables from that fi
 `meridian.example` (tenant A) and `coastal.example` (tenant B); the password is the generated
 `DEMO_USER_PASSWORD` shown at the end of `up.sh` (it is not a fixed, published password).
 
-<!-- sections 9 onwards are completed after verification -->
+## 9. What was verified, where, and the numbers
+
+**Scope of every number below: the full live profile (`deploy/live/up.sh`, the same compose files and the same
+production image) running on the build sandbox (4 vCPU / 15 GiB, Linux), reached at `http://localhost:8080`
+through the Caddy edge, verified 2026-10-01 (final run 19:16 UTC, image `sha256:73ca5541...`).** It is a real,
+complete deployment of the platform, but it is **not on a public URL**: see section 10.
+
+| Check | Result | Evidence |
+|---|---|---|
+| 31 scripted checks as real users (Keycloak sign-in with code+PKCE for 4 users, 401 without/with a bad token, two tenants, RBAC: viewer cannot ack / audit / Copilot, dispatcher can ack and cannot read the audit log, tenant admin reads the audit log and sees the ack; tenant isolation: 404 for another tenant's vehicle, telemetry and alert, no foreign VIN in lists; CORS: foreign origin refused, own origin allowed, no wildcard; password grant refused, DEV test client absent, Keycloak admin/master realm/management endpoints 404; security headers; Copilot answers) | **31/31 passed** | `evidence/live-deployment/live_checks.json`, `tests/e2e/live_checks.mjs` |
+| Browser journey (Playwright, headless Chromium): sign in, dashboard (40,000 vehicles for the tenant, 800 reporting live, charger network 951/1,594 out of service, live map), vehicle list, alert detail with SoC, estimated range, nearest charger and route | passed, no console errors | `evidence/live-deployment/shots/` |
+| Data flow: simulator (mTLS 1.3, Vault-issued certificates) to gateway to Kafka to worker (range-risk) and sink (ClickHouse) to alert service to PostgreSQL/Redis to API/SSE to console | ~816 events/s through the worker, lag 0; 33 alerts (4 critical) persisted | `evidence/live-deployment/alert-latency-recv-to-detect.txt`, `health.txt` |
+| Live event rate | **~816 events/s** at `DEMO_VEHICLES=2000` (about 800 vehicles are on the road at the 07:30 simulated start, so this is below 2,000/s) | worker log, `alert-latency-recv-to-detect.txt` |
+| Alert latency, **receive to detect only** (gateway receive timestamp to alert detection) | n=33: p50 28 ms, p95 133 ms, max 224 ms. **End-to-end (device event to dashboard) and the 5 s target were not measured on the live profile**; the earlier 100K-events/s result (NOT met) is unchanged | `evidence/live-deployment/alert-latency-recv-to-detect.txt` |
+| API latency (300 sequential requests per endpoint, same host, ingest running) | p95 <= 10.3 ms, p99 <= 12.9 ms on four endpoints; this is a loopback client, not a network or concurrent-load measurement | `live_checks.json` |
+| Memory working set of all 16 containers | ~2.4 GiB at ~816 events/s | `evidence/live-deployment/resource-usage.txt` |
+| Health | every container healthy; `/readyz` (PostgreSQL, Redis, ClickHouse) 200 through the edge; Prometheus scrapes gateway, worker, Keycloak, OTel: all up | `evidence/live-deployment/health.txt` |
+
+### Restart and recovery (measured, `evidence/live-deployment/restart-recovery.txt`, `full-restart.txt`)
+
+* API restart: ready again within the 1 s polling resolution. Caddy restart: 1 s. Keycloak restart: OIDC discovery back after 13 s.
+* Worker restart, then Kafka broker restart (single broker): the stream resumed after the consumer-group rebalance
+  (roughly 100 s of no processing), then caught up at 12,377 events/s to lag 0; the ClickHouse sink kept ingesting through
+  the broker restart (+53,284 rows). No loss was assessed beyond the reconciliation done in `evidence/G13`.
+* **Full stop of the whole stack, then `deploy/live/up.sh`:** PostgreSQL (18 alerts, 100,000 vehicles), the Keycloak realm
+  and ClickHouse history (452,887 to 481,783 rows as the sink caught up) all survived. **This test found a defect:** the
+  restarted simulator numbered events from 1 again, so the worker (correctly) classified every event as stale
+  (`new=0 stale=25347`) and the live demo went dead after any restart. Fixed at the source: `vssim -seq-base=-1`
+  continues above the previous run's numbers (a device keeps its counter across reconnects); a unit test covers it.
+  After the fix the same test resumed the stream (`new` growing at ~800/s, `stale` frozen at the old backlog).
+* Not tested: PostgreSQL failover, gateway kill, node loss, restart under the 100K load, a restart of Vault without
+  `up.sh` (dev-mode Vault loses its CA; `up.sh` recreates it and recreates the gateway).
+
+### Containers, Kubernetes, Terraform, CI
+
+| Item | Result |
+|---|---|
+| `docker build` of the production image | **PASS**, 74.5 MB, runs as 65532:65532, all 14 service binaries and the web console. First ever build of this Dockerfile (it had only been linted); in this sandbox it needed the egress proxy's CA injected through a throwaway Dockerfile copy because the sandbox intercepts TLS: that is a sandbox property, the committed Dockerfile is unchanged and is what CI builds |
+| Image vulnerability scan (Trivy 0.57.1, HIGH/CRITICAL, OS + Go binaries) | 0 findings (`evidence/live-deployment/image-scan.txt`) |
+| `docker compose config` for the live profile (with and without `tls`) | PASS locally; also a CI step |
+| Helm: `helm lint`, `helm template | kubeconform -strict` | PASS: 0 failed, 21/21 resources valid (`helm-terraform-validation.txt`). Chart default image now points at the real GHCR image |
+| **A real Kubernetes cluster** | **NOT RUN here.** A `kind` cluster cannot start in the build sandbox (kubelet: `write /proc/self/oom_score_adj: permission denied`). `.github/workflows/kubernetes.yml` creates an ephemeral kind cluster on a GitHub runner and does a server-side dry run plus a real install of the chart; **it had not run when this was written**. No public Kubernetes cluster exists and none is claimed |
+| Terraform | `fmt -check` and `validate` pass for AWS and GCP; **not applied** (paid resources) |
+| Secrets | gitleaks over all 37 commits and the tree: no leaks; `.env` untracked; no localhost reference in the web sources (`secrets-scan.txt`) |
+| CI | the `image` job (build, non-root check, scan, publish to GHCR on main/tags) and the live-compose validation are new in `ci.yml`; their first run is on the push that carries them |
+
+## 10. What is not done, and why (limitations)
+
+* **No public URL has been created.** Every free host that can run this stack needs the owner's account, a
+  step that cannot be done from here (section 2 and 5). The deliverable is the one-command, verified profile plus the
+  exact steps; until those are executed there is nothing to open on the internet.
+* The free deployment is a **demo scale** (default 2,000 simulated vehicles, ~816 events/s). 100K events/s, the 3x
+  burst for 5 minutes, soak, and the 5 s alert-latency target are **not claimed** for it; the 100K measurements and the
+  unmet latency target are in `docs/capacity.md` and `evidence/G14/`.
+* Dev-mode Vault (in-memory, per-deployment root token); single Kafka broker / ClickHouse / Redis (no HA); no
+  Loki/Tempo (metrics only); the Copilot runs on the deterministic stub provider unless `ANTHROPIC_API_KEY` is set;
+  the Parquet cold tier is not implemented (object store disabled in this profile).
+* Codespaces stop when idle; an always-on host needs a VM (section 6). Free-tier terms change: the table in section 2
+  is dated.
+* `gh codespace ports visibility` automation and the Codespaces devcontainer were not exercised here.
+* A CI-triggered deployment to a public host is not set up (it would need a provider credential stored as a
+  repository secret by the owner).
+
+## 11. Demo sequence (about 5 minutes, all from the running deployment)
+
+0:00 open the URL, 0:20 sign in as the dispatcher, 0:40 fleet overview (cards, live map), 1:10 vehicle detail,
+1:40 open a critical alert (SoC, estimated range with the estimator named, nearest available charger and route),
+2:10 acknowledge it (audit entry), 2:40 chargers page (network degraded at +5 minutes), 3:10 reports/analytics,
+3:40 Copilot ("which vehicles are at risk of not reaching a charger?": tool calls and citations shown),
+4:20 sign in as the viewer: the acknowledge button and the audit log are refused, then as the coastal dispatcher:
+no meridian vehicles are visible, 4:40 architecture, compose/Helm/Terraform and CI, 5:00 end.
+

@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:8080",
-  "at": "2026-10-01T18:58:19.634Z",
+  "at": "2026-10-01T19:16:51.240Z",
   "results": [
     {
       "id": "AUTH-viewer@meridian",
@@ -46,7 +46,7 @@
       "what": "dispatcher can list alerts",
       "pass": true,
       "detail": {
-        "sample": "4c113ef3-3b31-4e4b-8033-b84151941760"
+        "sample": "a43c7ba7-6255-4e0d-9d85-93cf26b0b705"
       }
     },
     {
@@ -184,43 +184,43 @@
       "id": "LAT-1",
       "what": "API p95 < 200 ms (all four endpoints, sequential client on the same host)",
       "pass": true,
-      "detail": 11.3
+      "detail": 10.3
     },
     {
       "id": "LAT-2",
       "what": "API p99 < 500 ms",
       "pass": true,
-      "detail": 15.7
+      "detail": 12.9
     }
   ],
   "latency": {
     "fleet_summary": {
       "n": 300,
-      "p50_ms": 7.3,
-      "p95_ms": 11.3,
-      "p99_ms": 15.7,
-      "max_ms": 22
+      "p50_ms": 6.8,
+      "p95_ms": 10.3,
+      "p99_ms": 12.9,
+      "max_ms": 20.1
     },
     "vehicles_page": {
       "n": 300,
       "p50_ms": 1.5,
-      "p95_ms": 3.8,
-      "p99_ms": 5,
-      "max_ms": 11.8
+      "p95_ms": 3.7,
+      "p99_ms": 7.3,
+      "max_ms": 8.1
     },
     "alerts_open": {
       "n": 300,
-      "p50_ms": 1.5,
-      "p95_ms": 3.1,
-      "p99_ms": 5.7,
-      "max_ms": 11.1
+      "p50_ms": 1.6,
+      "p95_ms": 4.2,
+      "p99_ms": 9.7,
+      "max_ms": 18.8
     },
     "map_cells": {
       "n": 300,
-      "p50_ms": 1.6,
-      "p95_ms": 2.9,
-      "p99_ms": 8.7,
-      "max_ms": 11.1
+      "p50_ms": 1.5,
+      "p95_ms": 2.7,
+      "p99_ms": 5.6,
+      "max_ms": 8
     }
   }
 }
