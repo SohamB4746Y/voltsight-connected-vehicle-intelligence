@@ -1,0 +1,229 @@
+{
+  "SchemaVersion": 2,
+  "CreatedAt": "2026-10-01T14:02:14.012421884Z",
+  "ArtifactName": "/src",
+  "ArtifactType": "filesystem",
+  "Metadata": {
+    "ImageConfig": {
+      "architecture": "",
+      "created": "0001-01-01T00:00:00Z",
+      "os": "",
+      "rootfs": {
+        "type": "",
+        "diff_ids": null
+      },
+      "config": {}
+    }
+  },
+  "Results": [
+    {
+      "Target": "go.mod",
+      "Class": "lang-pkgs",
+      "Type": "gomod"
+    },
+    {
+      "Target": "web/package-lock.json",
+      "Class": "lang-pkgs",
+      "Type": "npm"
+    },
+    {
+      "Target": "deploy/docker/Dockerfile",
+      "Class": "config",
+      "Type": "dockerfile",
+      "MisconfSummary": {
+        "Successes": 20,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "deploy/helm/voltsight/templates/ingress-netpol.yaml",
+      "Class": "config",
+      "Type": "helm",
+      "MisconfSummary": {
+        "Successes": 10,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "deploy/helm/voltsight/templates/services.yaml",
+      "Class": "config",
+      "Type": "helm",
+      "MisconfSummary": {
+        "Successes": 23,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "deploy/terraform/aws",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 47,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "deploy/terraform/aws/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "deploy/terraform/gcp",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 26,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "deploy/terraform/gcp/main.tf",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 0,
+        "Failures": 1
+      },
+      "Misconfigurations": [
+        {
+          "Type": "Terraform Security Check",
+          "ID": "AVD-GCP-0048",
+          "AVDID": "AVD-GCP-0048",
+          "Title": "Legacy metadata endpoints enabled.",
+          "Description": "The Compute Engine instance metadata server exposes legacy v0.1 and v1beta1 endpoints, which do not enforce metadata query headers.\n\nThis is a feature in the v1 APIs that makes it more difficult for a potential attacker to retrieve instance metadata.\n\nUnless specifically required, we recommend you disable these legacy APIs.\n\nWhen setting the \u003ccode\u003emetadata\u003c/code\u003e block, the default value for \u003ccode\u003edisable-legacy-endpoints\u003c/code\u003e is set to true, they should not be explicitly enabled.\n",
+          "Message": "Cluster has legacy metadata endpoints enabled.",
+          "Namespace": "builtin.google.gke.google0048",
+          "Query": "data.builtin.google.gke.google0048.deny",
+          "Resolution": "Disable legacy metadata endpoints",
+          "Severity": "HIGH",
+          "PrimaryURL": "https://avd.aquasec.com/misconfig/avd-gcp-0048",
+          "References": [
+            "https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster#protect_node_metadata_default_for_112",
+            "https://avd.aquasec.com/misconfig/avd-gcp-0048"
+          ],
+          "Status": "FAIL",
+          "Layer": {},
+          "CauseMetadata": {
+            "Resource": "google_container_node_pool.general",
+            "Provider": "Google",
+            "Service": "gke",
+            "StartLine": 131,
+            "EndLine": 142,
+            "Code": {
+              "Lines": [
+                {
+                  "Number": 122,
+                  "Content": "resource \"google_container_node_pool\" \"general\" {",
+                  "IsCause": false,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "\u001b[38;5;33mresource\u001b[0m \u001b[38;5;37m\"google_container_node_pool\"\u001b[0m \u001b[38;5;37m\"general\"\u001b[0m {",
+                  "FirstCause": false,
+                  "LastCause": false
+                },
+                {
+                  "Number": 123,
+                  "Content": "",
+                  "IsCause": false,
+                  "Annotation": "",
+                  "Truncated": true,
+                  "FirstCause": false,
+                  "LastCause": false
+                },
+                {
+                  "Number": 131,
+                  "Content": "  node_config {",
+                  "IsCause": true,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "  node_config {",
+                  "FirstCause": true,
+                  "LastCause": false
+                },
+                {
+                  "Number": 132,
+                  "Content": "    machine_type = var.machine_type",
+                  "IsCause": true,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "    \u001b[38;5;245mmachine_type\u001b[0m = \u001b[38;5;33mvar\u001b[0m.machine_type",
+                  "FirstCause": false,
+                  "LastCause": false
+                },
+                {
+                  "Number": 133,
+                  "Content": "    disk_type    = \"pd-ssd\"",
+                  "IsCause": true,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "    \u001b[38;5;245mdisk_type\u001b[0m    = \u001b[38;5;37m\"pd-ssd\"",
+                  "FirstCause": false,
+                  "LastCause": false
+                },
+                {
+                  "Number": 134,
+                  "Content": "    shielded_instance_config {",
+                  "IsCause": true,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "\u001b[0m    shielded_instance_config {",
+                  "FirstCause": false,
+                  "LastCause": false
+                },
+                {
+                  "Number": 135,
+                  "Content": "      enable_secure_boot          = true",
+                  "IsCause": true,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "      \u001b[38;5;245menable_secure_boot\u001b[0m          = \u001b[38;5;166mtrue",
+                  "FirstCause": false,
+                  "LastCause": false
+                },
+                {
+                  "Number": 136,
+                  "Content": "      enable_integrity_monitoring = true",
+                  "IsCause": true,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "\u001b[0m      \u001b[38;5;245menable_integrity_monitoring\u001b[0m = \u001b[38;5;166mtrue",
+                  "FirstCause": false,
+                  "LastCause": false
+                },
+                {
+                  "Number": 137,
+                  "Content": "    }",
+                  "IsCause": true,
+                  "Annotation": "",
+                  "Truncated": false,
+                  "Highlighted": "\u001b[0m    }",
+                  "FirstCause": false,
+                  "LastCause": true
+                },
+                {
+                  "Number": 138,
+                  "Content": "",
+                  "IsCause": false,
+                  "Annotation": "",
+                  "Truncated": true,
+                  "FirstCause": false,
+                  "LastCause": false
+                }
+              ]
+            },
+            "Occurrences": [
+              {
+                "Resource": "google_container_node_pool.general",
+                "Filename": "deploy/terraform/gcp/main.tf",
+                "Location": {
+                  "StartLine": 122,
+                  "EndLine": 147
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

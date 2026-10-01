@@ -415,3 +415,34 @@ func (s *Server) reportSoH(w http.ResponseWriter, r *http.Request, p *Principal)
 	}
 	writeJSON(w, 200, map[string]any{"vehicles_estimated": n, "mean_soh_pct": mean, "distribution": buckets, "lowest": worst})
 }
+
+// reportEnergy reads the daily trip rollup through trip_daily_v (tenant-filtered security-barrier view).
+func (s *Server) reportEnergy(w http.ResponseWriter, r *http.Request, p *Principal) {
+	type day struct {
+		Day   time.Time `json:"day"`
+		Trips int       `json:"trips"`
+		Km    float64   `json:"km"`
+		KWh   float64   `json:"kwh"`
+	}
+	out := []day{}
+	err := s.tx(r.Context(), p.TenantID, func(tx pgx.Tx) error {
+		rs, err := tx.Query(r.Context(), `SELECT day, trips, km, kwh FROM trip_daily_v ORDER BY day DESC LIMIT 60`)
+		if err != nil {
+			return err
+		}
+		defer rs.Close()
+		for rs.Next() {
+			var d day
+			if err := rs.Scan(&d.Day, &d.Trips, &d.Km, &d.KWh); err != nil {
+				return err
+			}
+			out = append(out, d)
+		}
+		return rs.Err()
+	})
+	if err != nil {
+		serverError(w, err)
+		return
+	}
+	writeJSON(w, 200, map[string]any{"days": out})
+}

@@ -1,0 +1,8 @@
+# Waiver (documented in docs/security-report.md): AVD-GCP-0015 checks the legacy `require_ssl` argument. This module
+# enforces TLS with `ssl_mode = "ENCRYPTED_ONLY"`, the replacement in google provider >= 6 (the old argument is rejected).
+AVD-GCP-0015
+
+# Waiver: AVD-GCP-0048 is reported although every node config sets metadata.disable-legacy-endpoints = "true"
+# (cluster node_config and the node pool) and workload identity (GKE_METADATA) is on; the check does not follow
+# the node-pool resource's inline block (verified by reading deploy/terraform/gcp/main.tf).
+AVD-GCP-0048

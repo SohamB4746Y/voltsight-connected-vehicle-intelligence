@@ -141,6 +141,9 @@ func main() {
 		totTrips += len(trips)
 		fmt.Printf("tenant %s: %d trips, %d SoH estimates\n", tenant.String()[:8], len(trips), len(sohs))
 	}
+	if _, err := pool.Exec(ctx, `SELECT refresh_trip_daily()`); err != nil {
+		fmt.Fprintln(os.Stderr, "vsbatch: refresh trip_daily:", err)
+	}
 	fmt.Printf("done: %d vehicles analysed, %d trips, %d SoH estimates (window %s .. now)\n", totVeh, totTrips, totSoH, from.Format(time.RFC3339))
 }
 

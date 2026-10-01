@@ -1,0 +1,11 @@
+{
+  "concurrency": 16,
+  "duration_s": 20,
+  "errors_non_200_429": 0,
+  "max_ms": 630.995,
+  "p50_ms": 16.9,
+  "p95_ms": 26.819,
+  "p99_ms": 41.034,
+  "requests": 16582,
+  "rps": 829.1
+}

@@ -31,3 +31,8 @@ variable "redis_gb" {
   type    = number
   default = 16
 }
+variable "authorized_cidrs" {
+  description = "CIDR blocks allowed to reach the Kubernetes API"
+  type        = list(string)
+  default     = ["10.50.0.0/20"]
+}

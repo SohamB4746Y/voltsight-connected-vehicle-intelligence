@@ -11,9 +11,11 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 
@@ -316,4 +318,49 @@ func TestErasureFlowEndToEnd(t *testing.T) {
 	if pii != 0 || !strings.HasPrefix(pseudonym, "erased-") {
 		t.Fatalf("subject data remains: pii=%d pseudonym=%q", pii, pseudonym)
 	}
+}
+
+// D12: no N+1 - the number of SQL statements per request does not depend on the page size
+type stmtCounter struct{ n atomic.Int64 }
+
+func (c *stmtCounter) TraceQueryStart(ctx context.Context, _ *pgx.Conn, _ pgx.TraceQueryStartData) context.Context {
+	c.n.Add(1)
+	return ctx
+}
+func (c *stmtCounter) TraceQueryEnd(context.Context, *pgx.Conn, pgx.TraceQueryEndData) {}
+
+func TestNoNPlusOneQueries(t *testing.T) {
+	env, _ := dotenv.Load("../../.env")
+	dsn, _ := dbtool.OwnerDSN(env)
+	u, _ := url.Parse(dsn)
+	u.User = url.UserPassword("voltsight_app", dotenv.Get(env, "DB_APP_PASSWORD"))
+	cfg, err := pgxpool.ParseConfig(u.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ctr stmtCounter
+	cfg.ConnConfig.Tracer = &ctr
+	pool, err := pgxpool.NewWithConfig(context.Background(), cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer pool.Close()
+	h := newHarness(t, func(c *Config) { c.Pool = pool })
+	tok := h.token("viewer@meridian.example")
+	count := func(path string) int64 {
+		h.do("GET", path, tok, "") // warm the entitlement cache
+		before := ctr.n.Load()
+		if code, _ := h.do("GET", path, tok, ""); code != 200 {
+			t.Fatalf("%s -> %d", path, code)
+		}
+		return ctr.n.Load() - before
+	}
+	small, large := count("/v1/vehicles?limit=5"), count("/v1/vehicles?limit=200")
+	if small != large {
+		t.Fatalf("statements per request depend on page size: %d for 5 rows, %d for 200 rows (N+1)", small, large)
+	}
+	if a, b := count("/v1/alerts?limit=5"), count("/v1/alerts?limit=200"); a != b {
+		t.Fatalf("alerts: %d vs %d statements", a, b)
+	}
+	t.Logf("MEASURED: vehicle list issues %d SQL statements per request for 5 and for 200 rows", small)
 }

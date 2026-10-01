@@ -34,6 +34,7 @@ func (s *Server) routes() {
 	m.HandleFunc("POST /v1/plans/{id}/approve", s.guard(PermPlansWrite, "plan.approve", "plan", s.decidePlan("approved")))
 	m.HandleFunc("POST /v1/plans/{id}/reject", s.guard(PermPlansWrite, "plan.reject", "plan", s.decidePlan("rejected")))
 	m.HandleFunc("GET /v1/reports/cost", s.guard(PermReportsRead, "report.cost", "report", s.reportCost))
+	m.HandleFunc("GET /v1/reports/energy", s.guard(PermReportsRead, "report.energy", "report", s.reportEnergy))
 	m.HandleFunc("GET /v1/reports/soh", s.guard(PermReportsRead, "report.soh", "report", s.reportSoH))
 
 	m.HandleFunc("GET /v1/audit", s.guard(PermAuditRead, "audit.read", "audit", s.listAudit))

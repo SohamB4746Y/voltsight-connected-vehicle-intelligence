@@ -5,7 +5,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	// Waiver: retry jitter only; not security-sensitive.
+	"math/rand" // nosemgrep: go.lang.security.audit.crypto.math_random.math-random-used
 	"regexp"
 	"sync/atomic"
 	"time"
