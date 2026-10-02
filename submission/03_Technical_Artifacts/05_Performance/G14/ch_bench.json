@@ -1,0 +1,38 @@
+{
+  "synthetic_rows": 29200000,
+  "vehicles": 100000,
+  "samples_per_vehicle": 292,
+  "generation_and_merge_seconds": 0,
+  "bytes_on_disk": 387094595,
+  "bytes_per_row_on_disk": 13.26,
+  "uncompressed_bytes_per_row": 121.01,
+  "compression_ratio": 9.13,
+  "queries": [
+    {
+      "name": "q_vehicle_day",
+      "wall_ms": 129,
+      "rows_read": 8192
+    },
+    {
+      "name": "q_tenant_hourly_5h",
+      "wall_ms": 234,
+      "rows_read": 4874240
+    },
+    {
+      "name": "q_low_soc_hour",
+      "wall_ms": 176,
+      "rows_read": 4874240
+    },
+    {
+      "name": "q_km_per_vehicle_day",
+      "wall_ms": 244,
+      "rows_read": 4874240
+    },
+    {
+      "name": "q_full_scan",
+      "wall_ms": 720,
+      "rows_read": 29200000
+    }
+  ],
+  "note": "synthetic data generated inside ClickHouse with the production schema/ordering/codecs; smooth synthetic signals compress better than real telemetry"
+}

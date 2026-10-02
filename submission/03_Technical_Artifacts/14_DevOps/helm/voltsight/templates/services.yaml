@@ -1,0 +1,119 @@
+{{- range $name, $s := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vs-{{ $name }}
+  labels: {{ include "vs.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  replicas: {{ $s.replicas }}
+  selector:
+    matchLabels: { app.kubernetes.io/instance: {{ $.Release.Name }}, app.kubernetes.io/component: {{ $name }} }
+  strategy: { type: RollingUpdate, rollingUpdate: { maxUnavailable: 0, maxSurge: 1 } }
+  template:
+    metadata:
+      labels: {{ include "vs.labels" $ | nindent 8 }}
+        app.kubernetes.io/component: {{ $name }}
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: { matchLabels: { app.kubernetes.io/instance: {{ $.Release.Name }}, app.kubernetes.io/component: {{ $name }} } }
+      containers:
+        - name: {{ $name }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          command: [{{ $s.command | quote }}]
+          args: {{ toJson $s.args }}
+          securityContext: {{ toJson $.Values.securityContext }}
+          env:
+            {{- include "vs.env" $ | nindent 12 }}
+            {{- include "vs.secretEnv" $ | nindent 12 }}
+          {{- if or $s.port $s.adminPort }}
+          ports:
+            {{- if $s.port }}
+            - { name: main, containerPort: {{ $s.port }} }
+            {{- end }}
+            {{- if $s.adminPort }}
+            - { name: admin, containerPort: {{ $s.adminPort }} }
+            {{- end }}
+          {{- end }}
+          {{- if $s.probe }}
+          livenessProbe:  { httpGet: { path: {{ $s.probe }}, port: {{ default $s.port $s.adminPort }} }, periodSeconds: 10, failureThreshold: 6 }
+          readinessProbe: { httpGet: { path: {{ default $s.probe $s.ready }}, port: {{ default $s.port $s.adminPort }} }, periodSeconds: 5 }
+          {{- end }}
+          resources: {{ toJson $s.resources }}
+          volumeMounts: [{ name: tmp, mountPath: /tmp }]
+      volumes: [{ name: tmp, emptyDir: {} }]
+{{- if gt (int $s.replicas) 1 }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: vs-{{ $name }} }
+spec:
+  minAvailable: 1
+  selector: { matchLabels: { app.kubernetes.io/instance: {{ $.Release.Name }}, app.kubernetes.io/component: {{ $name }} } }
+{{- end }}
+{{- if $s.hpa }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: vs-{{ $name }} }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: vs-{{ $name }} }
+  minReplicas: {{ $s.hpa.min }}
+  maxReplicas: {{ $s.hpa.max }}
+  metrics: [{ type: Resource, resource: { name: cpu, target: { type: Utilization, averageUtilization: {{ $s.hpa.cpu }} } } }]
+{{- end }}
+{{- if $s.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vs-{{ $name }}
+  labels: {{ include "vs.labels" $ | nindent 4 }}
+spec:
+  type: {{ default "ClusterIP" $s.serviceType }}
+  selector: { app.kubernetes.io/instance: {{ $.Release.Name }}, app.kubernetes.io/component: {{ $name }} }
+  ports: [{ name: main, port: {{ $s.port }}, targetPort: main }]
+{{- end }}
+{{- end }}
+{{- range $name, $c := .Values.cronjobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vs-{{ $name }}
+  labels: {{ include "vs.labels" $ | nindent 4 }}
+spec:
+  schedule: {{ $c.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels: {{ include "vs.labels" $ | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          securityContext: { runAsNonRoot: true, seccompProfile: { type: RuntimeDefault } }
+          containers:
+            - name: {{ $name }}
+              image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              command: [{{ $c.command | quote }}]
+              args: {{ toJson $c.args }}
+              securityContext: {{ toJson $.Values.securityContext }}
+              env:
+                {{- include "vs.env" $ | nindent 16 }}
+                {{- include "vs.secretEnv" $ | nindent 16 }}
+              resources: {{ toJson $c.resources }}
+              volumeMounts: [{ name: tmp, mountPath: /tmp }]
+          volumes: [{ name: tmp, emptyDir: {} }]
+{{- end }}

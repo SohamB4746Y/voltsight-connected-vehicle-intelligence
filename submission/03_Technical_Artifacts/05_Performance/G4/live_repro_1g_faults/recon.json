@@ -1,0 +1,13 @@
+{
+  "balanced": false,
+  "clickhouse_duplicates_collapsed": 26869,
+  "clickhouse_rows": 5155742,
+  "clickhouse_rows_after_dedup": 5128873,
+  "kafka_dlq_records": 11855,
+  "kafka_telemetry_records": 6000557,
+  "problems": [
+    "sink drained but ClickHouse holds 5155742 rows, Kafka has 6000557 records"
+  ],
+  "rt_group_lag": 0,
+  "sink_group_lag": 0
+}

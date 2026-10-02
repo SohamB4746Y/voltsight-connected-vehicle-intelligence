@@ -1,0 +1,6 @@
+{
+  "events_sampled": 5000,
+  "method": "internal/contract TestWireSizeIsMeasuredAndWithinBudget, random events from a seeded PCG",
+  "protobuf_bytes_per_event": 197.5188,
+  "protojson_bytes_per_event": 545.5834
+}

@@ -1,0 +1,17 @@
+## T1 restart api
+ready after 0 s
+## T2 restart caddy
+ready after 1 s
+## T3 restart worker
+rtp: 0 events (0/s) new=0 late=0 dup=0 stale=0 lag=0
+## T4 restart kafka (single broker)
+worker: rtp: 0 events (0/s) new=0 late=0 dup=0 stale=0 lag=0
+voltsight-simulator-1 Up 8 minutes
+voltsight-alerts-1 Up 8 minutes
+voltsight-sink-1 Up 8 minutes
+voltsight-worker-1 Up 58 seconds
+voltsight-gateway-1 Up 8 minutes
+voltsight-kafka-1 Up 45 seconds (healthy)
+clickhouse rows before=372333 after=425617 (delta 53284)
+## T5 restart keycloak
+oidc back after 13 s

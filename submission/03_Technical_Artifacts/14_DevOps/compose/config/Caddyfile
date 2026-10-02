@@ -1,0 +1,47 @@
+# One public origin. Browsers talk only to this proxy; Keycloak's admin console and the master realm are not routed.
+{
+	admin off
+	servers {
+		timeouts {
+			read_header 10s
+		}
+	}
+}
+
+{$SITE_ADDRESS::8080} {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# never reachable from the internet, whatever the routing below becomes: the Keycloak admin console, the master
+	# realm and the management endpoints
+	@blocked path /admin /admin/* /realms/master /realms/master/* /metrics /health /health/*
+	handle @blocked {
+		respond 404
+	}
+
+	# OIDC login pages and assets for the one realm the console uses (no /admin, no /realms/master)
+	@keycloak path /realms/voltsight /realms/voltsight/* /resources/*
+	handle @keycloak {
+		reverse_proxy keycloak:8080 {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host {host}
+		}
+	}
+
+	# Server-Sent Events: never buffer
+	handle /v1/alerts/stream {
+		reverse_proxy api:8081 {
+			flush_interval -1
+		}
+	}
+
+	handle {
+		encode zstd gzip # the map and list responses are JSON; the event stream above is never compressed
+		reverse_proxy api:8081
+	}
+}

@@ -1,0 +1,15 @@
+{
+  "gofmt_unformatted": [],
+  "go_vet_ok": true,
+  "staticcheck_ok": true,
+  "staticcheck_output": "",
+  "gitleaks_ok": true,
+  "semgrep_findings": 0,
+  "semgrep_waivers": [
+    {
+      "rule": "go.lang.security.audit.crypto.math_random.math-random-used",
+      "file": "internal/seedgen/world.go",
+      "rationale": "seeded PRNG for deterministic synthetic data; not security-sensitive"
+    }
+  ]
+}

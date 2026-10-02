@@ -1,0 +1,2 @@
+    pgvsch_stack_test.go:91: MEASURED (1000000 rows incl. client-side row generation): PostgreSQL COPY 97231 rows/s, 299.0 B/row on disk (with its primary-key index) | ClickHouse 405464 rows/s, 2.7 B/row | ClickHouse is 4.2x faster and 112.3x smaller
+ok  	voltsight/internal/sink	14.033s

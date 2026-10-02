@@ -1,0 +1,76 @@
+{
+  "data": {
+    "trips": 24006,
+    "vehicles": 2500,
+    "train_vehicles": 2000,
+    "test_vehicles": 500
+  },
+  "A_vehicle_holdout": {
+    "gbm": {
+      "mae_kwh_per_km": 0.01736,
+      "mape_pct": 7.17
+    },
+    "fleet_mean": {
+      "mae_kwh_per_km": 0.05188,
+      "mape_pct": 23.38
+    },
+    "catalogue": {
+      "mae_kwh_per_km": 0.03301,
+      "mape_pct": 13.17
+    },
+    "vehicle_history": {
+      "mae_kwh_per_km": 0.0274,
+      "mape_pct": 11.52
+    },
+    "best_baseline": "vehicle_history",
+    "gbm_minus_best_baseline_mae_ci95": {
+      "low": -0.01124,
+      "mean": -0.01004,
+      "high": -0.00883
+    },
+    "gbm_significantly_better": true,
+    "test_trips": 4755,
+    "test_vehicles": 500
+  },
+  "B_time_holdout": {
+    "gbm": {
+      "mae_kwh_per_km": 0.01718,
+      "mape_pct": 6.6
+    },
+    "fleet_mean": {
+      "mae_kwh_per_km": 0.05663,
+      "mape_pct": 22.45
+    },
+    "catalogue": {
+      "mae_kwh_per_km": 0.03699,
+      "mape_pct": 13.81
+    },
+    "vehicle_history": {
+      "mae_kwh_per_km": 0.02489,
+      "mape_pct": 9.86
+    },
+    "best_baseline": "vehicle_history",
+    "gbm_minus_best_baseline_mae_ci95": {
+      "low": -0.00862,
+      "mean": -0.00771,
+      "high": -0.0068
+    },
+    "gbm_significantly_better": true,
+    "test_trips": 4813,
+    "test_vehicles": 1252
+  },
+  "checks": {
+    "vehicle_sets_disjoint": true,
+    "features_exclude_label": true,
+    "first_trip_prior_equals_catalogue": true,
+    "shuffled_label_model_mae": 0.05152,
+    "shuffled_label_model_is_worse_than_real": true
+  },
+  "artifact": {
+    "path": "ml/model.joblib",
+    "sha256": "aef157a21e76f5a996b08ee450a8668e18a5d68704521c75e64a238777161b26",
+    "trained_at": "2026-10-01T13:51:02Z",
+    "algorithm": "HistGradientBoostingRegressor"
+  },
+  "limitation": "Simulated world: labels come from the simulator's physics; payload, driver style and true state of health are hidden from the features. Absolute errors do not transfer to real fleets."
+}

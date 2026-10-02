@@ -1,0 +1,458 @@
+{
+  "accessTokenLifespan": 300,
+  "attributes": {
+    "unmanagedAttributePolicy": "ADMIN_EDIT"
+  },
+  "bruteForceProtected": true,
+  "clients": [
+    {
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "+"
+      },
+      "clientId": "voltsight-web",
+      "defaultClientScopes": [
+        "basic",
+        "profile",
+        "email",
+        "roles",
+        "web-origins"
+      ],
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "implicitFlowEnabled": false,
+      "name": "VoltSight web",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "tenant_id",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.attribute": "tenant_id"
+          },
+          "consentRequired": false,
+          "name": "tenant_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "id.token.claim": "false",
+            "jsonType.label": "String",
+            "multivalued": "true"
+          },
+          "consentRequired": false,
+          "name": "roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.custom.audience": "voltsight-api"
+          },
+          "consentRequired": false,
+          "name": "audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ],
+      "publicClient": true,
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:8081/*"
+      ],
+      "serviceAccountsEnabled": false,
+      "standardFlowEnabled": true,
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:8081"
+      ]
+    },
+    {
+      "bearerOnly": true,
+      "clientId": "voltsight-api",
+      "directAccessGrantsEnabled": false,
+      "enabled": true,
+      "name": "VoltSight API (resource server)",
+      "protocol": "openid-connect",
+      "standardFlowEnabled": false
+    },
+    {
+      "clientId": "voltsight-test",
+      "defaultClientScopes": [
+        "basic",
+        "profile",
+        "email",
+        "roles",
+        "web-origins"
+      ],
+      "directAccessGrantsEnabled": true,
+      "enabled": true,
+      "implicitFlowEnabled": false,
+      "name": "VoltSight test client (DEV ONLY)",
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "tenant_id",
+            "id.token.claim": "true",
+            "jsonType.label": "String",
+            "user.attribute": "tenant_id"
+          },
+          "consentRequired": false,
+          "name": "tenant_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "id.token.claim": "false",
+            "jsonType.label": "String",
+            "multivalued": "true"
+          },
+          "consentRequired": false,
+          "name": "roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.custom.audience": "voltsight-api"
+          },
+          "consentRequired": false,
+          "name": "audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        },
+        {
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "included.client.audience": "account"
+          },
+          "consentRequired": false,
+          "name": "account-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper"
+        }
+      ],
+      "publicClient": false,
+      "secret": "${KC_TEST_CLIENT_SECRET}",
+      "serviceAccountsEnabled": false,
+      "standardFlowEnabled": false
+    }
+  ],
+  "defaultSignatureAlgorithm": "RS256",
+  "displayName": "VoltSight",
+  "enabled": true,
+  "failureFactor": 5,
+  "maxFailureWaitSeconds": 900,
+  "realm": "voltsight",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "viewer"
+      },
+      {
+        "name": "dispatcher"
+      },
+      {
+        "name": "energy_manager"
+      },
+      {
+        "name": "tenant_admin"
+      },
+      {
+        "name": "platform_admin"
+      }
+    ]
+  },
+  "sslRequired": "external",
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "users": [
+    {
+      "attributes": {
+        "tenant_id": [
+          "b0813b89-210d-585f-9c4e-856440224c40"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "viewer@meridian.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Meridian Logistics",
+      "id": "e5e7e2b8-7a4a-5d0d-9d29-e14c9b208d51",
+      "lastName": "viewer",
+      "realmRoles": [
+        "viewer"
+      ],
+      "username": "viewer@meridian.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "b0813b89-210d-585f-9c4e-856440224c40"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "dispatcher@meridian.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Meridian Logistics",
+      "id": "124ad63b-49fd-5780-bacd-aba185a03e26",
+      "lastName": "dispatcher",
+      "realmRoles": [
+        "dispatcher"
+      ],
+      "username": "dispatcher@meridian.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "b0813b89-210d-585f-9c4e-856440224c40"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "energy_manager@meridian.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Meridian Logistics",
+      "id": "b28af1bd-9288-5a3a-8be8-d060961837f9",
+      "lastName": "energy_manager",
+      "realmRoles": [
+        "energy_manager"
+      ],
+      "username": "energy_manager@meridian.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "b0813b89-210d-585f-9c4e-856440224c40"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "tenant_admin@meridian.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Meridian Logistics",
+      "id": "9391229b-145a-5612-afb2-026c8fe698e8",
+      "lastName": "tenant_admin",
+      "realmRoles": [
+        "tenant_admin"
+      ],
+      "username": "tenant_admin@meridian.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "72a7d3bc-44d1-5f88-8f44-0518b04e2b92"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "viewer@coastal.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Coastal Rentals",
+      "id": "90cf4368-e1f3-53bc-8704-1c80241cb0d1",
+      "lastName": "viewer",
+      "realmRoles": [
+        "viewer"
+      ],
+      "username": "viewer@coastal.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "72a7d3bc-44d1-5f88-8f44-0518b04e2b92"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "dispatcher@coastal.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Coastal Rentals",
+      "id": "0d8b965e-4d21-599b-ae41-c7c07a770d81",
+      "lastName": "dispatcher",
+      "realmRoles": [
+        "dispatcher"
+      ],
+      "username": "dispatcher@coastal.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "72a7d3bc-44d1-5f88-8f44-0518b04e2b92"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "energy_manager@coastal.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Coastal Rentals",
+      "id": "78e21d97-e0cb-5939-8840-388b52357a78",
+      "lastName": "energy_manager",
+      "realmRoles": [
+        "energy_manager"
+      ],
+      "username": "energy_manager@coastal.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "72a7d3bc-44d1-5f88-8f44-0518b04e2b92"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "tenant_admin@coastal.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Coastal Rentals",
+      "id": "2f816df7-e1a6-527c-a7e4-22c7c353190f",
+      "lastName": "tenant_admin",
+      "realmRoles": [
+        "tenant_admin"
+      ],
+      "username": "tenant_admin@coastal.example"
+    },
+    {
+      "attributes": {
+        "tenant_id": [
+          "0eb31c0a-90d3-537f-aab0-2c08f644ee3d"
+        ]
+      },
+      "clientRoles": {
+        "account": [
+          "view-profile",
+          "manage-account"
+        ]
+      },
+      "credentials": [
+        {
+          "temporary": false,
+          "type": "password",
+          "value": "${DEMO_USER_PASSWORD}"
+        }
+      ],
+      "email": "admin@platform.example",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "VoltSight Platform",
+      "id": "cccce15e-4654-50b8-8c84-9bcd9f63f2f4",
+      "lastName": "platform_admin",
+      "realmRoles": [
+        "platform_admin"
+      ],
+      "username": "admin@platform.example"
+    }
+  ]
+}

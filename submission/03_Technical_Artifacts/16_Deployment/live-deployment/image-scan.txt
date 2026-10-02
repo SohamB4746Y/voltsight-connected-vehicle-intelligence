@@ -1,0 +1,19 @@
+Unable to find image 'aquasec/trivy:0.57.1' locally
+0.57.1: Pulling from aquasec/trivy
+Digest: sha256:5c59e08f980b5d4d503329773480fcea2c9bdad7e381d846fbf9f2ecb8050f6b
+Status: Downloaded newer image for aquasec/trivy:0.57.1
+2026-10-01T19:04:50Z	INFO	[vulndb] Need to update DB
+2026-10-01T19:04:50Z	INFO	[vulndb] Downloading vulnerability DB...
+2026-10-01T19:04:50Z	INFO	[vulndb] Downloading artifact...	repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-10-01T19:05:00Z	INFO	[vulndb] Artifact successfully downloaded	repo="mirror.gcr.io/aquasec/trivy-db:2"
+2026-10-01T19:05:00Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-10-01T19:05:06Z	INFO	Detected OS	family="debian" version="12.15"
+2026-10-01T19:05:06Z	INFO	[debian] Detecting vulnerabilities...	os_version="12" pkg_num=5
+2026-10-01T19:05:06Z	INFO	Number of language-specific files	num=14
+2026-10-01T19:05:06Z	INFO	[gobinary] Detecting vulnerabilities...
+2026-10-01T19:05:06Z	WARN	Using severities from other vendors for some vulnerabilities. Read https://aquasecurity.github.io/trivy/v0.57/docs/scanner/vulnerability#severity-selection for details.
+
+ghcr.io/sohamb4746y/voltsight-connected-vehicle-intelligence:main (debian 12.15)
+================================================================================
+Total: 0 (HIGH: 0, CRITICAL: 0)
+

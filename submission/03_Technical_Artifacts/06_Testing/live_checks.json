@@ -1,0 +1,226 @@
+{
+  "base": "http://localhost:8080",
+  "at": "2026-10-01T19:16:51.240Z",
+  "results": [
+    {
+      "id": "AUTH-viewer@meridian",
+      "what": "OIDC sign-in (code+PKCE) yields a bearer token",
+      "pass": true
+    },
+    {
+      "id": "AUTH-dispatcher@meridian",
+      "what": "OIDC sign-in (code+PKCE) yields a bearer token",
+      "pass": true
+    },
+    {
+      "id": "AUTH-tenant_admin@meridian",
+      "what": "OIDC sign-in (code+PKCE) yields a bearer token",
+      "pass": true
+    },
+    {
+      "id": "AUTH-dispatcher@coastal",
+      "what": "OIDC sign-in (code+PKCE) yields a bearer token",
+      "pass": true
+    },
+    {
+      "id": "SEC-1",
+      "what": "no token -> 401",
+      "pass": true
+    },
+    {
+      "id": "SEC-2",
+      "what": "garbage token -> 401",
+      "pass": true
+    },
+    {
+      "id": "SEC-3",
+      "what": "two tenants resolve to different tenant ids",
+      "pass": true,
+      "detail": {
+        "meridian": "b0813b89",
+        "coastal": "72a7d3bc"
+      }
+    },
+    {
+      "id": "RBAC-0",
+      "what": "dispatcher can list alerts",
+      "pass": true,
+      "detail": {
+        "sample": "a43c7ba7-6255-4e0d-9d85-93cf26b0b705"
+      }
+    },
+    {
+      "id": "RBAC-1",
+      "what": "viewer cannot acknowledge an alert (403)",
+      "pass": true,
+      "detail": 403
+    },
+    {
+      "id": "RBAC-2",
+      "what": "dispatcher can acknowledge an alert (2xx)",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "id": "RBAC-3",
+      "what": "viewer cannot read the audit log (403)",
+      "pass": true
+    },
+    {
+      "id": "RBAC-4",
+      "what": "dispatcher cannot read the audit log (403)",
+      "pass": true
+    },
+    {
+      "id": "RBAC-5",
+      "what": "tenant admin can read the audit log and it records the alert acknowledgement",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "id": "RBAC-6",
+      "what": "viewer cannot use the Copilot (403)",
+      "pass": true
+    },
+    {
+      "id": "ISO-0",
+      "what": "meridian dispatcher sees vehicles",
+      "pass": true,
+      "detail": 5
+    },
+    {
+      "id": "ISO-1",
+      "what": "coastal dispatcher cannot read a meridian vehicle (404, no existence leak)",
+      "pass": true,
+      "detail": 404
+    },
+    {
+      "id": "ISO-2",
+      "what": "coastal dispatcher cannot read a meridian vehicle's telemetry",
+      "pass": true,
+      "detail": 404
+    },
+    {
+      "id": "ISO-3",
+      "what": "coastal vehicle list contains no meridian VIN",
+      "pass": true,
+      "detail": {
+        "coastal_rows": 200
+      }
+    },
+    {
+      "id": "ISO-4",
+      "what": "coastal dispatcher cannot read a meridian alert (404)",
+      "pass": true
+    },
+    {
+      "id": "CORS-1",
+      "what": "foreign origin gets no Access-Control-Allow-Origin",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "id": "CORS-2",
+      "what": "the deployment's own origin is allowed",
+      "pass": true,
+      "detail": "http://localhost:8080"
+    },
+    {
+      "id": "CORS-3",
+      "what": "no wildcard ACAO on an authenticated endpoint",
+      "pass": true
+    },
+    {
+      "id": "EXP-1",
+      "what": "Keycloak admin console is not reachable (404)",
+      "pass": true
+    },
+    {
+      "id": "EXP-2",
+      "what": "master realm is not reachable (404, and no Keycloak metadata served)",
+      "pass": true
+    },
+    {
+      "id": "EXP-2b",
+      "what": "Keycloak management endpoints are not reachable (/metrics, /health)",
+      "pass": true
+    },
+    {
+      "id": "EXP-3",
+      "what": "password grant is refused for the web client",
+      "pass": true,
+      "detail": 400
+    },
+    {
+      "id": "EXP-4",
+      "what": "the DEV-only test client does not exist in the public realm",
+      "pass": true,
+      "detail": "invalid_client"
+    },
+    {
+      "id": "EXP-5",
+      "what": "security headers present",
+      "pass": true
+    },
+    {
+      "id": "COP-1",
+      "what": "copilot answers with tool-backed content or says insufficient evidence",
+      "pass": true,
+      "detail": {
+        "status": 200,
+        "keys": [
+          "session_id",
+          "answer",
+          "citations",
+          "tool_calls",
+          "pending_actions",
+          "provider"
+        ]
+      }
+    },
+    {
+      "id": "LAT-1",
+      "what": "API p95 < 200 ms (all four endpoints, sequential client on the same host)",
+      "pass": true,
+      "detail": 10.3
+    },
+    {
+      "id": "LAT-2",
+      "what": "API p99 < 500 ms",
+      "pass": true,
+      "detail": 12.9
+    }
+  ],
+  "latency": {
+    "fleet_summary": {
+      "n": 300,
+      "p50_ms": 6.8,
+      "p95_ms": 10.3,
+      "p99_ms": 12.9,
+      "max_ms": 20.1
+    },
+    "vehicles_page": {
+      "n": 300,
+      "p50_ms": 1.5,
+      "p95_ms": 3.7,
+      "p99_ms": 7.3,
+      "max_ms": 8.1
+    },
+    "alerts_open": {
+      "n": 300,
+      "p50_ms": 1.6,
+      "p95_ms": 4.2,
+      "p99_ms": 9.7,
+      "max_ms": 18.8
+    },
+    "map_cells": {
+      "n": 300,
+      "p50_ms": 1.5,
+      "p95_ms": 2.7,
+      "p99_ms": 5.6,
+      "max_ms": 8
+    }
+  }
+}

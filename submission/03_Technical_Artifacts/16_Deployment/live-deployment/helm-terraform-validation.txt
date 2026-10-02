@@ -1,0 +1,22 @@
+### helm lint
+==> Linting deploy/helm/voltsight
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+### helm template | kubeconform (strict)
+Summary: 21 resources found in 1 file - Valid: 21, Invalid: 0, Errors: 0, Skipped: 0
+### rendered kinds
+      2 kind: CronJob
+      6 kind: Deployment
+      3 kind: HorizontalPodAutoscaler
+      3 kind: NetworkPolicy
+      5 kind: PodDisruptionBudget
+      2 kind: Service
+### terraform fmt -check
+fmt ok
+### terraform validate aws
+[32m[1mSuccess![0m The configuration is valid.
+[0m
+### terraform validate gcp
+[32m[1mSuccess![0m The configuration is valid.
+[0m

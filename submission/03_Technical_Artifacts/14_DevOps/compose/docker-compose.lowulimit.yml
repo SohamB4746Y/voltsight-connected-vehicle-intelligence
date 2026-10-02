@@ -1,0 +1,8 @@
+# Override for hosts whose hard RLIMIT_NOFILE is below 262144 (e.g. restricted Linux sandboxes/CI containers).
+# Usage: docker compose -f deploy/compose/docker-compose.yml -f deploy/compose/docker-compose.lowulimit.yml ...
+services:
+  clickhouse:
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 20000
