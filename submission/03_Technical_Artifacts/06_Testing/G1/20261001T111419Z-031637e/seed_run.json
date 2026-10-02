@@ -1,0 +1,63 @@
+{
+  "load": {
+    "rows": 323321,
+    "duration_ns": 18518779000,
+    "rows_per_s": 17459.088420462278
+  },
+  "manifest": {
+    "generator_version": "1",
+    "seed": 20260925,
+    "vehicles": 100000,
+    "counts": {
+      "app_user": 9,
+      "charger": 3008,
+      "depot": 189,
+      "driver": 110000,
+      "fleet": 41,
+      "oem": 4,
+      "plan": 3,
+      "plan_feature": 12,
+      "role": 5,
+      "subscription": 5,
+      "tariff_band": 15,
+      "tariff_zone": 3,
+      "tenant": 6,
+      "user_role": 9,
+      "vehicle": 100000,
+      "vehicle_driver_assignment": 110000,
+      "vehicle_model": 12
+    },
+    "digests": {
+      "charger": "5dac7778cbaa19a4b60239a5b8fccc651e798b6247ceaa4ce4936d0eaf5650e4",
+      "depot": "df7d48511988e5971f86ffcb20c38d4906f1f069b613a6d7755d985e6abe279e",
+      "driver": "31d202fae627b663d9e4abc7289cdb5fcfdea14bf505487c988bc8029e9d9cb5",
+      "fleet": "ef35fbf500cd71fd976edce6a69cb18fd817873c7d2833afb546108ff4f62819",
+      "vehicle": "534ef231e1d94c6c54ca77fb6793cfafdfb438c95e94da9c2eadeb0b7725d11c",
+      "vehicle_driver_assignment": "3aa6b8be2b31cad1853571028ab9d777e55faa6d625f2f145271f1411b93dde6"
+    },
+    "overall": "3fd921a446813662014b5d28da97f9bf236233d202664e30c7d9cb050422a046"
+  },
+  "verify": {
+    "ok": true,
+    "invalid_vins_in_db": 0,
+    "counts": {
+      "app_user": 9,
+      "charger": 3008,
+      "depot": 189,
+      "driver": 110000,
+      "fleet": 41,
+      "oem": 4,
+      "plan": 3,
+      "plan_feature": 12,
+      "role": 5,
+      "subscription": 5,
+      "tariff_band": 15,
+      "tariff_zone": 3,
+      "tenant": 6,
+      "user_role": 9,
+      "vehicle": 100000,
+      "vehicle_driver_assignment": 110000,
+      "vehicle_model": 12
+    }
+  }
+}

@@ -1,0 +1,7 @@
+== tls1_3
+New, TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
+    Protocol  : TLSv1.3
+== tls1_2
+400754805D7F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:../ssl/record/rec_layer_s3.c:1599:SSL alert number 70
+New, (NONE), Cipher is (NONE)
+    Protocol  : TLSv1.2

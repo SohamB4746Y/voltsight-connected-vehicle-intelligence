@@ -1,0 +1,48 @@
+name: kubernetes
+
+# Validates the Helm chart against a REAL (ephemeral, in-runner) Kubernetes API server. This is not a public
+# cluster and nothing is deployed to the internet: it proves the chart is accepted by the API server (schema,
+# admission, defaulting) and that its objects can be created.
+on:
+  push:
+    paths:
+      - "deploy/helm/**"
+      - ".github/workflows/kubernetes.yml"
+  pull_request:
+    paths:
+      - "deploy/helm/**"
+      - ".github/workflows/kubernetes.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chart:
+    name: helm chart on a real cluster (kind, ephemeral)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: voltsight
+          node_image: kindest/node:v1.32.2
+      - name: Cluster is up
+        run: |
+          kubectl version
+          kubectl get nodes -o wide
+      - name: Helm lint
+        run: helm lint deploy/helm/voltsight
+      - name: Server-side dry run of the release (API server validation and admission)
+        run: |
+          helm install vs deploy/helm/voltsight --namespace voltsight --create-namespace --dry-run=server > /tmp/dry-run.yaml
+          grep -c '^kind:' /tmp/dry-run.yaml
+      - name: Create the objects for real, then show what the cluster accepted
+        run: |
+          helm install vs deploy/helm/voltsight --namespace voltsight --create-namespace
+          kubectl -n voltsight get deploy,svc,hpa,pdb,networkpolicy,cronjob
+          kubectl -n voltsight get pods -o wide
+      - name: Uninstall
+        if: always()
+        run: helm uninstall vs --namespace voltsight || true

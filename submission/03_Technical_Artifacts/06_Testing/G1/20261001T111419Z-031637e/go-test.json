@@ -1,0 +1,500 @@
+{"Time":"2026-10-01T16:44:23.6323245+05:30","Action":"start","Package":"voltsight/cmd/vsdb"}
+{"Time":"2026-10-01T16:44:23.6323245+05:30","Action":"output","Package":"voltsight/cmd/vsdb","Output":"?   \tvoltsight/cmd/vsdb\t[no test files]\n"}
+{"Time":"2026-10-01T16:44:23.6323245+05:30","Action":"skip","Package":"voltsight/cmd/vsdb","Elapsed":0}
+{"Time":"2026-10-01T16:44:23.63391+05:30","Action":"start","Package":"voltsight/cmd/vser"}
+{"Time":"2026-10-01T16:44:23.63391+05:30","Action":"output","Package":"voltsight/cmd/vser","Output":"?   \tvoltsight/cmd/vser\t[no test files]\n"}
+{"Time":"2026-10-01T16:44:23.63391+05:30","Action":"skip","Package":"voltsight/cmd/vser","Elapsed":0}
+{"Time":"2026-10-01T16:44:23.653563+05:30","Action":"start","Package":"voltsight/cmd/vspki"}
+{"Time":"2026-10-01T16:44:23.653563+05:30","Action":"output","Package":"voltsight/cmd/vspki","Output":"?   \tvoltsight/cmd/vspki\t[no test files]\n"}
+{"Time":"2026-10-01T16:44:23.653563+05:30","Action":"skip","Package":"voltsight/cmd/vspki","Elapsed":0}
+{"Time":"2026-10-01T16:44:23.6551513+05:30","Action":"start","Package":"voltsight/cmd/vsrealm"}
+{"Time":"2026-10-01T16:44:23.6551513+05:30","Action":"output","Package":"voltsight/cmd/vsrealm","Output":"?   \tvoltsight/cmd/vsrealm\t[no test files]\n"}
+{"Time":"2026-10-01T16:44:23.6552618+05:30","Action":"skip","Package":"voltsight/cmd/vsrealm","Elapsed":0}
+{"Time":"2026-10-01T16:44:23.6552618+05:30","Action":"start","Package":"voltsight/db"}
+{"Time":"2026-10-01T16:44:23.6552618+05:30","Action":"output","Package":"voltsight/db","Output":"?   \tvoltsight/db\t[no test files]\n"}
+{"Time":"2026-10-01T16:44:23.6552618+05:30","Action":"skip","Package":"voltsight/db","Elapsed":0}
+{"Time":"2026-10-01T16:44:24.8257182+05:30","Action":"start","Package":"voltsight/db/dbtests"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:25 github.com/testcontainers/testcontainers-go - Connected to docker: \n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Server Version: 29.8.1\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  API Version: 1.55\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Operating System: Docker Desktop (containerized)\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Total Memory: 10955 MB\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Labels:\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"    com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Testcontainers for Go Version: v0.44.0\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Resolved Docker Host: npipe:////./pipe/docker_engine\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Resolved Docker Socket Path: //var/run/docker.sock\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Test SessionID: 9480e8360b7e073a49238939010bc8c422708837ddc8a58be67a414cab3bd3ae\n"}
+{"Time":"2026-10-01T16:44:25.0359144+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"  Test ProcessID: bc3fdd1c-304a-4a5b-a5d4-e1998a7d03e2\n"}
+{"Time":"2026-10-01T16:44:25.0778262+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:25 🐳 Creating container for image pgvector/pgvector:pg16\n"}
+{"Time":"2026-10-01T16:44:25.3521158+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:25 🐳 Creating container for image testcontainers/ryuk:0.14.0\n"}
+{"Time":"2026-10-01T16:44:25.4876976+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:25 ✅ Container created: a695fa3b8c4b\n"}
+{"Time":"2026-10-01T16:44:25.4876976+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:25 🐳 Starting container: a695fa3b8c4b\n"}
+{"Time":"2026-10-01T16:44:25.712165+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:25 ✅ Container started: a695fa3b8c4b\n"}
+{"Time":"2026-10-01T16:44:25.712165+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:25 ⏳ Waiting for container id a695fa3b8c4b image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message \"Started\", port 8080/tcp to be listening]\n"}
+{"Time":"2026-10-01T16:44:26.0137241+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:26 Shell not found in container\n"}
+{"Time":"2026-10-01T16:44:26.0142592+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:26 🔔 Container is ready: a695fa3b8c4b\n"}
+{"Time":"2026-10-01T16:44:26.0218149+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:26 ✅ Container created: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:44:26.0223523+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:26 🐳 Starting container: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:44:26.2511694+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:26 ✅ Container started: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:44:26.2511694+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:26 ⏳ Waiting for container id 6bc9941d8649 image: pgvector/pgvector:pg16. Waiting for: all of: [log message \"database system is ready to accept connections\" (occurrence: 2), port 5432/tcp to be listening]\n"}
+{"Time":"2026-10-01T16:44:27.872143+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:44:27 🔔 Container is ready: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:44:28.1208509+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_TransactionRollsBackAtomically"}
+{"Time":"2026-10-01T16:44:28.1208509+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_TransactionRollsBackAtomically","Output":"=== RUN   TestACID_TransactionRollsBackAtomically\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1247174+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_TransactionRollsBackAtomically","Output":"--- PASS: TestACID_TransactionRollsBackAtomically (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1247174+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_TransactionRollsBackAtomically","Elapsed":0}
+{"Time":"2026-10-01T16:44:28.1247174+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_AlertIdempotencyKey"}
+{"Time":"2026-10-01T16:44:28.1247174+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_AlertIdempotencyKey","Output":"=== RUN   TestACID_AlertIdempotencyKey\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1284151+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_AlertIdempotencyKey","Output":"--- PASS: TestACID_AlertIdempotencyKey (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1284151+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_AlertIdempotencyKey","Elapsed":0}
+{"Time":"2026-10-01T16:44:28.1284151+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_CompositeForeignKeysBlockCrossTenantReferences"}
+{"Time":"2026-10-01T16:44:28.1284151+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_CompositeForeignKeysBlockCrossTenantReferences","Output":"=== RUN   TestACID_CompositeForeignKeysBlockCrossTenantReferences\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1354706+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_CompositeForeignKeysBlockCrossTenantReferences","Output":"--- PASS: TestACID_CompositeForeignKeysBlockCrossTenantReferences (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1354706+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_CompositeForeignKeysBlockCrossTenantReferences","Elapsed":0.01}
+{"Time":"2026-10-01T16:44:28.1354706+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_DriverAssignmentsCannotOverlap"}
+{"Time":"2026-10-01T16:44:28.1354706+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_DriverAssignmentsCannotOverlap","Output":"=== RUN   TestACID_DriverAssignmentsCannotOverlap\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1370788+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_DriverAssignmentsCannotOverlap","Output":"--- PASS: TestACID_DriverAssignmentsCannotOverlap (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1370788+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_DriverAssignmentsCannotOverlap","Elapsed":0}
+{"Time":"2026-10-01T16:44:28.1370788+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_BusinessCheckConstraints"}
+{"Time":"2026-10-01T16:44:28.1370788+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_BusinessCheckConstraints","Output":"=== RUN   TestACID_BusinessCheckConstraints\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1412808+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_BusinessCheckConstraints","Output":"--- PASS: TestACID_BusinessCheckConstraints (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.1412808+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_BusinessCheckConstraints","Elapsed":0}
+{"Time":"2026-10-01T16:44:28.1412808+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_ConcurrentPlanApprovalHasExactlyOneWinner"}
+{"Time":"2026-10-01T16:44:28.1412808+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_ConcurrentPlanApprovalHasExactlyOneWinner","Output":"=== RUN   TestACID_ConcurrentPlanApprovalHasExactlyOneWinner\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3718385+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_ConcurrentPlanApprovalHasExactlyOneWinner","Output":"--- PASS: TestACID_ConcurrentPlanApprovalHasExactlyOneWinner (0.23s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3718385+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_ConcurrentPlanApprovalHasExactlyOneWinner","Elapsed":0.23}
+{"Time":"2026-10-01T16:44:28.3718385+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_VINFunctionAgreesWithGoImplementation"}
+{"Time":"2026-10-01T16:44:28.3718385+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_VINFunctionAgreesWithGoImplementation","Output":"=== RUN   TestACID_VINFunctionAgreesWithGoImplementation\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3744597+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_VINFunctionAgreesWithGoImplementation","Output":"--- PASS: TestACID_VINFunctionAgreesWithGoImplementation (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3744597+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_VINFunctionAgreesWithGoImplementation","Elapsed":0}
+{"Time":"2026-10-01T16:44:28.3744597+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestACID_AuditPartitionHelper"}
+{"Time":"2026-10-01T16:44:28.3744597+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_AuditPartitionHelper","Output":"=== RUN   TestACID_AuditPartitionHelper\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3861915+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestACID_AuditPartitionHelper","Output":"--- PASS: TestACID_AuditPartitionHelper (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3861915+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestACID_AuditPartitionHelper","Elapsed":0.01}
+{"Time":"2026-10-01T16:44:28.3861915+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestERDiagramIsGeneratedFromTheLiveSchema"}
+{"Time":"2026-10-01T16:44:28.3861915+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestERDiagramIsGeneratedFromTheLiveSchema","Output":"=== RUN   TestERDiagramIsGeneratedFromTheLiveSchema\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3935143+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestERDiagramIsGeneratedFromTheLiveSchema","Output":"--- PASS: TestERDiagramIsGeneratedFromTheLiveSchema (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3935143+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestERDiagramIsGeneratedFromTheLiveSchema","Elapsed":0.01}
+{"Time":"2026-10-01T16:44:28.3935143+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestNormalFormDocumentCoversEveryTable"}
+{"Time":"2026-10-01T16:44:28.3935143+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestNormalFormDocumentCoversEveryTable","Output":"=== RUN   TestNormalFormDocumentCoversEveryTable\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3940359+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestNormalFormDocumentCoversEveryTable","Output":"--- PASS: TestNormalFormDocumentCoversEveryTable (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.3940359+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestNormalFormDocumentCoversEveryTable","Elapsed":0}
+{"Time":"2026-10-01T16:44:28.3940359+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp"}
+{"Time":"2026-10-01T16:44:28.3940359+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"=== RUN   TestMigrationsUpDownUp\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:28.4373293+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:28 🐳 Creating container for image pgvector/pgvector:pg16\n"}
+{"Time":"2026-10-01T16:44:28.6617243+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:28 ✅ Container created: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:28.662254+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:28 🐳 Starting container: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:28.8708645+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:28 ✅ Container started: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:28.8708645+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:28 ⏳ Waiting for container id 121dc2a119f7 image: pgvector/pgvector:pg16. Waiting for: all of: [log message \"database system is ready to accept connections\" (occurrence: 2), port 5432/tcp to be listening]\n"}
+{"Time":"2026-10-01T16:44:30.05322+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:30 🔔 Container is ready: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:30.7806249+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"    migrate_lint_test.go:70: schema fingerprint stable across up/down/up: e6447de9f1367dff1785fa1445e92150472d652c6cca483119ba02305cac765a\n"}
+{"Time":"2026-10-01T16:44:30.7806249+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:30 🐳 Stopping container: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:31.2110707+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:31 ✅ Container stopped: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:31.2110707+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:31 🐳 Terminating container: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:31.2962778+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"2026/10/01 16:44:31 🚫 Container terminated: 121dc2a119f7\n"}
+{"Time":"2026-10-01T16:44:31.2962778+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Output":"--- PASS: TestMigrationsUpDownUp (2.90s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.2962778+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestMigrationsUpDownUp","Elapsed":2.9}
+{"Time":"2026-10-01T16:44:31.2968056+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_KeysAndClassification"}
+{"Time":"2026-10-01T16:44:31.2968056+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_KeysAndClassification","Output":"=== RUN   TestSchemaLint_KeysAndClassification\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.312686+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_KeysAndClassification","Output":"--- PASS: TestSchemaLint_KeysAndClassification (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.312686+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_KeysAndClassification","Elapsed":0.02}
+{"Time":"2026-10-01T16:44:31.312686+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_TenantTablesAreProtected"}
+{"Time":"2026-10-01T16:44:31.312686+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_TenantTablesAreProtected","Output":"=== RUN   TestSchemaLint_TenantTablesAreProtected\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.363481+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_TenantTablesAreProtected","Output":"--- PASS: TestSchemaLint_TenantTablesAreProtected (0.05s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.363481+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_TenantTablesAreProtected","Elapsed":0.05}
+{"Time":"2026-10-01T16:44:31.363481+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_ForeignKeysIndexed"}
+{"Time":"2026-10-01T16:44:31.363481+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_ForeignKeysIndexed","Output":"=== RUN   TestSchemaLint_ForeignKeysIndexed\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.3821796+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_ForeignKeysIndexed","Output":"--- PASS: TestSchemaLint_ForeignKeysIndexed (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.3821796+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_ForeignKeysIndexed","Elapsed":0.02}
+{"Time":"2026-10-01T16:44:31.3821796+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_RolesAreLeastPrivilege"}
+{"Time":"2026-10-01T16:44:31.3821796+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_RolesAreLeastPrivilege","Output":"=== RUN   TestSchemaLint_RolesAreLeastPrivilege\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.4445921+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_RolesAreLeastPrivilege","Output":"--- PASS: TestSchemaLint_RolesAreLeastPrivilege (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.4445921+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestSchemaLint_RolesAreLeastPrivilege","Elapsed":0.06}
+{"Time":"2026-10-01T16:44:31.4445921+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_ReadIsolationOnEveryTenantTable"}
+{"Time":"2026-10-01T16:44:31.4445921+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_ReadIsolationOnEveryTenantTable","Output":"=== RUN   TestRLS_ReadIsolationOnEveryTenantTable\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.4955175+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_ReadIsolationOnEveryTenantTable","Output":"--- PASS: TestRLS_ReadIsolationOnEveryTenantTable (0.05s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.4955175+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_ReadIsolationOnEveryTenantTable","Elapsed":0.05}
+{"Time":"2026-10-01T16:44:31.4955175+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_TenantTableSeesOnlyItself"}
+{"Time":"2026-10-01T16:44:31.4955175+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_TenantTableSeesOnlyItself","Output":"=== RUN   TestRLS_TenantTableSeesOnlyItself\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.4987832+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_TenantTableSeesOnlyItself","Output":"--- PASS: TestRLS_TenantTableSeesOnlyItself (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.4987832+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_TenantTableSeesOnlyItself","Elapsed":0}
+{"Time":"2026-10-01T16:44:31.4987832+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_UnsetOrEmptyGUCSeesNothing"}
+{"Time":"2026-10-01T16:44:31.4987832+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_UnsetOrEmptyGUCSeesNothing","Output":"=== RUN   TestRLS_UnsetOrEmptyGUCSeesNothing\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.5920617+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_UnsetOrEmptyGUCSeesNothing","Output":"--- PASS: TestRLS_UnsetOrEmptyGUCSeesNothing (0.09s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.5920617+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_UnsetOrEmptyGUCSeesNothing","Elapsed":0.09}
+{"Time":"2026-10-01T16:44:31.5920617+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_MalformedGUCErrorsInsteadOfLeaking"}
+{"Time":"2026-10-01T16:44:31.5920617+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_MalformedGUCErrorsInsteadOfLeaking","Output":"=== RUN   TestRLS_MalformedGUCErrorsInsteadOfLeaking\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.6011653+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_MalformedGUCErrorsInsteadOfLeaking","Output":"--- PASS: TestRLS_MalformedGUCErrorsInsteadOfLeaking (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.6011653+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_MalformedGUCErrorsInsteadOfLeaking","Elapsed":0.01}
+{"Time":"2026-10-01T16:44:31.6011653+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_WriteAttacksAreRejectedAndChangeNothing"}
+{"Time":"2026-10-01T16:44:31.6011653+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_WriteAttacksAreRejectedAndChangeNothing","Output":"=== RUN   TestRLS_WriteAttacksAreRejectedAndChangeNothing\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8381146+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_WriteAttacksAreRejectedAndChangeNothing","Output":"--- PASS: TestRLS_WriteAttacksAreRejectedAndChangeNothing (0.24s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8386206+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_WriteAttacksAreRejectedAndChangeNothing","Elapsed":0.24}
+{"Time":"2026-10-01T16:44:31.8386206+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_InsertAttacks"}
+{"Time":"2026-10-01T16:44:31.8386206+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_InsertAttacks","Output":"=== RUN   TestRLS_InsertAttacks\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8543389+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_InsertAttacks","Output":"--- PASS: TestRLS_InsertAttacks (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8543389+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_InsertAttacks","Elapsed":0.02}
+{"Time":"2026-10-01T16:44:31.8543389+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_ViewsAndFunctionsDoNotLeak"}
+{"Time":"2026-10-01T16:44:31.8543389+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_ViewsAndFunctionsDoNotLeak","Output":"=== RUN   TestRLS_ViewsAndFunctionsDoNotLeak\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8624003+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_ViewsAndFunctionsDoNotLeak","Output":"--- PASS: TestRLS_ViewsAndFunctionsDoNotLeak (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8629259+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_ViewsAndFunctionsDoNotLeak","Elapsed":0.01}
+{"Time":"2026-10-01T16:44:31.8629259+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_AuditLogIsAppendOnlyAndTenantBound"}
+{"Time":"2026-10-01T16:44:31.8629259+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_AuditLogIsAppendOnlyAndTenantBound","Output":"=== RUN   TestRLS_AuditLogIsAppendOnlyAndTenantBound\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8820493+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_AuditLogIsAppendOnlyAndTenantBound","Output":"--- PASS: TestRLS_AuditLogIsAppendOnlyAndTenantBound (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.8825554+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_AuditLogIsAppendOnlyAndTenantBound","Elapsed":0.02}
+{"Time":"2026-10-01T16:44:31.8825554+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestRLS_ServiceRolesAreScoped"}
+{"Time":"2026-10-01T16:44:31.8825554+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_ServiceRolesAreScoped","Output":"=== RUN   TestRLS_ServiceRolesAreScoped\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9085429+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestRLS_ServiceRolesAreScoped","Output":"--- PASS: TestRLS_ServiceRolesAreScoped (0.03s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9085429+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestRLS_ServiceRolesAreScoped","Elapsed":0.03}
+{"Time":"2026-10-01T16:44:31.9085429+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestKnownLimitation_TenantGUCIsCallerControlled"}
+{"Time":"2026-10-01T16:44:31.9085429+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestKnownLimitation_TenantGUCIsCallerControlled","Output":"=== RUN   TestKnownLimitation_TenantGUCIsCallerControlled\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9106868+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestKnownLimitation_TenantGUCIsCallerControlled","Output":"    rls_test.go:305: LIMITATION (documented): a session that sets app.tenant_id itself sees that tenant's rows (1); mitigated at the API layer\n"}
+{"Time":"2026-10-01T16:44:31.9112152+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestKnownLimitation_TenantGUCIsCallerControlled","Output":"--- PASS: TestKnownLimitation_TenantGUCIsCallerControlled (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9112152+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestKnownLimitation_TenantGUCIsCallerControlled","Elapsed":0}
+{"Time":"2026-10-01T16:44:31.9112152+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_PasswordsWorkAndRLSHoldsForRealLogins"}
+{"Time":"2026-10-01T16:44:31.9112152+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_PasswordsWorkAndRLSHoldsForRealLogins","Output":"=== RUN   TestBootstrapRoles_PasswordsWorkAndRLSHoldsForRealLogins\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9713309+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_PasswordsWorkAndRLSHoldsForRealLogins","Output":"--- PASS: TestBootstrapRoles_PasswordsWorkAndRLSHoldsForRealLogins (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9713309+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_PasswordsWorkAndRLSHoldsForRealLogins","Elapsed":0.06}
+{"Time":"2026-10-01T16:44:31.9713309+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_RefusesNonServiceRolesAndReportsErrors"}
+{"Time":"2026-10-01T16:44:31.9713309+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_RefusesNonServiceRolesAndReportsErrors","Output":"=== RUN   TestBootstrapRoles_RefusesNonServiceRolesAndReportsErrors\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9781496+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_RefusesNonServiceRolesAndReportsErrors","Output":"--- PASS: TestBootstrapRoles_RefusesNonServiceRolesAndReportsErrors (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:31.9781496+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestBootstrapRoles_RefusesNonServiceRolesAndReportsErrors","Elapsed":0.01}
+{"Time":"2026-10-01T16:44:31.9781496+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles"}
+{"Time":"2026-10-01T16:44:31.9781496+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"=== RUN   TestSeed100KVehicles\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:44:32.0217347+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:44:32 🐳 Creating container for image pgvector/pgvector:pg16\n"}
+{"Time":"2026-10-01T16:44:32.1642573+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:44:32 ✅ Container created: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:44:32.1642573+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:44:32 🐳 Starting container: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:44:32.3811175+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:44:32 ✅ Container started: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:44:32.3811175+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:44:32 ⏳ Waiting for container id fdb5fc9a0534 image: pgvector/pgvector:pg16. Waiting for: all of: [log message \"database system is ready to accept connections\" (occurrence: 2), port 5432/tcp to be listening]\n"}
+{"Time":"2026-10-01T16:44:33.6010475+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:44:33 🔔 Container is ready: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:44:52.7070716+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"    seed_test.go:53: loaded 323321 rows in 18.518779s (17459 rows/s)\n"}
+{"Time":"2026-10-01T16:45:53.524108+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:45:53 🐳 Stopping container: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:45:55.5151328+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:45:55 ✅ Container stopped: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:45:55.515638+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:45:55 🐳 Terminating container: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:45:55.6771568+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"2026/10/01 16:45:55 🚫 Container terminated: fdb5fc9a0534\n"}
+{"Time":"2026-10-01T16:45:55.6776666+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Output":"--- PASS: TestSeed100KVehicles (83.70s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:45:55.6776666+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestSeed100KVehicles","Elapsed":83.7}
+{"Time":"2026-10-01T16:45:55.6776666+05:30","Action":"run","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted"}
+{"Time":"2026-10-01T16:45:55.6776666+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"=== RUN   TestSeedPIIIsEncrypted\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:45:55.7230874+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:55 🐳 Creating container for image pgvector/pgvector:pg16\n"}
+{"Time":"2026-10-01T16:45:55.9353703+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:55 ✅ Container created: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:55.9359148+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:55 🐳 Starting container: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:56.2048609+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:56 ✅ Container started: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:56.2053665+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:56 ⏳ Waiting for container id 8b1f591ca9cb image: pgvector/pgvector:pg16. Waiting for: all of: [log message \"database system is ready to accept connections\" (occurrence: 2), port 5432/tcp to be listening]\n"}
+{"Time":"2026-10-01T16:45:57.7153593+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:57 🔔 Container is ready: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:58.2116214+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:58 🐳 Stopping container: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:58.8239615+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:58 ✅ Container stopped: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:58.8239615+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:58 🐳 Terminating container: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:58.9112926+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"2026/10/01 16:45:58 🚫 Container terminated: 8b1f591ca9cb\n"}
+{"Time":"2026-10-01T16:45:58.9112926+05:30","Action":"output","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Output":"--- PASS: TestSeedPIIIsEncrypted (3.23s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:45:58.9112926+05:30","Action":"pass","Package":"voltsight/db/dbtests","Test":"TestSeedPIIIsEncrypted","Elapsed":3.23}
+{"Time":"2026-10-01T16:45:58.9112926+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:45:58.9260158+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"coverage: 58.2% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:45:58.9297553+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:45:58 🐳 Stopping container: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:45:59.2894466+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:45:59 ✅ Container stopped: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:45:59.2899548+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:45:59 🐳 Terminating container: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:45:59.3776592+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"2026/10/01 16:45:59 🚫 Container terminated: 6bc9941d8649\n"}
+{"Time":"2026-10-01T16:45:59.3937511+05:30","Action":"output","Package":"voltsight/db/dbtests","Output":"ok  \tvoltsight/db/dbtests\t94.559s\tcoverage: 58.2% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:45:59.3942583+05:30","Action":"pass","Package":"voltsight/db/dbtests","Elapsed":94.569}
+{"Time":"2026-10-01T16:45:59.4452284+05:30","Action":"start","Package":"voltsight/gen/voltsight/alert/v1"}
+{"Time":"2026-10-01T16:45:59.4452284+05:30","Action":"output","Package":"voltsight/gen/voltsight/alert/v1","Output":"?   \tvoltsight/gen/voltsight/alert/v1\t[no test files]\n"}
+{"Time":"2026-10-01T16:45:59.4452284+05:30","Action":"skip","Package":"voltsight/gen/voltsight/alert/v1","Elapsed":0}
+{"Time":"2026-10-01T16:45:59.446022+05:30","Action":"start","Package":"voltsight/gen/voltsight/charger/v1"}
+{"Time":"2026-10-01T16:45:59.4465308+05:30","Action":"output","Package":"voltsight/gen/voltsight/charger/v1","Output":"?   \tvoltsight/gen/voltsight/charger/v1\t[no test files]\n"}
+{"Time":"2026-10-01T16:45:59.4465308+05:30","Action":"skip","Package":"voltsight/gen/voltsight/charger/v1","Elapsed":0.001}
+{"Time":"2026-10-01T16:45:59.4476471+05:30","Action":"start","Package":"voltsight/gen/voltsight/dlq/v1"}
+{"Time":"2026-10-01T16:45:59.4476471+05:30","Action":"output","Package":"voltsight/gen/voltsight/dlq/v1","Output":"?   \tvoltsight/gen/voltsight/dlq/v1\t[no test files]\n"}
+{"Time":"2026-10-01T16:45:59.4476471+05:30","Action":"skip","Package":"voltsight/gen/voltsight/dlq/v1","Elapsed":0}
+{"Time":"2026-10-01T16:45:59.4492437+05:30","Action":"start","Package":"voltsight/gen/voltsight/telemetry/v1"}
+{"Time":"2026-10-01T16:45:59.4492437+05:30","Action":"output","Package":"voltsight/gen/voltsight/telemetry/v1","Output":"?   \tvoltsight/gen/voltsight/telemetry/v1\t[no test files]\n"}
+{"Time":"2026-10-01T16:45:59.4492437+05:30","Action":"skip","Package":"voltsight/gen/voltsight/telemetry/v1","Elapsed":0}
+{"Time":"2026-10-01T16:46:01.7940429+05:30","Action":"start","Package":"voltsight/internal/contract"}
+{"Time":"2026-10-01T16:46:02.3468978+05:30","Action":"run","Package":"voltsight/internal/contract","Test":"TestProblemStatementExampleParsesUnchanged"}
+{"Time":"2026-10-01T16:46:02.3468978+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestProblemStatementExampleParsesUnchanged","Output":"=== RUN   TestProblemStatementExampleParsesUnchanged\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestProblemStatementExampleParsesUnchanged","Output":"--- PASS: TestProblemStatementExampleParsesUnchanged (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"pass","Package":"voltsight/internal/contract","Test":"TestProblemStatementExampleParsesUnchanged","Elapsed":0}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"run","Package":"voltsight/internal/contract","Test":"TestTelemetryContainsRequiredFields"}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestTelemetryContainsRequiredFields","Output":"=== RUN   TestTelemetryContainsRequiredFields\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestTelemetryContainsRequiredFields","Output":"--- PASS: TestTelemetryContainsRequiredFields (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"pass","Package":"voltsight/internal/contract","Test":"TestTelemetryContainsRequiredFields","Elapsed":0}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"run","Package":"voltsight/internal/contract","Test":"TestBinaryAndJSONRoundTrip"}
+{"Time":"2026-10-01T16:46:02.3474286+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestBinaryAndJSONRoundTrip","Output":"=== RUN   TestBinaryAndJSONRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3887395+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestBinaryAndJSONRoundTrip","Output":"--- PASS: TestBinaryAndJSONRoundTrip (0.04s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3895669+05:30","Action":"pass","Package":"voltsight/internal/contract","Test":"TestBinaryAndJSONRoundTrip","Elapsed":0.04}
+{"Time":"2026-10-01T16:46:02.3895669+05:30","Action":"run","Package":"voltsight/internal/contract","Test":"TestBatchRoundTripAndGarbageIsRejected"}
+{"Time":"2026-10-01T16:46:02.3895669+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestBatchRoundTripAndGarbageIsRejected","Output":"=== RUN   TestBatchRoundTripAndGarbageIsRejected\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3895669+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestBatchRoundTripAndGarbageIsRejected","Output":"--- PASS: TestBatchRoundTripAndGarbageIsRejected (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.3895669+05:30","Action":"pass","Package":"voltsight/internal/contract","Test":"TestBatchRoundTripAndGarbageIsRejected","Elapsed":0}
+{"Time":"2026-10-01T16:46:02.3895669+05:30","Action":"run","Package":"voltsight/internal/contract","Test":"TestWireSizeIsMeasuredAndWithinBudget"}
+{"Time":"2026-10-01T16:46:02.3895669+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestWireSizeIsMeasuredAndWithinBudget","Output":"=== RUN   TestWireSizeIsMeasuredAndWithinBudget\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.4205849+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestWireSizeIsMeasuredAndWithinBudget","Output":"    contract_test.go:167: MEASURED over 5000 random events: protobuf 197.5 B/event, protojson 545.6 B/event\n"}
+{"Time":"2026-10-01T16:46:02.4216799+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestWireSizeIsMeasuredAndWithinBudget","Output":"--- PASS: TestWireSizeIsMeasuredAndWithinBudget (0.03s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.4216799+05:30","Action":"pass","Package":"voltsight/internal/contract","Test":"TestWireSizeIsMeasuredAndWithinBudget","Elapsed":0.03}
+{"Time":"2026-10-01T16:46:02.4216799+05:30","Action":"run","Package":"voltsight/internal/contract","Test":"TestOtherContractsRoundTrip"}
+{"Time":"2026-10-01T16:46:02.4216799+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestOtherContractsRoundTrip","Output":"=== RUN   TestOtherContractsRoundTrip\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.422216+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestOtherContractsRoundTrip","Output":"--- PASS: TestOtherContractsRoundTrip (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.422216+05:30","Action":"pass","Package":"voltsight/internal/contract","Test":"TestOtherContractsRoundTrip","Elapsed":0}
+{"Time":"2026-10-01T16:46:02.422216+05:30","Action":"run","Package":"voltsight/internal/contract","Test":"TestEnumZeroValuesAreUnspecified"}
+{"Time":"2026-10-01T16:46:02.422216+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestEnumZeroValuesAreUnspecified","Output":"=== RUN   TestEnumZeroValuesAreUnspecified\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.422216+05:30","Action":"output","Package":"voltsight/internal/contract","Test":"TestEnumZeroValuesAreUnspecified","Output":"--- PASS: TestEnumZeroValuesAreUnspecified (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.422216+05:30","Action":"pass","Package":"voltsight/internal/contract","Test":"TestEnumZeroValuesAreUnspecified","Elapsed":0}
+{"Time":"2026-10-01T16:46:02.422216+05:30","Action":"output","Package":"voltsight/internal/contract","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:02.4443655+05:30","Action":"output","Package":"voltsight/internal/contract","Output":"coverage: 3.0% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:02.4624479+05:30","Action":"output","Package":"voltsight/internal/contract","Output":"ok  \tvoltsight/internal/contract\t0.651s\tcoverage: 3.0% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:02.4624479+05:30","Action":"pass","Package":"voltsight/internal/contract","Elapsed":0.668}
+{"Time":"2026-10-01T16:46:03.3931632+05:30","Action":"start","Package":"voltsight/internal/dbtool"}
+{"Time":"2026-10-01T16:46:03.9754182+05:30","Action":"run","Package":"voltsight/internal/dbtool","Test":"TestOwnerDSN"}
+{"Time":"2026-10-01T16:46:03.9754182+05:30","Action":"output","Package":"voltsight/internal/dbtool","Test":"TestOwnerDSN","Output":"=== RUN   TestOwnerDSN\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:03.9754182+05:30","Action":"output","Package":"voltsight/internal/dbtool","Test":"TestOwnerDSN","Output":"--- PASS: TestOwnerDSN (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:03.9754182+05:30","Action":"pass","Package":"voltsight/internal/dbtool","Test":"TestOwnerDSN","Elapsed":0}
+{"Time":"2026-10-01T16:46:03.9754182+05:30","Action":"output","Package":"voltsight/internal/dbtool","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:03.9888904+05:30","Action":"output","Package":"voltsight/internal/dbtool","Output":"coverage: 2.6% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:04.013309+05:30","Action":"output","Package":"voltsight/internal/dbtool","Output":"ok  \tvoltsight/internal/dbtool\t0.612s\tcoverage: 2.6% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:04.013309+05:30","Action":"pass","Package":"voltsight/internal/dbtool","Elapsed":0.62}
+{"Time":"2026-10-01T16:46:04.4367391+05:30","Action":"start","Package":"voltsight/internal/dotenv"}
+{"Time":"2026-10-01T16:46:04.789744+05:30","Action":"run","Package":"voltsight/internal/dotenv","Test":"TestLoadAndGet"}
+{"Time":"2026-10-01T16:46:04.789744+05:30","Action":"output","Package":"voltsight/internal/dotenv","Test":"TestLoadAndGet","Output":"=== RUN   TestLoadAndGet\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:04.7934071+05:30","Action":"output","Package":"voltsight/internal/dotenv","Test":"TestLoadAndGet","Output":"--- PASS: TestLoadAndGet (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:04.7934071+05:30","Action":"pass","Package":"voltsight/internal/dotenv","Test":"TestLoadAndGet","Elapsed":0}
+{"Time":"2026-10-01T16:46:04.7934071+05:30","Action":"run","Package":"voltsight/internal/dotenv","Test":"TestLoadMissingFileIsEmpty"}
+{"Time":"2026-10-01T16:46:04.7934071+05:30","Action":"output","Package":"voltsight/internal/dotenv","Test":"TestLoadMissingFileIsEmpty","Output":"=== RUN   TestLoadMissingFileIsEmpty\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:04.794463+05:30","Action":"output","Package":"voltsight/internal/dotenv","Test":"TestLoadMissingFileIsEmpty","Output":"--- PASS: TestLoadMissingFileIsEmpty (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:04.794463+05:30","Action":"pass","Package":"voltsight/internal/dotenv","Test":"TestLoadMissingFileIsEmpty","Elapsed":0}
+{"Time":"2026-10-01T16:46:04.794463+05:30","Action":"output","Package":"voltsight/internal/dotenv","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:04.8062662+05:30","Action":"output","Package":"voltsight/internal/dotenv","Output":"coverage: 1.9% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:04.8163058+05:30","Action":"output","Package":"voltsight/internal/dotenv","Output":"ok  \tvoltsight/internal/dotenv\t0.373s\tcoverage: 1.9% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:04.8163058+05:30","Action":"pass","Package":"voltsight/internal/dotenv","Elapsed":0.38}
+{"Time":"2026-10-01T16:46:04.8184671+05:30","Action":"start","Package":"voltsight/internal/erdiagram"}
+{"Time":"2026-10-01T16:46:05.1776592+05:30","Action":"output","Package":"voltsight/internal/erdiagram","Output":"\tvoltsight/internal/erdiagram\t\tcoverage: 0.0% of statements\n"}
+{"Time":"2026-10-01T16:46:05.3831623+05:30","Action":"pass","Package":"voltsight/internal/erdiagram","Elapsed":0.565}
+{"Time":"2026-10-01T16:46:05.8148832+05:30","Action":"start","Package":"voltsight/internal/geo"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"run","Package":"voltsight/internal/geo","Test":"TestEncodeKnownVectors"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestEncodeKnownVectors","Output":"=== RUN   TestEncodeKnownVectors\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestEncodeKnownVectors","Output":"--- PASS: TestEncodeKnownVectors (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"pass","Package":"voltsight/internal/geo","Test":"TestEncodeKnownVectors","Elapsed":0}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"run","Package":"voltsight/internal/geo","Test":"TestEncodeClampsPrecision"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestEncodeClampsPrecision","Output":"=== RUN   TestEncodeClampsPrecision\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestEncodeClampsPrecision","Output":"--- PASS: TestEncodeClampsPrecision (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"pass","Package":"voltsight/internal/geo","Test":"TestEncodeClampsPrecision","Elapsed":0}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"run","Package":"voltsight/internal/geo","Test":"TestRoundTripWithinCell"}
+{"Time":"2026-10-01T16:46:06.2478157+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestRoundTripWithinCell","Output":"=== RUN   TestRoundTripWithinCell\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestRoundTripWithinCell","Output":"--- PASS: TestRoundTripWithinCell (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"pass","Package":"voltsight/internal/geo","Test":"TestRoundTripWithinCell","Elapsed":0.01}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"run","Package":"voltsight/internal/geo","Test":"TestPrefixProperty"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestPrefixProperty","Output":"=== RUN   TestPrefixProperty\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestPrefixProperty","Output":"--- PASS: TestPrefixProperty (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"pass","Package":"voltsight/internal/geo","Test":"TestPrefixProperty","Elapsed":0}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"run","Package":"voltsight/internal/geo","Test":"TestInvalid"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestInvalid","Output":"=== RUN   TestInvalid\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestInvalid","Output":"--- PASS: TestInvalid (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"pass","Package":"voltsight/internal/geo","Test":"TestInvalid","Elapsed":0}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"run","Package":"voltsight/internal/geo","Test":"TestHaversine"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestHaversine","Output":"=== RUN   TestHaversine\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Test":"TestHaversine","Output":"--- PASS: TestHaversine (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"pass","Package":"voltsight/internal/geo","Test":"TestHaversine","Elapsed":0}
+{"Time":"2026-10-01T16:46:06.2558655+05:30","Action":"output","Package":"voltsight/internal/geo","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:06.270765+05:30","Action":"output","Package":"voltsight/internal/geo","Output":"coverage: 7.6% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:06.2822725+05:30","Action":"output","Package":"voltsight/internal/geo","Output":"ok  \tvoltsight/internal/geo\t0.459s\tcoverage: 7.6% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:06.2828062+05:30","Action":"pass","Package":"voltsight/internal/geo","Elapsed":0.468}
+{"Time":"2026-10-01T16:46:07.2709406+05:30","Action":"start","Package":"voltsight/internal/jwtverify"}
+{"Time":"2026-10-01T16:46:08.1568179+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestValidToken"}
+{"Time":"2026-10-01T16:46:08.1568179+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestValidToken","Output":"=== RUN   TestValidToken\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.2206414+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestValidToken","Output":"--- PASS: TestValidToken (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.2213723+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestValidToken","Elapsed":0.06}
+{"Time":"2026-10-01T16:46:08.2213723+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestRejectedTokens"}
+{"Time":"2026-10-01T16:46:08.2213723+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestRejectedTokens","Output":"=== RUN   TestRejectedTokens\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.3049135+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestRejectedTokens","Output":"--- PASS: TestRejectedTokens (0.08s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.3050833+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestRejectedTokens","Elapsed":0.08}
+{"Time":"2026-10-01T16:46:08.3050833+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestTenantClaimRequired"}
+{"Time":"2026-10-01T16:46:08.3050833+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestTenantClaimRequired","Output":"=== RUN   TestTenantClaimRequired\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.3552679+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestTenantClaimRequired","Output":"--- PASS: TestTenantClaimRequired (0.05s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.3552679+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestTenantClaimRequired","Elapsed":0.05}
+{"Time":"2026-10-01T16:46:08.3552679+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestECKeysAndKeyRotationRefetch"}
+{"Time":"2026-10-01T16:46:08.3552679+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestECKeysAndKeyRotationRefetch","Output":"=== RUN   TestECKeysAndKeyRotationRefetch\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.4497489+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestECKeysAndKeyRotationRefetch","Output":"--- PASS: TestECKeysAndKeyRotationRefetch (0.09s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.4503433+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestECKeysAndKeyRotationRefetch","Elapsed":0.09}
+{"Time":"2026-10-01T16:46:08.4503433+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestOffCurveECKeyIsRejected"}
+{"Time":"2026-10-01T16:46:08.4503433+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestOffCurveECKeyIsRejected","Output":"=== RUN   TestOffCurveECKeyIsRejected\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.4907113+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestOffCurveECKeyIsRejected","Output":"--- PASS: TestOffCurveECKeyIsRejected (0.04s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.4914138+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestOffCurveECKeyIsRejected","Elapsed":0.04}
+{"Time":"2026-10-01T16:46:08.4914138+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestRotationPicksUpNewKey"}
+{"Time":"2026-10-01T16:46:08.4914138+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestRotationPicksUpNewKey","Output":"=== RUN   TestRotationPicksUpNewKey\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.5478255+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestRotationPicksUpNewKey","Output":"--- PASS: TestRotationPicksUpNewKey (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.5479218+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestRotationPicksUpNewKey","Elapsed":0.06}
+{"Time":"2026-10-01T16:46:08.5479218+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestJWKSUnavailableFailsClosed"}
+{"Time":"2026-10-01T16:46:08.5479218+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestJWKSUnavailableFailsClosed","Output":"=== RUN   TestJWKSUnavailableFailsClosed\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.6034265+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestJWKSUnavailableFailsClosed","Output":"--- PASS: TestJWKSUnavailableFailsClosed (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.6034265+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestJWKSUnavailableFailsClosed","Elapsed":0.06}
+{"Time":"2026-10-01T16:46:08.6038871+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestJWKSNon200AndGarbage"}
+{"Time":"2026-10-01T16:46:08.6038871+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestJWKSNon200AndGarbage","Output":"=== RUN   TestJWKSNon200AndGarbage\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.6038871+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestJWKSNon200AndGarbage","Output":"--- PASS: TestJWKSNon200AndGarbage (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:08.6038871+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestJWKSNon200AndGarbage","Elapsed":0}
+{"Time":"2026-10-01T16:46:08.6038871+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestKC_DemoUsersGetCorrectlyScopedTokens"}
+{"Time":"2026-10-01T16:46:08.6038871+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_DemoUsersGetCorrectlyScopedTokens","Output":"=== RUN   TestKC_DemoUsersGetCorrectlyScopedTokens\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.0629593+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_DemoUsersGetCorrectlyScopedTokens","Output":"--- PASS: TestKC_DemoUsersGetCorrectlyScopedTokens (0.46s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.0629593+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestKC_DemoUsersGetCorrectlyScopedTokens","Elapsed":0.46}
+{"Time":"2026-10-01T16:46:09.0629593+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestKC_BadCredentialsAndClientsAreRejected"}
+{"Time":"2026-10-01T16:46:09.0629593+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_BadCredentialsAndClientsAreRejected","Output":"=== RUN   TestKC_BadCredentialsAndClientsAreRejected\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.119127+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_BadCredentialsAndClientsAreRejected","Output":"--- PASS: TestKC_BadCredentialsAndClientsAreRejected (0.06s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.119127+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestKC_BadCredentialsAndClientsAreRejected","Elapsed":0.06}
+{"Time":"2026-10-01T16:46:09.119127+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestKC_WebClientRequiresPKCE"}
+{"Time":"2026-10-01T16:46:09.119127+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_WebClientRequiresPKCE","Output":"=== RUN   TestKC_WebClientRequiresPKCE\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.1513154+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_WebClientRequiresPKCE","Output":"--- PASS: TestKC_WebClientRequiresPKCE (0.03s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.1513154+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestKC_WebClientRequiresPKCE","Elapsed":0.03}
+{"Time":"2026-10-01T16:46:09.1513154+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestKC_UserCannotForgeTenantClaim"}
+{"Time":"2026-10-01T16:46:09.1513154+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_UserCannotForgeTenantClaim","Output":"=== RUN   TestKC_UserCannotForgeTenantClaim\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.2037278+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_UserCannotForgeTenantClaim","Output":"    keycloak_stack_test.go:218: attack: POST /account with a forged tenant_id -\u003e HTTP 204 \n"}
+{"Time":"2026-10-01T16:46:09.2466993+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_UserCannotForgeTenantClaim","Output":"--- PASS: TestKC_UserCannotForgeTenantClaim (0.10s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.2466993+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestKC_UserCannotForgeTenantClaim","Elapsed":0.1}
+{"Time":"2026-10-01T16:46:09.2466993+05:30","Action":"run","Package":"voltsight/internal/jwtverify","Test":"TestKC_RealmHardeningSettings"}
+{"Time":"2026-10-01T16:46:09.2466993+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_RealmHardeningSettings","Output":"=== RUN   TestKC_RealmHardeningSettings\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.2973562+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Test":"TestKC_RealmHardeningSettings","Output":"--- PASS: TestKC_RealmHardeningSettings (0.05s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.2973562+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Test":"TestKC_RealmHardeningSettings","Elapsed":0.05}
+{"Time":"2026-10-01T16:46:09.2973562+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:09.3081914+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Output":"coverage: 32.4% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:09.3240619+05:30","Action":"output","Package":"voltsight/internal/jwtverify","Output":"ok  \tvoltsight/internal/jwtverify\t2.044s\tcoverage: 32.4% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:09.3245996+05:30","Action":"pass","Package":"voltsight/internal/jwtverify","Elapsed":2.054}
+{"Time":"2026-10-01T16:46:10.3233176+05:30","Action":"start","Package":"voltsight/internal/pki"}
+{"Time":"2026-10-01T16:46:11.1578125+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestParseIdentity"}
+{"Time":"2026-10-01T16:46:11.1578125+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestParseIdentity","Output":"=== RUN   TestParseIdentity\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1600747+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestParseIdentity","Output":"--- PASS: TestParseIdentity (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1600747+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestParseIdentity","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1600747+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestVerify"}
+{"Time":"2026-10-01T16:46:11.1600747+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify","Output":"=== RUN   TestVerify\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1606095+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestVerify/wrong_CA"}
+{"Time":"2026-10-01T16:46:11.1606095+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/wrong_CA","Output":"=== RUN   TestVerify/wrong_CA\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1606095+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/wrong_CA","Output":"--- PASS: TestVerify/wrong_CA (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1606095+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestVerify/wrong_CA","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1606095+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestVerify/expired"}
+{"Time":"2026-10-01T16:46:11.1606095+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/expired","Output":"=== RUN   TestVerify/expired\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/expired","Output":"--- PASS: TestVerify/expired (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestVerify/expired","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestVerify/not_yet_valid"}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/not_yet_valid","Output":"=== RUN   TestVerify/not_yet_valid\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/not_yet_valid","Output":"--- PASS: TestVerify/not_yet_valid (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestVerify/not_yet_valid","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestVerify/server-auth_only"}
+{"Time":"2026-10-01T16:46:11.1616619+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/server-auth_only","Output":"=== RUN   TestVerify/server-auth_only\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/server-auth_only","Output":"--- PASS: TestVerify/server-auth_only (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestVerify/server-auth_only","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestVerify/no_identity"}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/no_identity","Output":"=== RUN   TestVerify/no_identity\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/no_identity","Output":"--- PASS: TestVerify/no_identity (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestVerify/no_identity","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestVerify/revoked"}
+{"Time":"2026-10-01T16:46:11.1621828+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/revoked","Output":"=== RUN   TestVerify/revoked\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify/revoked","Output":"--- PASS: TestVerify/revoked (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestVerify/revoked","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestVerify","Output":"--- PASS: TestVerify (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestVerify","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestSerialFromHex"}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestSerialFromHex","Output":"=== RUN   TestSerialFromHex\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestSerialFromHex","Output":"--- PASS: TestSerialFromHex (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestSerialFromHex","Elapsed":0}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestStack_BootstrapIsIdempotent"}
+{"Time":"2026-10-01T16:46:11.1627048+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_BootstrapIsIdempotent","Output":"=== RUN   TestStack_BootstrapIsIdempotent\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1780555+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_BootstrapIsIdempotent","Output":"--- PASS: TestStack_BootstrapIsIdempotent (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1780555+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestStack_BootstrapIsIdempotent","Elapsed":0.02}
+{"Time":"2026-10-01T16:46:11.1780555+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestStack_IssueVerifyRevoke"}
+{"Time":"2026-10-01T16:46:11.1780555+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_IssueVerifyRevoke","Output":"=== RUN   TestStack_IssueVerifyRevoke\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1913768+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_IssueVerifyRevoke","Output":"--- PASS: TestStack_IssueVerifyRevoke (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:11.1913768+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestStack_IssueVerifyRevoke","Elapsed":0.01}
+{"Time":"2026-10-01T16:46:11.1913768+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestStack_ExpiredCertificateIsRejected"}
+{"Time":"2026-10-01T16:46:11.1913768+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_ExpiredCertificateIsRejected","Output":"=== RUN   TestStack_ExpiredCertificateIsRejected\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.0005264+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_ExpiredCertificateIsRejected","Output":"--- PASS: TestStack_ExpiredCertificateIsRejected (3.81s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.0005264+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestStack_ExpiredCertificateIsRejected","Elapsed":3.81}
+{"Time":"2026-10-01T16:46:15.0005264+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestStack_LifetimeIsCappedByRole"}
+{"Time":"2026-10-01T16:46:15.0005264+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_LifetimeIsCappedByRole","Output":"=== RUN   TestStack_LifetimeIsCappedByRole\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.0102288+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_LifetimeIsCappedByRole","Output":"--- PASS: TestStack_LifetimeIsCappedByRole (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.0102288+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestStack_LifetimeIsCappedByRole","Elapsed":0.01}
+{"Time":"2026-10-01T16:46:15.0102288+05:30","Action":"run","Package":"voltsight/internal/pki","Test":"TestStack_RejectsIdentitiesOutsideTheRole"}
+{"Time":"2026-10-01T16:46:15.0102288+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_RejectsIdentitiesOutsideTheRole","Output":"=== RUN   TestStack_RejectsIdentitiesOutsideTheRole\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.0192874+05:30","Action":"output","Package":"voltsight/internal/pki","Test":"TestStack_RejectsIdentitiesOutsideTheRole","Output":"--- PASS: TestStack_RejectsIdentitiesOutsideTheRole (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.0192874+05:30","Action":"pass","Package":"voltsight/internal/pki","Test":"TestStack_RejectsIdentitiesOutsideTheRole","Elapsed":0.01}
+{"Time":"2026-10-01T16:46:15.0192874+05:30","Action":"output","Package":"voltsight/internal/pki","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.0313045+05:30","Action":"output","Package":"voltsight/internal/pki","Output":"coverage: 12.0% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:15.0438973+05:30","Action":"output","Package":"voltsight/internal/pki","Output":"ok  \tvoltsight/internal/pki\t4.713s\tcoverage: 12.0% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:15.0438973+05:30","Action":"pass","Package":"voltsight/internal/pki","Elapsed":4.721}
+{"Time":"2026-10-01T16:46:15.5120493+05:30","Action":"start","Package":"voltsight/internal/realm"}
+{"Time":"2026-10-01T16:46:15.8838834+05:30","Action":"run","Package":"voltsight/internal/realm","Test":"TestCommittedRealmMatchesGenerator"}
+{"Time":"2026-10-01T16:46:15.8838834+05:30","Action":"output","Package":"voltsight/internal/realm","Test":"TestCommittedRealmMatchesGenerator","Output":"=== RUN   TestCommittedRealmMatchesGenerator\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.8859875+05:30","Action":"output","Package":"voltsight/internal/realm","Test":"TestCommittedRealmMatchesGenerator","Output":"--- PASS: TestCommittedRealmMatchesGenerator (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.8859875+05:30","Action":"pass","Package":"voltsight/internal/realm","Test":"TestCommittedRealmMatchesGenerator","Elapsed":0}
+{"Time":"2026-10-01T16:46:15.8859875+05:30","Action":"run","Package":"voltsight/internal/realm","Test":"TestRealmContainsNoSecretsAndIsSafelyConfigured"}
+{"Time":"2026-10-01T16:46:15.8859875+05:30","Action":"output","Package":"voltsight/internal/realm","Test":"TestRealmContainsNoSecretsAndIsSafelyConfigured","Output":"=== RUN   TestRealmContainsNoSecretsAndIsSafelyConfigured\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.8875526+05:30","Action":"output","Package":"voltsight/internal/realm","Test":"TestRealmContainsNoSecretsAndIsSafelyConfigured","Output":"--- PASS: TestRealmContainsNoSecretsAndIsSafelyConfigured (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.8875526+05:30","Action":"pass","Package":"voltsight/internal/realm","Test":"TestRealmContainsNoSecretsAndIsSafelyConfigured","Elapsed":0}
+{"Time":"2026-10-01T16:46:15.8875526+05:30","Action":"run","Package":"voltsight/internal/realm","Test":"TestUsersMatchSeedIdentities"}
+{"Time":"2026-10-01T16:46:15.8875526+05:30","Action":"output","Package":"voltsight/internal/realm","Test":"TestUsersMatchSeedIdentities","Output":"=== RUN   TestUsersMatchSeedIdentities\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.8891293+05:30","Action":"output","Package":"voltsight/internal/realm","Test":"TestUsersMatchSeedIdentities","Output":"--- PASS: TestUsersMatchSeedIdentities (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.8891293+05:30","Action":"pass","Package":"voltsight/internal/realm","Test":"TestUsersMatchSeedIdentities","Elapsed":0}
+{"Time":"2026-10-01T16:46:15.8891293+05:30","Action":"output","Package":"voltsight/internal/realm","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:15.9014082+05:30","Action":"output","Package":"voltsight/internal/realm","Output":"coverage: 24.2% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:15.9106543+05:30","Action":"output","Package":"voltsight/internal/realm","Output":"ok  \tvoltsight/internal/realm\t0.392s\tcoverage: 24.2% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:15.9106543+05:30","Action":"pass","Package":"voltsight/internal/realm","Elapsed":0.399}
+{"Time":"2026-10-01T16:46:16.3594529+05:30","Action":"start","Package":"voltsight/internal/seedgen"}
+{"Time":"2026-10-01T16:46:16.741765+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestExactVehicleCountAndSplit"}
+{"Time":"2026-10-01T16:46:16.741765+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestExactVehicleCountAndSplit","Output":"=== RUN   TestExactVehicleCountAndSplit\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.8560726+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestExactVehicleCountAndSplit","Output":"--- PASS: TestExactVehicleCountAndSplit (0.11s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.8560726+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestExactVehicleCountAndSplit","Elapsed":0.11}
+{"Time":"2026-10-01T16:46:16.8560726+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestDeterminism"}
+{"Time":"2026-10-01T16:46:16.8560726+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestDeterminism","Output":"=== RUN   TestDeterminism\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.9008247+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestDeterminism","Output":"--- PASS: TestDeterminism (0.04s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.9008247+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestDeterminism","Elapsed":0.04}
+{"Time":"2026-10-01T16:46:16.9008247+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestVINsValidAndUnique"}
+{"Time":"2026-10-01T16:46:16.9008247+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestVINsValidAndUnique","Output":"=== RUN   TestVINsValidAndUnique\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.924833+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestVINsValidAndUnique","Output":"--- PASS: TestVINsValidAndUnique (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.9257883+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestVINsValidAndUnique","Elapsed":0.02}
+{"Time":"2026-10-01T16:46:16.9257883+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestReferentialAndTenantConsistency"}
+{"Time":"2026-10-01T16:46:16.9257883+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestReferentialAndTenantConsistency","Output":"=== RUN   TestReferentialAndTenantConsistency\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.947684+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestReferentialAndTenantConsistency","Output":"--- PASS: TestReferentialAndTenantConsistency (0.02s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:16.9480222+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestReferentialAndTenantConsistency","Elapsed":0.02}
+{"Time":"2026-10-01T16:46:16.9480222+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestIdentitiesUniqueAtFullSize"}
+{"Time":"2026-10-01T16:46:16.9480222+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestIdentitiesUniqueAtFullSize","Output":"=== RUN   TestIdentitiesUniqueAtFullSize\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.0860506+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestIdentitiesUniqueAtFullSize","Output":"--- PASS: TestIdentitiesUniqueAtFullSize (0.14s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.0864171+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestIdentitiesUniqueAtFullSize","Elapsed":0.14}
+{"Time":"2026-10-01T16:46:17.0864171+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestChargerInvariants"}
+{"Time":"2026-10-01T16:46:17.0864171+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestChargerInvariants","Output":"=== RUN   TestChargerInvariants\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.0895594+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestChargerInvariants","Output":"--- PASS: TestChargerInvariants (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.0901086+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestChargerInvariants","Elapsed":0}
+{"Time":"2026-10-01T16:46:17.0901086+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestEntitlementsAndUsers"}
+{"Time":"2026-10-01T16:46:17.0901086+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestEntitlementsAndUsers","Output":"=== RUN   TestEntitlementsAndUsers\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.0906477+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestEntitlementsAndUsers","Output":"--- PASS: TestEntitlementsAndUsers (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.0906477+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestEntitlementsAndUsers","Elapsed":0}
+{"Time":"2026-10-01T16:46:17.0906477+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestCommittedManifestMatchesGenerator"}
+{"Time":"2026-10-01T16:46:17.0906477+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestCommittedManifestMatchesGenerator","Output":"=== RUN   TestCommittedManifestMatchesGenerator\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.4131011+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestCommittedManifestMatchesGenerator","Output":"--- PASS: TestCommittedManifestMatchesGenerator (0.32s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.4136506+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestCommittedManifestMatchesGenerator","Elapsed":0.32}
+{"Time":"2026-10-01T16:46:17.4136506+05:30","Action":"run","Package":"voltsight/internal/seedgen","Test":"TestDigestIsOrderIndependent"}
+{"Time":"2026-10-01T16:46:17.4136506+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestDigestIsOrderIndependent","Output":"=== RUN   TestDigestIsOrderIndependent\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.4136506+05:30","Action":"output","Package":"voltsight/internal/seedgen","Test":"TestDigestIsOrderIndependent","Output":"--- PASS: TestDigestIsOrderIndependent (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.4136506+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Test":"TestDigestIsOrderIndependent","Elapsed":0}
+{"Time":"2026-10-01T16:46:17.4136506+05:30","Action":"output","Package":"voltsight/internal/seedgen","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:17.4275092+05:30","Action":"output","Package":"voltsight/internal/seedgen","Output":"coverage: 26.1% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:17.4480599+05:30","Action":"output","Package":"voltsight/internal/seedgen","Output":"ok  \tvoltsight/internal/seedgen\t1.080s\tcoverage: 26.1% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:17.4480599+05:30","Action":"pass","Package":"voltsight/internal/seedgen","Elapsed":1.089}
+{"Time":"2026-10-01T16:46:17.8899426+05:30","Action":"start","Package":"voltsight/internal/vin"}
+{"Time":"2026-10-01T16:46:18.2669184+05:30","Action":"run","Package":"voltsight/internal/vin","Test":"TestKnownVINs"}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestKnownVINs","Output":"=== RUN   TestKnownVINs\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestKnownVINs","Output":"--- PASS: TestKnownVINs (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"pass","Package":"voltsight/internal/vin","Test":"TestKnownVINs","Elapsed":0}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"run","Package":"voltsight/internal/vin","Test":"TestRejects"}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestRejects","Output":"=== RUN   TestRejects\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestRejects","Output":"--- PASS: TestRejects (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"pass","Package":"voltsight/internal/vin","Test":"TestRejects","Elapsed":0}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"run","Package":"voltsight/internal/vin","Test":"TestBuildProducesValidAndIsIdempotent"}
+{"Time":"2026-10-01T16:46:18.2674474+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestBuildProducesValidAndIsIdempotent","Output":"=== RUN   TestBuildProducesValidAndIsIdempotent\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestBuildProducesValidAndIsIdempotent","Output":"--- PASS: TestBuildProducesValidAndIsIdempotent (0.01s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"pass","Package":"voltsight/internal/vin","Test":"TestBuildProducesValidAndIsIdempotent","Elapsed":0.01}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"run","Package":"voltsight/internal/vin","Test":"TestSingleCharacterErrorsDetected"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestSingleCharacterErrorsDetected","Output":"=== RUN   TestSingleCharacterErrorsDetected\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestSingleCharacterErrorsDetected","Output":"--- PASS: TestSingleCharacterErrorsDetected (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"pass","Package":"voltsight/internal/vin","Test":"TestSingleCharacterErrorsDetected","Elapsed":0}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"run","Package":"voltsight/internal/vin","Test":"TestBuildErrors"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestBuildErrors","Output":"=== RUN   TestBuildErrors\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"output","Package":"voltsight/internal/vin","Test":"TestBuildErrors","Output":"--- PASS: TestBuildErrors (0.00s)\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"pass","Package":"voltsight/internal/vin","Test":"TestBuildErrors","Elapsed":0}
+{"Time":"2026-10-01T16:46:18.2797232+05:30","Action":"output","Package":"voltsight/internal/vin","Output":"PASS\n","OutputType":"frame"}
+{"Time":"2026-10-01T16:46:18.2924296+05:30","Action":"output","Package":"voltsight/internal/vin","Output":"coverage: 4.0% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:18.3055981+05:30","Action":"output","Package":"voltsight/internal/vin","Output":"ok  \tvoltsight/internal/vin\t0.407s\tcoverage: 4.0% of statements in ./internal/..., ./db/...\n"}
+{"Time":"2026-10-01T16:46:18.3061073+05:30","Action":"pass","Package":"voltsight/internal/vin","Elapsed":0.416}

@@ -1,0 +1,23 @@
+{
+  "base": "http://localhost:8080",
+  "at": "2026-10-02T00:59:21.271Z",
+  "notes": [
+    {
+      "k": "dashboard_cards",
+      "v": [
+        "Vehicles 40000 800 reporting live",
+        "Moving / charging 549 / 200",
+        "Average SoC 57.9% 236 below 20%",
+        "Critical alerts 23 47 warnings",
+        "Chargers 1594 951 out of service (network)"
+      ]
+    },
+    {
+      "k": "map_sources",
+      "v": {
+        "vehicles": 800,
+        "chargers": 1594
+      }
+    }
+  ]
+}

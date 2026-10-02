@@ -1,0 +1,48 @@
+{{- if .Values.ingress.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vs-api
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.3"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "1m"
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls: [{ hosts: [{{ .Values.ingress.host | quote }}], secretName: {{ .Values.ingress.tlsSecret }} }]
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths: [{ path: /, pathType: Prefix, backend: { service: { name: vs-api, port: { name: main } } } }]
+{{- end }}
+{{- if .Values.networkPolicy.enabled }}
+---
+# default deny; each service may talk to the data tier and DNS, only the API and the gateway accept outside traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: vs-default-deny-ingress }
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/instance: {{ .Release.Name }} } }
+  policyTypes: [Ingress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: vs-allow-edge }
+spec:
+  podSelector:
+    matchExpressions:
+      - { key: app.kubernetes.io/component, operator: In, values: [api, gateway] }
+  policyTypes: [Ingress]
+  ingress: [{}]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: vs-allow-metrics }
+spec:
+  podSelector: { matchLabels: { app.kubernetes.io/instance: {{ .Release.Name }} } }
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{ namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } } }]
+      ports: [{ port: 9100 }, { port: 9102 }]
+{{- end }}

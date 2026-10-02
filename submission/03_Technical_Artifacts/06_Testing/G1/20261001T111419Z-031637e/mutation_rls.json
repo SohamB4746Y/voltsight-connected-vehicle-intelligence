@@ -1,0 +1,13 @@
+{
+  "mutation": "tenant_isolation policy replaced by USING (true) WITH CHECK (true)",
+  "suite_failed_as_required": true,
+  "leak_reports": 21,
+  "sample": [
+    "rls_test.go:29: LEAK: tenant A sees 1 of tenant B's rows in agent_action",
+    "rls_test.go:29: LEAK: tenant A sees 1 of tenant B's rows in agent_session",
+    "rls_test.go:29: LEAK: tenant A sees 1 of tenant B's rows in alert",
+    "rls_test.go:29: LEAK: tenant A sees 1 of tenant B's rows in alert_event",
+    "rls_test.go:29: LEAK: tenant A sees 1 of tenant B's rows in app_user"
+  ],
+  "migration_restored_byte_identical": true
+}

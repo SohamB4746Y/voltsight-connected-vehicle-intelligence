@@ -1,0 +1,18 @@
+{
+  "scenario": "kafka-restart",
+  "live_distinct_rows": 7500000,
+  "clean_replay_distinct_rows": 7500000,
+  "kafka_records": 7500469,
+  "lost_vs_clean_replay": 0,
+  "sim_events_emitted": 7500000,
+  "gateway_accepted": 7500000,
+  "sim_failed": 0,
+  "sim_retried_429": 0,
+  "sim_retried_503": 48,
+  "events_log": [
+    "fault at 14:46:58: kafka-restart",
+    "fault injected, recovery started 14:46:59",
+    "recovered_to_lag_lt_20k_seconds_after_fault: 97"
+  ],
+  "no_loss": true
+}

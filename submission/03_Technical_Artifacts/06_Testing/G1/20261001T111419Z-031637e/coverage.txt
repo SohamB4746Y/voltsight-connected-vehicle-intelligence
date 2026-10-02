@@ -1,0 +1,11 @@
+{
+  "vin": 100.0,
+  "seedgen": 98.8,
+  "pki": 82.0,
+  "jwtverify": 93.2,
+  "realm": 92.3,
+  "geo": 100.0,
+  "dotenv": 94.4,
+  "dbtool": 81.8,
+  "erdiagram": 89.2
+}

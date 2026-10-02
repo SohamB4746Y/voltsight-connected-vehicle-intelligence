@@ -1,0 +1,41 @@
+{
+  "duration_s": 116.2,
+  "tests_passed": 89,
+  "tests_failed": [],
+  "tests_skipped": [],
+  "packages": {
+    "voltsight/cmd/vsdb": "skip",
+    "voltsight/cmd/vser": "skip",
+    "voltsight/cmd/vspki": "skip",
+    "voltsight/cmd/vsrealm": "skip",
+    "voltsight/db": "skip",
+    "voltsight/db/dbtests": "pass",
+    "voltsight/gen/voltsight/alert/v1": "skip",
+    "voltsight/gen/voltsight/charger/v1": "skip",
+    "voltsight/gen/voltsight/dlq/v1": "skip",
+    "voltsight/gen/voltsight/telemetry/v1": "skip",
+    "voltsight/internal/contract": "pass",
+    "voltsight/internal/dbtool": "pass",
+    "voltsight/internal/dotenv": "pass",
+    "voltsight/internal/erdiagram": "pass",
+    "voltsight/internal/geo": "pass",
+    "voltsight/internal/jwtverify": "pass",
+    "voltsight/internal/pki": "pass",
+    "voltsight/internal/realm": "pass",
+    "voltsight/internal/seedgen": "pass",
+    "voltsight/internal/vin": "pass"
+  },
+  "exit_code": 0,
+  "coverage_pct": {
+    "vin": 100.0,
+    "seedgen": 98.8,
+    "pki": 82.0,
+    "jwtverify": 93.2,
+    "realm": 92.3,
+    "geo": 100.0,
+    "dotenv": 94.4,
+    "dbtool": 81.8,
+    "erdiagram": 89.2
+  },
+  "coverage_min_required": 80.0
+}

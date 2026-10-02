@@ -1,0 +1,24 @@
+verified at 2026-10-01T19:16:51Z against sha256:73ca5541cd31eff686ca7876865769bcc77ce6bfb791ee474361c3a81d65eeef
+SERVICE          STATUS
+alerts           Up 11 minutes
+api              Up 11 minutes
+caddy            Up 11 minutes
+clickhouse       Up 16 minutes (healthy)
+gateway          Up 11 minutes
+grafana          Up 16 minutes (healthy)
+kafka            Up 16 minutes (healthy)
+keycloak         Up 16 minutes (healthy)
+otel-collector   Up 16 minutes
+postgres         Up 16 minutes (healthy)
+prometheus       Up 16 minutes (healthy)
+redis            Up 16 minutes (healthy)
+simulator        Up 11 minutes
+sink             Up 11 minutes
+vault            Up 16 minutes (healthy)
+worker           Up 11 minutes
+
+readyz: {"clickhouse":"ok","postgres":"ok","redis":"ok"}
+healthz: {"status":"ok"}
+gateway admin /readyz (from inside the network): HTTP 200
+worker admin /healthz (from inside the network): HTTP 200
+prometheus scrape targets: gateway=up, keycloak=up, otel-app-metrics=up, otel-collector-self=up, prometheus=up, worker=up

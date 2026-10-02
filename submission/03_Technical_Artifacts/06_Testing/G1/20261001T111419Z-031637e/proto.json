@@ -1,0 +1,16 @@
+{
+  "lint": true,
+  "format_clean": true,
+  "generate_ok": true,
+  "generated_code_up_to_date": true,
+  "baseline_ref": "HEAD",
+  "breaking_vs_baseline": true,
+  "negative_test": {
+    "breaking_change_detected": true,
+    "findings": [
+      "C:\\Users\\Dell\\AppData\\Local\\Temp\\tmp76_rc5o7\\mutated\\voltsight\\telemetry\\v1\\telemetry.proto:35:1:Previously present field \"6\" with name \"soc_pct\" on message \"TelemetryEvent\" was deleted.",
+      "C:\\Users\\Dell\\AppData\\Local\\Temp\\tmp76_rc5o7\\mutated\\voltsight\\telemetry\\v1\\telemetry.proto:45:3:Field \"10\" with name \"seq\" on message \"TelemetryEvent\" changed type from \"uint64\" to \"string\"."
+    ],
+    "additive_change_allowed": true
+  }
+}
