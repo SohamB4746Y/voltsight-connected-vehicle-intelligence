@@ -1,0 +1,125 @@
+{
+  "base": "http://localhost:8080",
+  "at": "2026-10-01T23:49:41.379Z",
+  "access_token_lifetime_s": 90,
+  "hold_s": 20,
+  "results": [
+    {
+      "id": "M0",
+      "what": "map data loaded in the browser (vehicle and charger sources non-empty)",
+      "pass": true,
+      "detail": {
+        "vehicles": 800,
+        "chargers": 1594
+      }
+    },
+    {
+      "id": "M1",
+      "what": "no Content-Security-Policy violation in the console",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "M2",
+      "what": "basemap tiles and style fetched from OpenFreeMap",
+      "pass": false,
+      "detail": {
+        "ok": 0,
+        "failed": 0
+      }
+    },
+    {
+      "id": "M3",
+      "what": "attribution visible: OpenStreetMap contributors and OpenFreeMap",
+      "pass": false,
+      "detail": "© OpenStreetMap contributors"
+    },
+    {
+      "id": "M4",
+      "what": "charger statuses are only backend-supported values",
+      "pass": true,
+      "detail": [
+        "OUT_OF_SERVICE",
+        "AVAILABLE"
+      ]
+    },
+    {
+      "id": "M5",
+      "what": "marker coordinates equal the backend's vehicle state (sample via /v1/vehicles/{vin})",
+      "pass": true,
+      "detail": {
+        "matched": 6,
+        "of": 6
+      }
+    },
+    {
+      "id": "M6",
+      "what": "risk state comes from the backend (some vehicles have an open alert)",
+      "pass": true,
+      "detail": {
+        "risky_vehicles": 13,
+        "of": 800
+      }
+    },
+    {
+      "id": "M7",
+      "what": "city filter flies to the city",
+      "pass": true,
+      "detail": {
+        "lng": 80.27070000000003,
+        "lat": 13.082700000000017,
+        "z": 10.5
+      }
+    },
+    {
+      "id": "T1",
+      "what": "the original access token expired during the hold and the user stayed signed in",
+      "pass": false,
+      "detail": {
+        "token_lifetime_s": 90,
+        "held_s": 21
+      }
+    },
+    {
+      "id": "T2",
+      "what": "the token was renewed with a refresh-token grant",
+      "pass": false,
+      "detail": {
+        "refresh_grants": 0
+      }
+    },
+    {
+      "id": "T3",
+      "what": "no 'invalid token' banner and no 401 from the API",
+      "pass": true,
+      "detail": {
+        "banner": "",
+        "status401": []
+      }
+    },
+    {
+      "id": "T4",
+      "what": "dashboard metrics kept updating",
+      "pass": true,
+      "detail": {
+        "before": "40000 | 503 / 200 | 58.1% | 6 | 1594",
+        "after": "40000 | 500 / 200 | 58.1% | 6 | 1594"
+      }
+    },
+    {
+      "id": "T5",
+      "what": "live connection indicator is LIVE",
+      "pass": true,
+      "detail": "LIVE ●"
+    },
+    {
+      "id": "P1",
+      "what": "page reload keeps the session",
+      "pass": true
+    }
+  ],
+  "other_console_errors": [
+    "Error: Worker failed to load. Check that the worker URL is correct.\n    at Worker.<anonymous> (http://localhost:8080/assets/index-3M0L32mL.js:50:37358)",
+    "Error: Worker failed to load. Check that the worker URL is correct.\n    at Worker.<anonymous> (http://localhost:8080/assets/index-3M0L32mL.js:50:37358)"
+  ]
+}

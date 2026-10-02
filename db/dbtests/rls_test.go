@@ -300,7 +300,7 @@ func TestKnownLimitation_TenantGUCIsCallerControlled(t *testing.T) {
 			t.Fatal(err)
 		}
 		if n == 0 {
-			t.Fatal("expected the documented limitation to hold (caller-controlled GUC); if the DB now prevents it, update docs/threat-model.md")
+			t.Fatal("expected the documented limitation to hold (caller-controlled GUC); if the DB now prevents it, update docs/security/STRIDE.md")
 		}
 		t.Logf("LIMITATION (documented): a session that sets app.tenant_id itself sees that tenant's rows (%d); mitigated at the API layer", n)
 	})

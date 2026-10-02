@@ -86,7 +86,9 @@ jobs:
       - name: Build every binary
         run: go build ./...
       - name: Unit tests (no external services; simulator-based analytics tests included)
-        run: go test -count=1 ./internal/...
+        run: go test -count=1 ./internal/... ./cmd/... ./tools/reqtrace/...
+      - name: Requirement traceability gate (a PASS needs implementation, verification and existing evidence)
+        run: go run ./tools/reqtrace docs/compliance/FINAL_REQUIREMENT_MATRIX.md
       - name: govulncheck
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
@@ -98,6 +100,7 @@ jobs:
         working-directory: web
         run: |
           npm ci --no-audit --no-fund
+          npm test
           npm run build
           npm audit --omit=dev
       - uses: azure/setup-helm@v4

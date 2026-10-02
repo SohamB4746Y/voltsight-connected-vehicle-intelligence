@@ -18,7 +18,7 @@ Every algorithm below is used in the product (not decoration). "MEASURED" number
 | **Union-Find on geohash cells** | clusters of stops at unapproved locations | O(n·α(n)) | planted-cluster test; run over live data not evaluated |
 | **Charge-session capacity estimate** (∫\|V·I\| dt / ΔSoC, median) | battery state of health | O(n) | MEASURED (simulator truth): MAPE 0.51%, p90 1.16% on 358 vehicles — *optimistic*: the assumed 0.93 charge efficiency equals the simulator's hidden constant |
 | **VIN check digit / DTC parser** | normalisation | O(1) | exhaustive DTC round trip; VIN property tests |
-| **Keyset pagination** | API lists | O(log n) seek | `TestKeysetPagination`; 0.28 ms vs 1,306 ms for OFFSET (`docs/sql-optimisation.md`) |
+| **Keyset pagination** | API lists | O(log n) seek | `TestKeysetPagination`; 0.28 ms vs 1,306 ms for OFFSET (`docs/database/SQL_OPTIMIZATION.md`) |
 | **Feature-hashing embedder** + HNSW cosine | similar-incident search | O(len) embed; HNSW ~O(log n) | recall@5 0.958 on a labelled paraphrase set (lexical; limitation) |
 | **Gradient-boosted trees** (scikit-learn HistGB) | trip consumption | — | MAPE 7.17% vs 11.52% best baseline (vehicle-level hold-out), paired-bootstrap CI excludes 0 (`evidence/G8`) |
 

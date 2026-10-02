@@ -18,6 +18,10 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	telemetryv1 "voltsight/gen/voltsight/telemetry/v1"
 
 	"voltsight/internal/dbtool"
 	"voltsight/internal/dotenv"
@@ -401,5 +405,105 @@ func TestLocationMaskingByRole(t *testing.T) {
 	}
 	if d["lat"].(float64) != 13.123456 || d["route"] == nil {
 		t.Errorf("dispatcher lost precision: %v", d)
+	}
+}
+
+// The map endpoints are tenant-bound: a dispatcher never receives another tenant's vehicle positions or depot
+// chargers, whatever city filter is used, and roles without geo.precise get masked coordinates.
+func TestMapEndpointsAreTenantBoundAndShaped(t *testing.T) {
+	h := newHarness(t)
+	ctx := context.Background()
+	dsn, _ := dbtool.OwnerDSN(h.env)
+	owner, err := pgxpool.New(ctx, dsn)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer owner.Close()
+	first := func(tenantName string) (tenant, vin string) {
+		if err := owner.QueryRow(ctx, `SELECT v.tenant_id::text, v.vin FROM vehicle v JOIN tenant t ON t.id = v.tenant_id WHERE t.name = $1 ORDER BY v.vin LIMIT 1`, tenantName).Scan(&tenant, &vin); err != nil {
+			t.Skipf("seed missing for %s: %v", tenantName, err)
+		}
+		return
+	}
+	ta, va := first("Meridian Logistics")
+	tb, vb := first("Coastal Rentals")
+	rdb := h.srv.cfg.Redis
+	put := func(tenant, vin string, lat, lon float64) {
+		b, _ := proto.Marshal(&telemetryv1.TelemetryEvent{Vin: vin, TenantId: tenant, Lat: lat, Lon: lon, SocPct: 55, SpeedKmh: 40, Ts: timestamppb.Now()})
+		key := "t:" + tenant + ":v:" + vin
+		if err := rdb.HSet(ctx, key, "ev", b).Err(); err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { rdb.Del(ctx, key) })
+	}
+	put(ta, va, 13.123456, 80.271234) // Meridian vehicle in Chennai
+	put(tb, vb, 21.171234, 72.831234) // Coastal vehicle in Surat
+
+	list := func(user, query string) []mapVehicle {
+		code, body := h.do("GET", "/v1/map/vehicles"+query, h.token(user), "")
+		if code != 200 {
+			t.Fatalf("%s %s: HTTP %d %s", user, query, code, body)
+		}
+		var r struct {
+			Vehicles []mapVehicle `json:"vehicles"`
+		}
+		if err := json.Unmarshal(body, &r); err != nil {
+			t.Fatal(err)
+		}
+		return r.Vehicles
+	}
+	find := func(vs []mapVehicle, vin string) *mapVehicle {
+		for i := range vs {
+			if vs[i].VIN == vin {
+				return &vs[i]
+			}
+		}
+		return nil
+	}
+	if find(list("dispatcher@meridian.example", ""), va) == nil || find(list("dispatcher@meridian.example", ""), vb) != nil {
+		t.Fatal("a meridian dispatcher must see the meridian vehicle and never the coastal one")
+	}
+	if find(list("dispatcher@coastal.example", ""), vb) == nil || find(list("dispatcher@coastal.example", ""), va) != nil {
+		t.Fatal("a coastal dispatcher must see the coastal vehicle and never the meridian one")
+	}
+	if find(list("dispatcher@meridian.example", "?city=Surat"), va) != nil || find(list("dispatcher@meridian.example", "?city=Surat"), vb) != nil {
+		t.Fatal("the city filter must filter, and must not widen the tenant scope")
+	}
+	d := find(list("dispatcher@meridian.example", "?city=Chennai"), va)
+	if d == nil || d.City != "Chennai" || d.Lat != 13.123456 || d.Risk == "" {
+		t.Fatalf("dispatcher view wrong: %+v", d)
+	}
+	if v := find(list("viewer@meridian.example", ""), va); v == nil || v.Lat != 13.12 || v.Lon != 80.27 {
+		t.Fatalf("a role without geo.precise must receive masked coordinates: %+v", v)
+	}
+
+	// chargers: the other tenant's depot chargers must not appear
+	var foreign []string
+	rs, err := owner.Query(ctx, `SELECT id::text FROM charger WHERE tenant_id = $1`, tb)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for rs.Next() {
+		var id string
+		_ = rs.Scan(&id)
+		foreign = append(foreign, id)
+	}
+	rs.Close()
+	code, body := h.do("GET", "/v1/map/chargers", h.token("dispatcher@meridian.example"), "")
+	if code != 200 {
+		t.Fatalf("chargers: HTTP %d", code)
+	}
+	for _, id := range foreign {
+		if strings.Contains(string(body), id) {
+			t.Fatalf("meridian received a coastal depot charger %s", id)
+		}
+	}
+	var cr struct {
+		Count    int          `json:"count"`
+		Chargers []mapCharger `json:"chargers"`
+	}
+	_ = json.Unmarshal(body, &cr)
+	if cr.Count == 0 || cr.Chargers[0].Status == "" || cr.Chargers[0].City == "" {
+		t.Fatalf("chargers must carry status and city: %+v", cr.Count)
 	}
 }

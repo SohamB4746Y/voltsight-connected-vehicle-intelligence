@@ -39,3 +39,15 @@ table.grid tbody tr { cursor:pointer; } table.grid tbody tr:hover, tr.sel { back
 .msg { margin:10px 0; padding:10px 12px; border-radius:10px; max-width:80%; white-space:pre-wrap; }
 .msg.user { background:var(--blue); color:#fff; margin-left:auto; } .msg.assistant { background:var(--panel); border:1px solid var(--line); }
 .chat input { flex:1; }
+
+/* geographic map */
+.geomap { width:100%; height:480px; border-radius:10px; overflow:hidden; border:1px solid var(--line); }
+.geo-head { display:flex; gap:12px; align-items:center; margin:6px 0; }
+.conn { font-weight:700; font-size:12px; padding:2px 8px; border-radius:10px; }
+.conn.live { background:#dcfce7; color:#166534; } .conn.connecting, .conn.reconnecting { background:#fef3c7; color:#92400e; }
+.legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin:6px 0; color:var(--muted); }
+.legend i { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:5px; vertical-align:-1px; border:1.5px solid #0f172a; }
+.legend i.sq { border-radius:50%; } .legend i.ln { width:18px; height:4px; border-radius:2px; background:#2563eb; border:0; }
+.panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-top:10px; }
+.panel button { float:right; }
+table.kv { width:100%; border-collapse:collapse; margin:6px 0; font-size:13px; } table.kv td { padding:3px 6px; border-bottom:1px solid var(--line); } table.kv td:first-child { color:var(--muted); width:46%; }

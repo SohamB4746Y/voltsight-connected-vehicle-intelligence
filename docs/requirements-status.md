@@ -7,7 +7,7 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | SC1 | 100,000 vehicles | PASS | seeded + verified against `db/seed/manifest.json`; simulator runs all 100K in ~200 MB heap |
 | SC2/N1 | ~100K events/s sustained | **MEASURED, below target, short**: 6.0M events at **98.3K ev/s for 60 s** (box, everything on one 4-vCPU host, CPU oversubscribed) | `evidence/G4/live_fixed_faults_adversarial` — not a sustained/soak result |
 | SC3/N2 | 3× burst for 5 min, no loss | **PARTIAL**: 3× burst for **40 s** inside a 100 s run: 18.0M events, 0 lost/DLQ/failed, no 429s, books balanced (164K ev/s average); the 5-minute duration was not run | `evidence/G14/burst_3x` |
-| SC4 | ~1 KB event, TB/day analysis | PARTIAL | measured bytes/event in `docs/capacity.md`; the TB/day figure is an extrapolation |
+| SC4 | ~1 KB event, TB/day analysis | PARTIAL | measured bytes/event in `docs/performance/CAPACITY_ANALYSIS.md`; the TB/day figure is an extrapolation |
 | SC5 | single SQL DB vs right store, with a benchmark | PASS (benchmark) | 1M rows: PostgreSQL COPY 97K rows/s, 299 B/row with PK index vs ClickHouse 405K rows/s (4.2×); the 2.7 B/row ClickHouse figure is inflated by uniform synthetic rows — simulated telemetry measures 17.3 B/row (`evidence/G14/pg_vs_clickhouse.txt`) |
 | SC6 | ACID for ownership/billing/access/audit | PASS | G1 transaction + RLS tests |
 | N3 | ingest → dashboard < 2 s | NOT MEASURED | SSE path built; no latency probe was run |
@@ -15,7 +15,7 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | N5 | API p95 < 200 ms, p99 < 500 ms | PASS (ingest idle) | p95 26.8 ms, p99 41.0 ms, 829 req/s, 16 clients (`evidence/G9b/api_latency.json`); not measured under 100K ev/s ingest |
 | N6/N7 | horizontal scale, add brokers without code change | NOT MEASURED | stateless services + 64 partitions by design; no scale-out experiment |
 | N8/N9/N10 | no SPOF, 99.9%, recovery | N10 PARTIAL (`evidence/G13/status.md`: worker/sink kill, Redis/ClickHouse/Kafka restart recover with zero loss; gateway kill, PostgreSQL failover and Kubernetes pod kills not run); N8 LIMITATION (single broker/ClickHouse/Redis locally); N9 NOT MEASURED | |
-| N11–N14 | OIDC/JWT, RBAC, tenant isolation, device mTLS | PASS | API/G3/G1 test suites (`docs/threat-model.md`) |
+| N11–N14 | OIDC/JWT, RBAC, tenant isolation, device mTLS | PASS | API/G3/G1 test suites (`docs/security/STRIDE.md`) |
 | N15 | TLS 1.3 | PASS (local, openssl) | API `-tls` and gateway accept only 1.3 (`evidence/G12/tls_api.txt`, G3); no scanner run |
 | N16 | AES-256 at rest | LIMITATION | local volumes unencrypted; KMS/CMEK in Terraform (validated, not applied) |
 | N17 | secrets in a vault | PARTIAL | Vault issues device/server certificates; DB/Redis passwords are generated into a git-ignored `.env`, referenced by Kubernetes Secret in Helm |
@@ -29,13 +29,13 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | ID | Status | Notes |
 |---|---|---|
 | MB1–MB4, T1–T4, T6–T10 | PASS | simulator, real-time path, batch analytics, polyglot stores (PostgreSQL/pgvector, ClickHouse, Redis), secure API, console, ML vs baselines, vector search, audited Copilot |
-| MB5 | PASS (tests); DAST **not run** | |
+| MB5 | PASS (tests); DAST: ZAP baseline run (unauthenticated; 58 pass, 0 fail, 3 warning groups), see `evidence/security/zap/` | |
 | MB6 | PASS | Playwright journey through real Keycloak sign-in (`tests/e2e`, screenshots in `evidence/G11`); accessibility scan not run |
 | MB7/DL10 | PARTIAL | Dockerfile written; **image never built** here; hadolint not run |
 | MB9/T12/DL11/DL12 | PARTIAL | Helm lint + kubeconform 21/21; `terraform validate` AWS+GCP; **no kind install, no cloud apply** |
 | T5 | PARTIAL | batch over 22M rows measured (trips in 15 s); ClickHouse history queries on 29.2M synthetic rows 129–720 ms (`evidence/G14/ch_bench.json`); the "billion-row" benchmark was **not** run |
 | T11 | PARTIAL | Prometheus metrics on gateway/worker; no Loki/Tempo traces |
-| D1–D3, D8–D13 | PASS | `docs/3nf.md`, `docs/er`, `docs/sql-optimisation.md`, migration 4; D5 skew histogram not run |
+| D1–D3, D8–D13 | PASS | `docs/3nf.md`, `docs/er`, `docs/database/SQL_OPTIMIZATION.md`, migration 4; D5 skew histogram not run |
 | AL1–AL6, AL8–AL11 | PASS | `docs/algorithms.md` |
 | AL7 | PARTIAL | sequence window and EWMA are implemented; no general time-window aggregation operator |
 | SD1, SD4, SD5, SD9, SD12, SD14, SD16 | PASS | ADRs + replay/crash/chaos tests |
@@ -53,12 +53,12 @@ Legend: **PASS** = verified by a committed test/measurement · **PARTIAL** = bui
 | TS8/TS10 | PASS | semgrep, gitleaks, govulncheck, npm audit, Trivy fs; image scan not run |
 | TS9 | NOT RUN | OWASP ZAP |
 | TS11–TS13 | PASS | |
-| DL1 Solution Document | **NOT DONE** | the template was never provided |
+| DL1 Solution Document | **PARTIAL** | the template was never provided; a structured substitute is `docs/solution/SOLUTION_DOCUMENT.md` |
 | DL2/DL3/DL8 | PARTIAL | `make up-lowulimit && make seed && make build && make web && tools/live/demo.sh` works in this sandbox; no clean-clone run |
 | DL4–DL7, DL13, DL14 | PASS | |
 | DL9 | PARTIAL | evidence folders; no rendered claims-check tooling |
 | DL15 demo video | PARTIAL | three silent screen-recording clips of the real journey (dispatcher, energy manager, viewer; 49 s + 17 s + 13 s) in `docs/demo/*.webm`, recorded by `tests/e2e/record_demo.mjs` against the live system; **no narration**, shorter than the 5-minute slot; the spoken script is `docs/demo.md` |
-| RL1, RL2, RL5 | PASS | `docs/ai-oss-declaration.md` (SBOM not generated) |
+| RL1, RL2, RL5 | PASS | `docs/AI_OSS_DISCLOSURE.md` (SBOM not generated) |
 | RL3 | see git tags | |
 
 ## Live deployment (added 2026-10-01; scope: the live profile on the build sandbox unless stated)
